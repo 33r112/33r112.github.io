@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Projects — THREAD 33</title>
+  <meta name="description" content="Things ryoku33r has built — starting with a turn-based × action RPG in Unreal Engine 5." />
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("thread33-theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="page-title-bar">
+      <div class="container page-title-bar__row">
+        <a class="site-wordmark-link" href="index.html">Thread 33</a>
+        <div class="header-controls">
+          <button
+            class="icon-btn theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Toggle color theme"
+          >
+            <svg class="icon-sun" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="4" y="4" width="4" height="4" />
+              <rect x="5" y="0" width="2" height="2" />
+              <rect x="5" y="10" width="2" height="2" />
+              <rect x="0" y="5" width="2" height="2" />
+              <rect x="10" y="5" width="2" height="2" />
+              <rect x="1" y="1" width="2" height="2" />
+              <rect x="9" y="1" width="2" height="2" />
+              <rect x="1" y="9" width="2" height="2" />
+              <rect x="9" y="9" width="2" height="2" />
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="2" y="2" width="8" height="8" fill="currentColor" />
+              <rect x="5" y="-1" width="8" height="8" fill="var(--bg)" />
+            </svg>
+          </button>
+          <button
+            class="icon-btn nav-toggle"
+            type="button"
+            data-nav-toggle
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="nav-panel"
+          >
+            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="2" width="10" height="1.5" />
+              <rect x="1" y="5.25" width="10" height="1.5" />
+              <rect x="1" y="8.5" width="10" height="1.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-nav-bar">
+      <nav class="container site-nav-row" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link is-active" href="projects.html" aria-current="page">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+      </nav>
+
+      <nav class="container nav-panel" id="nav-panel" data-nav-panel aria-label="Primary (mobile)">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link is-active" href="projects.html" aria-current="page">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container shell" id="main-content">
+    <div class="main-col">
+      <h1 class="page-title">Projects</h1>
+
+      <section class="block-project" aria-labelledby="project-1-heading">
+        <div class="project-block">
+          <div class="project-screenshot" data-label="SCREENSHOT"></div>
+          <div>
+            <h2 id="project-1-heading" class="project-title">Untitled RPG Project</h2>
+            <div class="project-tags">
+              <span class="project-tag">Unreal Engine 5</span>
+              <span class="project-tag">Turn-Based × Action RPG</span>
+              <span class="project-tag">In Development</span>
+            </div>
+            <p class="project-desc">
+              A turn-based × action combat RPG built in Unreal Engine 5. Combat
+              blends real-time positioning with a turn-based skill system —
+              currently prototyping the skill-slot design and encounter flow.
+            </p>
+            <p class="project-desc">
+              This is the first entry here. Screenshots, a proper name and a
+              devlog will replace this placeholder as the project moves past
+              early prototyping — see <a href="notes.html">Notes</a> for
+              development log entries in the meantime.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">THREAD 33 / ryoku33r / 2026</div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

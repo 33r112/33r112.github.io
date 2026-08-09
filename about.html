@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>About — THREAD 33</title>
+  <meta name="description" content="About ryoku33r and what THREAD 33 is." />
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("thread33-theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="page-title-bar">
+      <div class="container page-title-bar__row">
+        <a class="site-wordmark-link" href="index.html">Thread 33</a>
+        <div class="header-controls">
+          <button
+            class="icon-btn theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Toggle color theme"
+          >
+            <svg class="icon-sun" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="4" y="4" width="4" height="4" />
+              <rect x="5" y="0" width="2" height="2" />
+              <rect x="5" y="10" width="2" height="2" />
+              <rect x="0" y="5" width="2" height="2" />
+              <rect x="10" y="5" width="2" height="2" />
+              <rect x="1" y="1" width="2" height="2" />
+              <rect x="9" y="1" width="2" height="2" />
+              <rect x="1" y="9" width="2" height="2" />
+              <rect x="9" y="9" width="2" height="2" />
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="2" y="2" width="8" height="8" fill="currentColor" />
+              <rect x="5" y="-1" width="8" height="8" fill="var(--bg)" />
+            </svg>
+          </button>
+          <button
+            class="icon-btn nav-toggle"
+            type="button"
+            data-nav-toggle
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="nav-panel"
+          >
+            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="2" width="10" height="1.5" />
+              <rect x="1" y="5.25" width="10" height="1.5" />
+              <rect x="1" y="8.5" width="10" height="1.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-nav-bar">
+      <nav class="container site-nav-row" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link is-active" href="about.html" aria-current="page">About</a></li>
+        </ul>
+      </nav>
+
+      <nav class="container nav-panel" id="nav-panel" data-nav-panel aria-label="Primary (mobile)">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link is-active" href="about.html" aria-current="page">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container shell" id="main-content">
+    <div class="main-col">
+      <h1 class="page-title">About</h1>
+
+      <section class="about-section" aria-labelledby="about-me-heading">
+        <h2 id="about-me-heading" class="section-heading">About Me</h2>
+        <p class="about-text">
+          I'm ryoku33r — I make things, mostly games and the occasional tool,
+          and I keep a running record of what I play, watch and read. This
+          site is where that record lives.
+        </p>
+      </section>
+
+      <section class="about-section" aria-labelledby="interests-heading">
+        <h2 id="interests-heading" class="section-heading">Interests</h2>
+        <p class="about-text">
+          RPGs — turn-based and otherwise — game design and systems, Unreal
+          Engine, old web culture, and whatever anime or manga I've most
+          recently gotten attached to.
+        </p>
+      </section>
+
+      <section class="about-section" aria-labelledby="what-is-heading">
+        <h2 id="what-is-heading" class="section-heading">What THREAD 33 Is</h2>
+        <p class="about-text">
+          THREAD 33 is a personal archive, not a portfolio and not a blog.
+          Library keeps track of games, movies, TV, anime and manga I've gone
+          through. Projects holds things I've built. Notes is where ideas
+          worth keeping — mostly about game design and development — get
+          written down instead of lost. It's meant to be added to for a long
+          time, not launched once and abandoned.
+        </p>
+      </section>
+
+      <section class="about-section" aria-labelledby="links-heading">
+        <h2 id="links-heading" class="section-heading">Links</h2>
+        <div class="links-list">
+          <a href="#">GitHub</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">THREAD 33 / ryoku33r / 2026</div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

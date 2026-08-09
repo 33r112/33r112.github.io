@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>THREAD 33</title>
+  <meta name="description" content="THREAD 33 is a personal archive for media, projects and notes." />
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("thread33-theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <header class="site-header">
+    <section class="site-banner" aria-label="Banner">
+      <div class="site-banner__media" data-label="BANNER"></div>
+      <div class="site-banner__text">
+        <h1 class="site-banner__title">Thread 33</h1>
+        <p class="site-banner__tagline">A personal archive for media, projects and notes.</p>
+      </div>
+    </section>
+
+    <div class="site-nav-bar">
+      <nav class="container site-nav-row" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link is-active" href="index.html" aria-current="page">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+        <div class="header-controls">
+          <button
+            class="icon-btn theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Toggle color theme"
+          >
+            <svg class="icon-sun" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="4" y="4" width="4" height="4" />
+              <rect x="5" y="0" width="2" height="2" />
+              <rect x="5" y="10" width="2" height="2" />
+              <rect x="0" y="5" width="2" height="2" />
+              <rect x="10" y="5" width="2" height="2" />
+              <rect x="1" y="1" width="2" height="2" />
+              <rect x="9" y="1" width="2" height="2" />
+              <rect x="1" y="9" width="2" height="2" />
+              <rect x="9" y="9" width="2" height="2" />
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="2" y="2" width="8" height="8" fill="currentColor" />
+              <rect x="5" y="-1" width="8" height="8" fill="var(--bg)" />
+            </svg>
+          </button>
+          <button
+            class="icon-btn nav-toggle"
+            type="button"
+            data-nav-toggle
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="nav-panel"
+          >
+            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="2" width="10" height="1.5" />
+              <rect x="1" y="5.25" width="10" height="1.5" />
+              <rect x="1" y="8.5" width="10" height="1.5" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <nav class="container nav-panel" id="nav-panel" data-nav-panel aria-label="Primary (mobile)">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link is-active" href="index.html" aria-current="page">Home</a></li>
+          <li><a class="site-nav__link" href="library.html">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container shell" id="main-content">
+    <div class="main-col">
+      <section class="block-currently" id="currently" aria-labelledby="currently-heading">
+        <h2 id="currently-heading" class="section-heading">Currently</h2>
+        <div class="currently-list">
+          <div class="currently-row">
+            <span class="currently-label">Playing</span>
+            <span class="currently-value">Persona 5 Royal</span>
+          </div>
+          <div class="currently-row">
+            <span class="currently-label">Watching</span>
+            <span class="currently-value">Severance</span>
+          </div>
+          <div class="currently-row">
+            <span class="currently-label">Reading</span>
+            <span class="currently-value">Invincible</span>
+          </div>
+          <div class="currently-row">
+            <span class="currently-label">Working On</span>
+            <span class="currently-value">UE5 RPG</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="block-project" aria-labelledby="project-heading">
+        <h2 id="project-heading" class="section-heading">Featured Project</h2>
+        <div class="project-block">
+          <div class="project-screenshot" data-label="SCREENSHOT"></div>
+          <div>
+            <h3 class="project-title">Untitled RPG Project</h3>
+            <div class="project-tags">
+              <span class="project-tag">Unreal Engine 5</span>
+              <span class="project-tag">Turn-Based × Action RPG</span>
+            </div>
+            <p class="project-desc">
+              A turn-based × action combat RPG built in Unreal Engine 5, currently
+              in early development. More details and playable builds will be
+              added here as the project progresses.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block-notes" aria-labelledby="notes-heading">
+        <h2 id="notes-heading" class="section-heading">Latest Notes</h2>
+        <div class="notes-list">
+          <a class="notes-row bracket-hover" href="#">
+            <span class="notes-date">2026.08.09</span>
+            <span class="notes-title">Building THREAD 33</span>
+            <span class="notes-tag">Dev</span>
+          </a>
+          <a class="notes-row bracket-hover" href="#">
+            <span class="notes-date">2026.07.18</span>
+            <span class="notes-title">Turn-Based Skill Slot Design</span>
+            <span class="notes-tag">Game Design</span>
+          </a>
+          <a class="notes-row bracket-hover" href="#">
+            <span class="notes-date">2026.06.30</span>
+            <span class="notes-title">Why This Isn't a Blog</span>
+            <span class="notes-tag">Misc</span>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <aside class="sidebar-col" aria-label="Sidebar">
+      <section class="sidebar-section" id="profile-section" aria-labelledby="profile-heading">
+        <h2 id="profile-heading" class="section-heading">Profile</h2>
+        <p class="profile-name">ryoku33r</p>
+        <p class="profile-bio">Making things, playing things, keeping notes.</p>
+      </section>
+
+      <section class="sidebar-section" aria-labelledby="library-heading">
+        <h2 id="library-heading" class="section-heading">Library</h2>
+        <div class="library-list">
+          <div class="library-row"><a href="library.html">Games</a><span class="library-count">128</span></div>
+          <div class="library-row"><a href="library.html">Movies &amp; TV</a><span class="library-count">64</span></div>
+          <div class="library-row"><a href="library.html">Anime &amp; Manga</a><span class="library-count">96</span></div>
+        </div>
+      </section>
+
+      <section class="sidebar-section" aria-labelledby="links-heading">
+        <h2 id="links-heading" class="section-heading">Links</h2>
+        <div class="links-list">
+          <a href="#">GitHub</a>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">THREAD 33 / ryoku33r / 2026</div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

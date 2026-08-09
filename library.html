@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Library — THREAD 33</title>
+  <meta name="description" content="Games, movies, TV, anime and manga — everything logged in THREAD 33's library." />
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("thread33-theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="page-title-bar">
+      <div class="container page-title-bar__row">
+        <a class="site-wordmark-link" href="index.html">Thread 33</a>
+        <div class="header-controls">
+          <button
+            class="icon-btn theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Toggle color theme"
+          >
+            <svg class="icon-sun" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="4" y="4" width="4" height="4" />
+              <rect x="5" y="0" width="2" height="2" />
+              <rect x="5" y="10" width="2" height="2" />
+              <rect x="0" y="5" width="2" height="2" />
+              <rect x="10" y="5" width="2" height="2" />
+              <rect x="1" y="1" width="2" height="2" />
+              <rect x="9" y="1" width="2" height="2" />
+              <rect x="1" y="9" width="2" height="2" />
+              <rect x="9" y="9" width="2" height="2" />
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="2" y="2" width="8" height="8" fill="currentColor" />
+              <rect x="5" y="-1" width="8" height="8" fill="var(--bg)" />
+            </svg>
+          </button>
+          <button
+            class="icon-btn nav-toggle"
+            type="button"
+            data-nav-toggle
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="nav-panel"
+          >
+            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="2" width="10" height="1.5" />
+              <rect x="1" y="5.25" width="10" height="1.5" />
+              <rect x="1" y="8.5" width="10" height="1.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-nav-bar">
+      <nav class="container site-nav-row" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link is-active" href="library.html" aria-current="page">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+      </nav>
+
+      <nav class="container nav-panel" id="nav-panel" data-nav-panel aria-label="Primary (mobile)">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html">Home</a></li>
+          <li><a class="site-nav__link is-active" href="library.html" aria-current="page">Library</a></li>
+          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
+          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
+          <li><a class="site-nav__link" href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container shell" id="main-content">
+    <div class="main-col">
+      <h1 class="page-title">Library</h1>
+
+      <div>
+        <div class="filter-tabs" data-filter-group="#library-grid" role="tablist" aria-label="Filter by category">
+          <button type="button" class="filter-tab is-active" data-filter="all">All</button>
+          <button type="button" class="filter-tab" data-filter="game">Games</button>
+          <button type="button" class="filter-tab" data-filter="movie-tv">Movies &amp; TV</button>
+          <button type="button" class="filter-tab" data-filter="anime-manga">Anime &amp; Manga</button>
+        </div>
+
+        <div class="recent-grid" id="library-grid">
+          <a class="recent-item" href="#" data-category="game">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Persona 5 Royal</p>
+            <div class="recent-meta"><span>Game · PS5</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="game">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Hollow Knight</p>
+            <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.5</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="game">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Baldur's Gate 3</p>
+            <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="game">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Celeste</p>
+            <div class="recent-meta"><span>Game · Switch</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="movie-tv">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Get Out</p>
+            <div class="recent-meta"><span>Movie</span><span class="recent-rating">8.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="movie-tv">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Severance</p>
+            <div class="recent-meta"><span>TV</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="movie-tv">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Parasite</p>
+            <div class="recent-meta"><span>Movie</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="movie-tv">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">The Bear</p>
+            <div class="recent-meta"><span>TV</span><span class="recent-rating">8.5</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="anime-manga">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Invincible</p>
+            <div class="recent-meta"><span>Manga</span><span class="recent-rating">8.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="anime-manga">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Frieren: Beyond Journey's End</p>
+            <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="anime-manga">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Chainsaw Man</p>
+            <div class="recent-meta"><span>Manga · Vol. 12</span><span class="recent-rating">8.5</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="anime-manga">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Vinland Saga</p>
+            <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+          </a>
+          <a class="recent-item" href="#" data-category="anime-manga">
+            <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+            <p class="recent-title">Berserk</p>
+            <div class="recent-meta"><span>Manga</span><span class="recent-rating">9.5</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">THREAD 33 / ryoku33r / 2026</div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

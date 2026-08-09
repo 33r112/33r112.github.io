@@ -1,0 +1,152 @@
+/* THREAD 33 — page shell: header, main+sidebar grid, footer */
+
+/* opt in to cross-document view transitions for same-origin navigations.
+   Unsupported browsers (Safari, Firefox as of this writing) just ignore
+   this and navigate normally — no fallback code needed. */
+@view-transition {
+  navigation: auto;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ---------------------------------- header --------------------------- */
+
+/* compact header used on inner pages instead of .site-banner — shares a
+   view-transition-name with .site-banner so navigating between the
+   homepage and an inner page morphs one into the other (Chromium only;
+   see @view-transition rule below) */
+.page-title-bar {
+  border-bottom: 1px solid var(--border);
+  view-transition-name: site-header-shape;
+}
+
+.page-title-bar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-4);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.site-nav-bar {
+  border-bottom: 1px solid var(--border);
+  view-transition-name: site-nav-shape;
+}
+
+.site-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-3);
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+/* .icon-btn (components.css) sets display:inline-flex; this compound
+   selector needs to outrank it regardless of stylesheet load order */
+.icon-btn.nav-toggle {
+  display: none;
+}
+
+/* mobile nav dropdown panel (hidden on desktop, toggled via JS on mobile) */
+.nav-panel {
+  border-top: 1px solid var(--border);
+  padding-block: var(--space-3);
+}
+
+@media (max-width: 959px) {
+  .site-nav-row {
+    display: none;
+  }
+
+  .icon-btn.nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav-panel {
+    display: none;
+  }
+
+  .nav-panel.is-open {
+    display: block;
+  }
+
+  .nav-panel .site-nav__list {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+}
+
+@media (min-width: 960px) {
+  .nav-panel {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------- banner ------------------------------ */
+
+/* full-bleed: intentionally ignores .container's max-width/padding so the
+   image runs edge to edge under the nav bar */
+.site-banner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  view-transition-name: site-header-shape;
+}
+
+/* ---------------------------------- shell ------------------------------ */
+
+.shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  padding-block: var(--space-7) var(--space-8);
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--text-sm);
+}
+
+/* two-column split only kicks in when a page actually has a sidebar —
+   inner pages without .sidebar-col stay single-column and full-width */
+@media (min-width: 960px) {
+  .shell:has(.sidebar-col) {
+    grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+    align-items: start;
+  }
+}
+
+/* ---------------------------------- footer ------------------------------ */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding-block: var(--space-5);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
