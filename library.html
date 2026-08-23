@@ -3,20 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="dark" />
   <title>Library — THREAD 33</title>
   <meta name="description" content="Games, movies, TV, anime and manga — everything logged in THREAD 33's library." />
-
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem("thread33-theme");
-        if (t === "light" || t === "dark") {
-          document.documentElement.setAttribute("data-theme", t);
-        }
-      } catch (e) {}
-    })();
-  </script>
 
   <link rel="stylesheet" href="styles/tokens.css" />
   <link rel="stylesheet" href="styles/base.css" />
@@ -27,72 +16,24 @@
   <header class="site-header">
     <div class="page-title-bar">
       <div class="container page-title-bar__row">
-        <a class="site-wordmark-link" href="index.html">Thread 33</a>
-        <div class="header-controls">
-          <button
-            class="icon-btn theme-toggle"
-            type="button"
-            data-theme-toggle
-            aria-label="Toggle color theme"
-          >
-            <svg class="icon-sun" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <rect x="4" y="4" width="4" height="4" />
-              <rect x="5" y="0" width="2" height="2" />
-              <rect x="5" y="10" width="2" height="2" />
-              <rect x="0" y="5" width="2" height="2" />
-              <rect x="10" y="5" width="2" height="2" />
-              <rect x="1" y="1" width="2" height="2" />
-              <rect x="9" y="1" width="2" height="2" />
-              <rect x="1" y="9" width="2" height="2" />
-              <rect x="9" y="9" width="2" height="2" />
-            </svg>
-            <svg class="icon-moon" viewBox="0 0 12 12" aria-hidden="true">
-              <rect x="2" y="2" width="8" height="8" fill="currentColor" />
-              <rect x="5" y="-1" width="8" height="8" fill="var(--bg)" />
-            </svg>
-          </button>
-          <button
-            class="icon-btn nav-toggle"
-            type="button"
-            data-nav-toggle
-            aria-label="Toggle navigation"
-            aria-expanded="false"
-            aria-controls="nav-panel"
-          >
-            <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <rect x="1" y="2" width="10" height="1.5" />
-              <rect x="1" y="5.25" width="10" height="1.5" />
-              <rect x="1" y="8.5" width="10" height="1.5" />
-            </svg>
-          </button>
-        </div>
+        <a class="site-wordmark-link" href="index.html">Thread <span class="wordmark-33">33</span></a>
       </div>
-    </div>
-
-    <div class="site-nav-bar">
-      <nav class="container site-nav-row" aria-label="Primary">
-        <ul class="site-nav__list">
-          <li><a class="site-nav__link" href="index.html">Home</a></li>
-          <li><a class="site-nav__link is-active" href="library.html" aria-current="page">Library</a></li>
-          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
-          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
-          <li><a class="site-nav__link" href="about.html">About</a></li>
-        </ul>
-      </nav>
-
-      <nav class="container nav-panel" id="nav-panel" data-nav-panel aria-label="Primary (mobile)">
-        <ul class="site-nav__list">
-          <li><a class="site-nav__link" href="index.html">Home</a></li>
-          <li><a class="site-nav__link is-active" href="library.html" aria-current="page">Library</a></li>
-          <li><a class="site-nav__link" href="projects.html">Projects</a></li>
-          <li><a class="site-nav__link" href="notes.html">Notes</a></li>
-          <li><a class="site-nav__link" href="about.html">About</a></li>
-        </ul>
-      </nav>
     </div>
   </header>
 
   <main class="container shell" id="main-content">
+    <aside class="sidebar-col" aria-label="Navigation">
+      <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
+
+      <ul class="home-nav-vertical">
+        <li><a class="home-nav-vertical__link" href="index.html">Home</a></li>
+        <li><a class="home-nav-vertical__link is-active" href="library.html" aria-current="page">Library</a></li>
+        <li><a class="home-nav-vertical__link" href="projects.html">Projects</a></li>
+        <li><a class="home-nav-vertical__link" href="notes.html">Notes</a></li>
+        <li><a class="home-nav-vertical__link" href="about.html">About</a></li>
+      </ul>
+    </aside>
+
     <div class="main-col">
       <h1 class="page-title">Library</h1>
 
@@ -109,66 +50,79 @@
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Persona 5 Royal</p>
             <div class="recent-meta"><span>Game · PS5</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Still the best turn-based combat loop I've played.</p>
           </a>
           <a class="recent-item" href="#" data-category="game">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Hollow Knight</p>
             <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.5</span></div>
+            <p class="recent-comment">Every area layout is a small masterclass in itself.</p>
           </a>
           <a class="recent-item" href="#" data-category="game">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Baldur's Gate 3</p>
             <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Too much reactivity, in the best way possible.</p>
           </a>
           <a class="recent-item" href="#" data-category="game">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Celeste</p>
             <div class="recent-meta"><span>Game · Switch</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Tight movement, tighter writing.</p>
           </a>
           <a class="recent-item" href="#" data-category="movie-tv">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Get Out</p>
             <div class="recent-meta"><span>Movie</span><span class="recent-rating">8.0</span></div>
+            <p class="recent-comment">Rewatched it for the direction, not the scares.</p>
           </a>
           <a class="recent-item" href="#" data-category="movie-tv">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Severance</p>
             <div class="recent-meta"><span>TV</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Currently watching — the sound design is doing a lot.</p>
           </a>
           <a class="recent-item" href="#" data-category="movie-tv">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Parasite</p>
             <div class="recent-meta"><span>Movie</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">The staircase says everything the dialogue doesn't.</p>
           </a>
           <a class="recent-item" href="#" data-category="movie-tv">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">The Bear</p>
             <div class="recent-meta"><span>TV</span><span class="recent-rating">8.5</span></div>
+            <p class="recent-comment">Stressful in a way that's oddly compelling.</p>
           </a>
           <a class="recent-item" href="#" data-category="anime-manga">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Invincible</p>
             <div class="recent-meta"><span>Manga</span><span class="recent-rating">8.0</span></div>
+            <p class="recent-comment">Currently reading — the pacing keeps surprising me.</p>
           </a>
           <a class="recent-item" href="#" data-category="anime-manga">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Frieren: Beyond Journey's End</p>
             <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Quietly devastating in a way most fantasy isn't.</p>
           </a>
           <a class="recent-item" href="#" data-category="anime-manga">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Chainsaw Man</p>
             <div class="recent-meta"><span>Manga · Vol. 12</span><span class="recent-rating">8.5</span></div>
+            <p class="recent-comment">Never know where the next chapter is going.</p>
           </a>
           <a class="recent-item" href="#" data-category="anime-manga">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Vinland Saga</p>
             <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+            <p class="recent-comment">Started as a revenge story, became something else entirely.</p>
           </a>
           <a class="recent-item" href="#" data-category="anime-manga">
             <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
             <p class="recent-title">Berserk</p>
             <div class="recent-meta"><span>Manga</span><span class="recent-rating">9.5</span></div>
+            <p class="recent-comment">The art alone is worth the reread.</p>
           </a>
         </div>
       </div>
@@ -176,7 +130,10 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container">THREAD 33 / ryoku33r / 2026</div>
+    <div class="container site-footer__row">
+      <span>THREAD 33 / ryoku33r / 2026</span>
+      <a href="#">GitHub</a>
+    </div>
   </footer>
 
   <script src="scripts/main.js"></script>

@@ -12,9 +12,15 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* reserve the scrollbar's width on every page, whether or not that page's
+     content is actually tall enough to scroll — otherwise pages that scroll
+     render measurably narrower than pages that don't (the bug you spotted) */
+  scrollbar-gutter: stable;
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   min-height: 100svh;
   background: var(--bg);
   color: var(--text);
@@ -23,6 +29,13 @@ body {
   line-height: var(--leading-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* pushes the footer to the bottom of the viewport when a page's content
+   is too short to fill it, while still scrolling normally on tall pages
+   — only affects pages with a <main>; the home page has none */
+main {
+  flex: 1 0 auto;
 }
 
 img,

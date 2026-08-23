@@ -1,26 +1,28 @@
 /*
   THREAD 33 — design tokens
   Single source of truth for color / spacing / type / layout constants.
-  Light values live on :root. Dark values only override the same names —
-  never introduce a token here that doesn't exist in both themes.
+  Dark-only (see project history for the earlier light/dark dual-theme
+  setup — dropped once the site's visual identity, incl. the starfield
+  background, became inherently dark-native).
 
-  Breakpoints (documented here, not usable as CSS vars inside @media):
-    640px  — Recently Added grid gains room, minor spacing bump
-    960px  — shell switches from single column to Main + Sidebar
+  Desktop-only: no mobile/tablet breakpoints anywhere in the site — layout
+  is fixed to the wide desktop shape at any viewport width. Sizes still use
+  clamp()/rem/% so things flex a bit across desktop window widths, but there
+  is no separate narrow-viewport layout to maintain.
 */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* ---- color: light (default) ---- */
-  --bg: #f2f1ec;
-  --bg-raised: #e9e7e0;
-  --text: #2b2a26;
-  --text-muted: #6f6c64;
-  --border: #dad7ce;
-  --border-strong: #b9b5a9;
-  --accent: #5b5e63;
-  --accent-soft: rgb(91 94 99 / 14%);
+  /* ---- color ---- */
+  --bg: #000000;
+  --bg-raised: #1e1c1a;
+  --text: #e9e6e1;
+  --text-muted: #8f8b85;
+  --border: #322f2c;
+  --border-strong: #4a4642;
+  --accent: #cf4a3a;
+  --accent-soft: rgb(207 74 58 / 16%);
 
   /* ---- spacing ---- */
   --space-1: 0.25rem;
@@ -33,9 +35,9 @@
   --space-8: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
 
   /* ---- type ---- */
-  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
-    "Hiragino Kaku Gothic ProN", "Noto Sans SC", "Noto Sans JP", "PingFang SC",
-    "PingFang TC", "Microsoft YaHei", "Microsoft JhengHei", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+    "PingFang SC", "Noto Sans SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", "Microsoft JhengHei", "PingFang TC", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
 
@@ -45,7 +47,7 @@
   --text-md: 1.0625rem;
   --text-lg: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
   --text-xl: clamp(1.5rem, 1.2rem + 1.2vw, 1.9rem);
-  --text-display: clamp(1.5rem, 1.25rem + 1vw, 1.85rem);
+  --text-hero: clamp(1.5rem, 1.1rem + 2.2vw, 2.5rem);
 
   --leading-tight: 1.25;
   --leading-snug: 1.4;
@@ -54,44 +56,12 @@
   /* ---- layout ---- */
   --container-max: 1250px;
   --container-pad: clamp(1rem, 4vw, 2rem);
-  --sidebar-width: minmax(240px, 300px);
+  --header-height: 4rem;
 
   /* ---- misc ---- */
   --cover-ratio: 2 / 3;
   --screenshot-ratio: 16 / 9;
-  --banner-ratio: 4 / 1;
   --transition-fast: 120ms ease;
   --transition-base: 180ms ease;
 }
 
-/* ---- color: dark, follows system preference by default ---- */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #1c1b19;
-    --bg-raised: #26241f;
-    --text: #e7e4dc;
-    --text-muted: #9c988d;
-    --border: #38352e;
-    --border-strong: #4c483e;
-    --accent: #a8abaf;
-    --accent-soft: rgb(168 171 175 / 16%);
-  }
-}
-
-/* ---- color: dark, explicit user choice always wins ---- */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #1c1b19;
-  --bg-raised: #26241f;
-  --text: #e7e4dc;
-  --text-muted: #9c988d;
-  --border: #38352e;
-  --border-strong: #4c483e;
-  --accent: #a8abaf;
-  --accent-soft: rgb(168 171 175 / 16%);
-}
-
-:root[data-theme="light"] {
-  color-scheme: light;
-}

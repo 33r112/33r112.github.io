@@ -1,4 +1,4 @@
-/* THREAD 33 — page shell: header, main+sidebar grid, footer */
+/* THREAD 33 — page shell: header, home frame, content shell, footer */
 
 /* opt in to cross-document view transitions for same-origin navigations.
    Unsupported browsers (Safari, Firefox as of this writing) just ignore
@@ -16,10 +16,20 @@
 
 /* ---------------------------------- header --------------------------- */
 
-/* compact header used on inner pages instead of .site-banner — shares a
-   view-transition-name with .site-banner so navigating between the
-   homepage and an inner page morphs one into the other (Chromium only;
-   see @view-transition rule below) */
+/* the same compact site-header markup is reused on every page, including
+   the homepage — it carries a view-transition-name so navigating between
+   pages doesn't jar (Chromium only; see @view-transition rule below) */
+/* the sticky positioning has to live on .site-header, not .page-title-bar
+   itself — .site-header has no explicit height, so without this its box
+   would be exactly as tall as .page-title-bar, leaving sticky nowhere to
+   "hold onto" past the first scrolled pixel */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+}
+
 .page-title-bar {
   border-bottom: 1px solid var(--border);
   view-transition-name: site-header-shape;
@@ -29,92 +39,174 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: var(--space-4);
+  height: var(--header-height);
 }
 
-.header-controls {
+/* ---------------------------------- home frame --------------------------- */
+
+/* locked to exactly one viewport, no scrolling — this is the whole point
+   of the homepage being a single composition, not a page you scroll.
+   overflow:hidden clips anything that would otherwise push it taller
+   (rather than letting the page grow and scroll) */
+.home-frame {
+  position: relative;
+  z-index: 0;
+  height: 100svh;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
+  justify-content: center;
 }
 
-.site-nav-bar {
-  border-bottom: 1px solid var(--border);
-  view-transition-name: site-nav-shape;
+/* a dedicated layer for the starfield image, separate from .home-frame
+   itself, so a filter (e.g. hue-rotate) can be applied to just the image
+   without also shifting the hue of the red accent / text on top of it */
+.home-frame__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("../img/stars.gif");
+  background-repeat: repeat;
+  background-size: 640px 400px;
+  filter: hue-rotate(120deg);
 }
 
-.site-nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-block: var(--space-3);
-}
-
-.site-nav__list {
+/* temporary: background color test buttons, remove along with the
+   markup once a value is picked */
+.hue-test {
+  position: fixed;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 10;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5);
+  justify-content: flex-end;
+  max-width: min(92vw, 720px);
+  gap: var(--space-2);
 }
 
-/* .icon-btn (components.css) sets display:inline-flex; this compound
-   selector needs to outrank it regardless of stylesheet load order */
-.icon-btn.nav-toggle {
-  display: none;
+.scale-test {
+  top: 3.5rem;
 }
 
-/* mobile nav dropdown panel (hidden on desktop, toggled via JS on mobile) */
-.nav-panel {
-  border-top: 1px solid var(--border);
-  padding-block: var(--space-3);
+.image-test {
+  top: 6.25rem;
 }
 
-@media (max-width: 959px) {
-  .site-nav-row {
-    display: none;
-  }
-
-  .icon-btn.nav-toggle {
-    display: inline-flex;
-  }
-
-  .nav-panel {
-    display: none;
-  }
-
-  .nav-panel.is-open {
-    display: block;
-  }
-
-  .nav-panel .site-nav__list {
-    flex-direction: column;
-    gap: var(--space-1);
-  }
+.filter-sliders {
+  top: 9rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
 }
 
-@media (min-width: 960px) {
-  .nav-panel {
-    display: none !important;
-  }
+.filter-sliders label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
 }
 
-/* ---------------------------------- banner ------------------------------ */
+.filter-sliders input[type="number"] {
+  width: 3.5em;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-1);
+}
 
-/* full-bleed: intentionally ignores .container's max-width/padding so the
-   image runs edge to edge under the nav bar */
-.site-banner {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  view-transition-name: site-header-shape;
+.hue-test button {
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.hue-test button:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* the "window": centered, opaque (so the starfield only shows in the
+   margins around it, not bleeding through behind the text inside). No
+   outer glow — just a plain border. The composition reads as a tight
+   grid of individually-bordered panels, not a few items floating loose
+   inside one big box, so both the outer padding and the gaps between
+   panels stay small throughout. */
+.home-wrap {
+  max-width: 1020px;
+  margin-inline: auto;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+}
+
+/* desktop-only site — no narrow-viewport fallback, so this grid is just
+   always two columns rather than being gated behind a breakpoint */
+.home-window-columns {
+  display: grid;
+  /* 220px max is the portrait's width (and so its height too, via
+     aspect-ratio:1/1 in components.css) */
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  /* stretch (the default): both columns take the height of the taller
+     one, so .home-info-placeholder and .home-links-placeholder (each
+     pinned to the bottom of their column via margin-top:auto) land on
+     the same line */
+  align-items: stretch;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.home-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
 /* ---------------------------------- shell ------------------------------ */
 
+/* desktop-only site — no narrow-viewport fallback, so this is just always
+   the two-column sidebar grid rather than being gated behind a breakpoint */
 .shell {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-8);
+  grid-template-columns: minmax(150px, 195px) minmax(0, 1fr);
+  align-items: start;
+  /* sidebar + main-col as one unit, capped narrower than the full
+     container and centered — otherwise the sidebar pins to the
+     container's left edge and only main-col's own content centers
+     itself, which reads as lopsided rather than centered as a whole */
+  max-width: 1020px;
+  margin-inline: auto;
+  gap: var(--space-6);
   padding-block: var(--space-7) var(--space-8);
+}
+
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  /* must equal the header's full rendered height (--header-height plus
+     its own 1px border-bottom) + .shell's own padding-block-start exactly
+     — any smaller and the sidebar visibly scrolls a couple pixels before
+     "catching" and locking in place, instead of being stuck from the
+     very first pixel of scroll */
+  top: calc(var(--header-height) + 1px + var(--space-7));
 }
 
 .main-col {
@@ -122,21 +214,6 @@
   flex-direction: column;
   gap: var(--space-8);
   min-width: 0;
-}
-
-.sidebar-col {
-  display: flex;
-  flex-direction: column;
-  font-size: var(--text-sm);
-}
-
-/* two-column split only kicks in when a page actually has a sidebar —
-   inner pages without .sidebar-col stay single-column and full-width */
-@media (min-width: 960px) {
-  .shell:has(.sidebar-col) {
-    grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
-    align-items: start;
-  }
 }
 
 /* ---------------------------------- footer ------------------------------ */
@@ -149,4 +226,15 @@
   font-size: var(--text-xs);
   letter-spacing: 0.03em;
   text-transform: uppercase;
+}
+
+.site-footer__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.site-footer__row a:hover {
+  color: var(--accent);
 }
