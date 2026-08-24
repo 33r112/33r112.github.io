@@ -135,6 +135,100 @@
   border-color: var(--accent);
 }
 
+.hue-test button.is-active {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* temporary: Notes page background test buttons, remove along with the
+   markup once values are picked */
+.notes-bg-color-test {
+  top: 3.5rem;
+}
+
+.notes-bg-size-test {
+  top: 7rem;
+}
+
+.notes-bg-invert-test {
+  top: 24rem;
+}
+
+.notes-shell-sliders {
+  top: 28rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.notes-shell-sliders label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.notes-shell-sliders input[type="number"] {
+  width: 3.5em;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-1);
+}
+
+/* master show/hide toggle for all the .hue-test panels — takes the top
+   slot the background-image buttons used to occupy, now that those are
+   gone */
+.notes-test-toggle {
+  position: fixed;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 10;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.notes-test-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.notes-bg-filter-sliders {
+  top: 9.75rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.notes-bg-filter-sliders label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.notes-bg-filter-sliders input[type="number"] {
+  width: 3.5em;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-1);
+}
+
 /* the "window": centered, opaque (so the starfield only shows in the
    margins around it, not bleeding through behind the text inside). No
    outer glow — just a plain border. The composition reads as a tight

@@ -129,12 +129,83 @@
   opacity: 1;
 }
 
+/* once a notes-row is expanded, hovering it should only turn the title
+   red (see .notes-row:hover .notes-title below) — not show the corner
+   bracket box too. Higher specificity than the rule above, so it wins
+   regardless of source order. */
+.notes-row[aria-expanded="true"]:hover::after,
+.notes-row[aria-expanded="true"]:focus-within::after {
+  opacity: 0;
+}
+
+/* clicking a row to collapse it leaves it focused even after the mouse
+   moves away, which would otherwise keep the box showing via
+   :focus-within (base.css's own :focus-visible outline still covers
+   keyboard-only focus feedback separately) — :hover after this in source
+   order still wins when the mouse really is over it */
+.notes-row:focus-within::after {
+  opacity: 0;
+}
+
+.notes-row:hover::after {
+  opacity: 1;
+}
+
 /* ---- decorative background ASCII art (Notes page only) ---- */
+
+/* frames the whole sidebar+content area in a translucent gray panel so
+   it reads clearly over the background image behind it */
+.notes-shell {
+  background: rgba(140, 140, 140, 0.35);
+}
+
+/* wide sky strip pinned to the very top, tiling horizontally only — the
+   rest of the page stays the plain solid --bg color behind it */
+.notes-top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  pointer-events: none;
+  height: 220px;
+  background-image: url("../img/backgrounds/blog2.png");
+  background-repeat: repeat-x;
+  background-position: top center;
+  background-size: auto 220px;
+}
+
+/* decorative character art flanking the content, vertically centered */
+.notes-char-bg {
+  position: fixed;
+  top: 50%;
+  transform: translateY(calc(-50% + 400px)) scale(2);
+  z-index: -1;
+  pointer-events: none;
+  height: 70vh;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  filter: grayscale(100%);
+}
+
+.notes-char-bg--left {
+  left: 4.5rem;
+  aspect-ratio: 459 / 926;
+  background-image: url("../img/backgrounds/New_hikari.png");
+}
+
+.notes-char-bg--right {
+  right: 4.5rem;
+  aspect-ratio: 460 / 927;
+  background-image: url("../img/backgrounds/New_homura.png");
+}
 
 .notes-bg-ascii {
   position: fixed;
   bottom: 0;
   right: 0;
+  z-index: -1;
   margin: 0;
   padding: 0;
   font-family: var(--font-mono);
@@ -145,6 +216,15 @@
   white-space: pre;
   pointer-events: none;
   user-select: none;
+}
+
+.notes-bg-ascii-left {
+  right: auto;
+  left: 0;
+}
+
+.notes-bg-ascii.is-mirrored {
+  transform: scaleX(-1);
 }
 
 /* ---- sidebar (Library/Projects/Notes/About): intro blurb + reuses
@@ -422,6 +502,13 @@
   gap: var(--space-5);
 }
 
+/* wraps one preview row + its (hidden by default) expanded content, so
+   they move together as a unit within .notes-list's gap */
+.notes-item {
+  display: flex;
+  flex-direction: column;
+}
+
 .notes-row {
   display: flex;
   align-items: center;
@@ -429,6 +516,17 @@
   padding: var(--space-4);
   border: 1px solid var(--border);
   background: var(--bg-raised);
+  cursor: pointer;
+}
+
+/* the full article content, revealed in place when its .notes-row is
+   clicked — same treatment as the article-body typography used to have
+   its own standalone page */
+.notes-expand {
+  border: 1px solid var(--border);
+  border-top: none;
+  background: var(--bg-raised);
+  padding: var(--space-4);
 }
 
 .notes-row__body {
@@ -444,7 +542,7 @@
 }
 
 .notes-title {
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: 500;
 }
 
@@ -462,7 +560,7 @@
 
 .notes-row__desc {
   margin-block-start: var(--space-1);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -471,8 +569,8 @@
 
 .notes-row__thumb {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 70px;
+  height: 70px;
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -637,6 +735,14 @@
   display: inline-block;
   max-width: 100%;
   border: 1px solid var(--border);
+}
+
+.article-figure--half img {
+  width: 50%;
+}
+
+.article-figure--bw img {
+  filter: grayscale(100%);
 }
 
 .article-figure figcaption {
