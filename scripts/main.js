@@ -205,9 +205,9 @@
     if (!bg || !buttons.length) return;
 
     var images = {
-      stars: "img/stars.gif",
-      bricks: "img/bluebrick.jpg",
-      vgrid: "img/vgrid.jpg",
+      stars: "img/backgrounds/stars.gif",
+      bricks: "img/backgrounds/bluebrick.jpg",
+      vgrid: "img/backgrounds/vgrid.jpg",
     };
 
     buttons.forEach(function (button) {

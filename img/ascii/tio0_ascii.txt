@@ -1,20 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark" />
-  <title>Notes — THREAD 33</title>
-  <meta name="description" content="Game design, development and media notes worth keeping around." />
-
-  <link rel="stylesheet" href="styles/tokens.css" />
-  <link rel="stylesheet" href="styles/base.css" />
-  <link rel="stylesheet" href="styles/layout.css" />
-  <link rel="stylesheet" href="styles/components.css" />
-</head>
-<body>
-  <!-- decorative background art, anchored bottom-right for now -->
-  <pre class="notes-bg-ascii" aria-hidden="true">
 
                                                                                                                                            .-#%-
                                                                                          .:-=**#####%%%%##*+%@@@@%*+-.                :=*%@@@#%@.
@@ -57,7 +40,7 @@
                                   +%     =#:+**=%:@++++%*=#+=...%======#%@*#@%##%%#%%%%%%@@@:....-#*:..:@:....-@@@@###%%###%%%%@*=%@%*+::@++%=====*+.:::::#+:::    +=
                                  :@.    ++:*=:#*#--@+++@#-*=#...@======#%@==@%%%%%#####%@%@@+......-#*::#+...-@**@%%%%%%%%%%%%%@: %@+@+::%+%*=====%-::::::%*::::    %-
                                 .@:    #=:#-:%-:-%:=@+=%@-=#-::#@======@@%= %@%%@%%%%%%%@@+@@+.......:**=@...... *@@@@%%%##%#*@# #+-*#=::@**+=====@.:-::::@+:::-.   .@.
-                               .@=   .#-:%-.#-...=*:*@+%@-:@:.++#+=====@#== .*==#@%##%%%@% .--=.........-#........::=%*****=+@#.::.:@=-.:@*:+===+%#.---:::@+::::-.   .@
+                               .@=   .#-:%-.#-...=*:*@+%@-:@:.++#+=====@#== .*==#@%##%%#@% .--=.........-#........::=%*****=+@#.::.:@=-.:@*:+===+%#.---:::@+::::-.   .@
                               :@=   .#::%-.*=.....::=*#%@=.@-.=*+*=====@@-++..#%%==++==*@+.........................=@%++==+**:.:-..+#+:.-@:-+===+@+.----:=@+::::--.   -*
                              =@=    ..:%-.+*...:...:%===@-.++.:@+%=====@+%:.-+.-#@%#*#%%=:...........................-+%@@@+......=#%-..++.+====*@-:=----#@*:::::-:.   *:
                             #@-    ..:%-.-#......::%+---@-.:%..:+@=====@+@=......-*****................................:.........=%@%...%-:+====@%.-====-*@*:::::-=..  .%
@@ -104,7 +87,7 @@
                              -%#######@##*%####*+++***#****@**+====*#%%###%%@#*#%%###%#+#@%@==%#+========@*+++++++#%##*%@#+===+%@%###%%@@%@%%%###@*#****++++++*****++++*******+++++*#%@=
                            :%#*######%%%#*%####++++********##*++===+#@%##%%@#@%#%@@@%##%%*#*+==+*%#+=====@*+++*#%#**%@%*=====*#@%#%%%#####%%%%###%%*#****++++++*****+++********+++++**#@%.
                          :@%+*#######@#%*+%###*++++****#******+++++*%@###%%@@##%%%%%%@@*+*+*#%%#*==+###*+@#*%@#**#%%*+====+#@@%###########%%#@####@+#*****+++++*****++++********++++++**#@+
-                        *%++*##*****@##@*+%##*++++************+++++*@%###@%@%########%@%#*======+##%#+==+@#*+*%%*+++==+*@@%##%##%########%%#@####@##******+++++*****++++********++++++***%@-
+                        *%++*##*****@##@*+%##*++++************+++++*@%###@%@%########%@%#*======+##%#+==+@#*+*#%%*+++==+*@@%##%##%########%%#@####@##******+++++*****++++********++++++***%@-
                       +%+=+*#****#*#%##@*+%##+++++*************+++#+@####@%@%#########%#%@#+=======-=+#@%@%%%@#++++++*%@%#####%##@########%%#@####%@+%******++++******+++********#*+++++****@%.
                     -%+==+##***#***@###@**%#*+++++*************+++#*@###%%%@%#########@##@#%@%*+======--=*@*++++++*%@%##*****#%%#@#######%%%#@#####@*%*******++++*****++++********#*++=++*****@-
                   .#*==+*#********%####%**#**++++**************++#+%%###@#%@%%########@##@#####%@%#*===--=@+++**%@%#*********#%%#@#######%%%#@#####@#*#****#***++******+++*********#*++++++****%#.
@@ -115,80 +98,3 @@
           =%+==++**********************************************%+@@####@##%%%%###*****%##%%***********@==.%:*@#***************#%#@******##@###@#####%@+%#########**************************************#
         .#*++++************************************************%*@#####@###@####******%##%%***********%=-.@.+@****************#%*@******#*@###@#####%@+%##########**************************************
        =%++++****************************************#**********#@####%@###@###*******##*%%***********%+:.@.-@****************#%*@******#*@###%%####%@*%##########**************************************
-  </pre>
-
-  <header class="site-header">
-    <div class="page-title-bar">
-      <div class="container page-title-bar__row">
-        <a class="site-wordmark-link" href="index.html">Thread <span class="wordmark-33">33</span></a>
-      </div>
-    </div>
-  </header>
-
-  <main class="container shell" id="main-content">
-    <aside class="sidebar-col" aria-label="Navigation">
-      <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
-
-      <ul class="home-nav-vertical">
-        <li><a class="home-nav-vertical__link" href="index.html">Home</a></li>
-        <li><a class="home-nav-vertical__link" href="library.html">Library</a></li>
-        <li><a class="home-nav-vertical__link" href="projects.html">Projects</a></li>
-        <li><a class="home-nav-vertical__link is-active" href="notes.html" aria-current="page">Notes</a></li>
-        <li><a class="home-nav-vertical__link" href="about.html">About</a></li>
-      </ul>
-    </aside>
-
-    <div class="main-col">
-      <h1 class="page-title">Notes</h1>
-
-      <div class="notes-list" id="notes-list">
-        <a class="notes-row bracket-hover" href="notes/cr.html" data-category="misc" data-date="2026-08-24">
-          <div class="notes-row__body">
-            <div class="notes-row__head">
-              <span class="notes-title">时隔5年的皇室战争</span>
-              <span class="notes-date">2026.08.24</span>
-            </div>
-            <p class="notes-row__desc">退游五年后，我又下载了cr。不过这次我却很快就把它又卸载了。</p>
-          </div>
-          <div class="notes-row__thumb">
-            <img src="img/avatars/fluttermane_Worried.png" alt="" />
-          </div>
-        </a>
-        <a class="notes-row bracket-hover" href="notes/test001-blog.html" data-category="misc" data-date="2026-08-23">
-          <div class="notes-row__body">
-            <div class="notes-row__head">
-              <span class="notes-title">雨天、咖啡和一下午的空白</span>
-              <span class="notes-date">2026.08.23</span>
-            </div>
-            <p class="notes-row__desc">用于个人网站 Markdown 样式测试的一篇短文。</p>
-          </div>
-          <div class="notes-row__thumb">
-            <img src="img/avatars/fluttermane_Normal.png" alt="" />
-          </div>
-        </a>
-        <a class="notes-row bracket-hover" href="notes/test002-devlog.html" data-category="development" data-date="2026-08-23">
-          <div class="notes-row__body">
-            <div class="notes-row__head">
-              <span class="notes-title">Devlog 01：把网站真正跑起来</span>
-              <span class="notes-date">2026.08.23</span>
-            </div>
-            <p class="notes-row__desc">用于测试个人网站项目日志页面的 Markdown 文件。</p>
-          </div>
-          <div class="notes-row__thumb">
-            <img src="img/avatars/fluttermane_Normal.png" alt="" />
-          </div>
-        </a>
-      </div>
-    </div>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container site-footer__row">
-      <span>THREAD 33 / ryoku33r / 2026</span>
-      <a href="#">GitHub</a>
-    </div>
-  </footer>
-
-  <script src="scripts/main.js"></script>
-</body>
-</html>

@@ -55,8 +55,9 @@
 
 /* .main-col's flex gap (--space-8) is too wide specifically between the
    page title and the section right after it — pull that one gap in
-   without touching the rhythm between other .main-col children */
-.page-title + div {
+   without touching the rhythm between other .main-col children. "* " (not
+   "div") so this still applies when that next sibling is an <hr> instead */
+.page-title + * {
   margin-block-start: calc(var(--space-5) - var(--space-8));
 }
 
@@ -126,6 +127,24 @@
 .bracket-hover:hover::after,
 .bracket-hover:focus-within::after {
   opacity: 1;
+}
+
+/* ---- decorative background ASCII art (Notes page only) ---- */
+
+.notes-bg-ascii {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 4px;
+  line-height: 1;
+  color: var(--text-muted);
+  opacity: 0.5;
+  white-space: pre;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---- sidebar (Library/Projects/Notes/About): intro blurb + reuses
