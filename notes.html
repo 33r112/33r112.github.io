@@ -20,82 +20,6 @@
   <div class="notes-char-bg notes-char-bg--left" id="notes-char-hikari" aria-hidden="true"></div>
   <div class="notes-char-bg notes-char-bg--right" id="notes-char-homura" aria-hidden="true"></div>
 
-  <!-- temporary: master show/hide for all the test control panels below -->
-  <button type="button" class="notes-test-toggle" data-notes-test-toggle>Hide Test Controls</button>
-
-  <div id="notes-test-panel">
-  <!-- temporary: filter/size test sliders (same mechanism as the home
-       page), now controlling the hikari/homura character art together
-       instead of the background image — remove once values are picked -->
-  <div class="hue-test notes-bg-color-test">
-    <button type="button" data-notesbg-color-preset="none">Original</button>
-    <button type="button" data-notesbg-color-preset="blue">Blue</button>
-    <button type="button" data-notesbg-color-preset="yellow">Yellow</button>
-    <button type="button" data-notesbg-color-preset="red">Red</button>
-    <button type="button" data-notesbg-color-preset="white">White</button>
-  </div>
-  <div class="hue-test notes-bg-size-test">
-    <button type="button" data-notesbg-size-preset="auto">Auto</button>
-    <button type="button" data-notesbg-size-preset="25">25%</button>
-    <button type="button" data-notesbg-size-preset="50">50%</button>
-    <button type="button" data-notesbg-size-preset="100">100%</button>
-    <button type="button" data-notesbg-size-preset="200">200%</button>
-    <button type="button" data-notesbg-size-preset="300">300%</button>
-  </div>
-  <div class="hue-test notes-bg-filter-sliders">
-    <label>
-      Hue
-      <input type="number" data-notesbg-filter-number="hue-rotate" min="0" max="360" step="1" value="0" />°
-      <input type="range" data-notesbg-filter-slider="hue-rotate" data-unit="deg" min="0" max="360" step="1" value="0" />
-    </label>
-    <label>
-      Gray
-      <input type="number" data-notesbg-filter-number="grayscale" min="0" max="100" step="1" value="100" />%
-      <input type="range" data-notesbg-filter-slider="grayscale" data-unit="%" min="0" max="100" step="1" value="100" />
-    </label>
-    <label>
-      Sat
-      <input type="number" data-notesbg-filter-number="saturate" min="0" max="200" step="1" value="100" />%
-      <input type="range" data-notesbg-filter-slider="saturate" data-unit="%" min="0" max="200" step="1" value="100" />
-    </label>
-    <label>
-      Bright
-      <input type="number" data-notesbg-filter-number="brightness" min="0" max="200" step="1" value="100" />%
-      <input type="range" data-notesbg-filter-slider="brightness" data-unit="%" min="0" max="200" step="1" value="100" />
-    </label>
-    <label>
-      Y
-      <input type="number" data-notesbg-offset-y min="-400" max="400" step="1" value="400" />px
-      <input type="range" data-notesbg-offset-y-slider min="-400" max="400" step="1" value="400" />
-    </label>
-    <label>
-      X
-      <input type="number" data-notesbg-offset-x min="0" max="30" step="0.5" value="4.5" />rem
-      <input type="range" data-notesbg-offset-x-slider min="0" max="30" step="0.5" value="4.5" />
-    </label>
-    <label>
-      Scale
-      <input type="number" data-notesbg-scale min="20" max="200" step="1" value="200" />%
-      <input type="range" data-notesbg-scale-slider min="20" max="200" step="1" value="200" />
-    </label>
-  </div>
-  <div class="hue-test notes-bg-invert-test">
-    <button type="button" data-notesbg-invert>Invert</button>
-  </div>
-  <div class="hue-test notes-shell-sliders">
-    <label>
-      Gray
-      <input type="number" data-notesshell-gray min="0" max="255" step="1" value="140" />
-      <input type="range" data-notesshell-gray-slider min="0" max="255" step="1" value="140" />
-    </label>
-    <label>
-      Opacity
-      <input type="number" data-notesshell-opacity min="0" max="100" step="1" value="35" />%
-      <input type="range" data-notesshell-opacity-slider min="0" max="100" step="1" value="35" />
-    </label>
-  </div>
-  </div>
-
   <!-- decorative background art, temporarily hidden -->
   <pre class="notes-bg-ascii" aria-hidden="true" hidden>
 
@@ -434,14 +358,6 @@
 @@%-::*===+*::*======+=::=+=-=-------==-----=%@.%%%%%%%*+++++++++********************%%=%**######%%%%%%%%%%%%%%%%%%@%%@%    .+::     -=-..---:::::=+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#############****************#+=%######%%%%%%%%%%@@%#%@#       .*@%+:::::::==::+%%%%%%%%%%%%%%%#*#%%%%%%%%%-*%%%%%%%%%%%%%%%%%%%+
 @@#::=*==++:-*======+=::+=====------==------+%# -%%%%*+=+++++++++********************%@=%########%%%%%%%%%%%%%%%%@%@%%@%     +:-     .=:--. :-::::::-%@%#%%%%%%%%%%%%%%%%%%%%%%%%##############*****************%++%#####%%%%%%%%%%%%%%#%@+        =%%*-::::::=+::=%%%%%%%%%%%%%%%%%%%%%%%%%--%%%%%%%%%%%%%%%%%%%@%%.  </pre>
 
-  <header class="site-header">
-    <div class="page-title-bar">
-      <div class="container page-title-bar__row">
-        <a class="site-wordmark-link" href="index.html">Thread <span class="wordmark-33">33</span></a>
-      </div>
-    </div>
-  </header>
-
   <main class="container shell notes-shell" id="main-content">
     <aside class="sidebar-col" aria-label="Navigation">
       <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
@@ -746,13 +662,6 @@
       </div>
     </div>
   </main>
-
-  <footer class="site-footer">
-    <div class="container site-footer__row">
-      <span>THREAD 33 / ryoku33r / 2026</span>
-      <a href="#">GitHub</a>
-    </div>
-  </footer>
 
   <script src="scripts/main.js"></script>
 </body>

@@ -24,27 +24,6 @@
   margin-block-end: var(--space-4);
 }
 
-/* ---- inner-page compact header ---- */
-
-.site-wordmark-link {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: var(--text-md);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--text);
-}
-
-.site-wordmark-link:hover {
-  color: var(--accent);
-}
-
-/* the "33" in the wordmark is red everywhere it appears — the one
-   recurring, deliberately-placed spot of accent color on every page */
-.wordmark-33 {
-  color: var(--accent);
-}
-
 .page-title {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -156,7 +135,7 @@
 /* frames the whole sidebar+content area in a translucent gray panel so
    it reads clearly over the background image behind it */
 .notes-shell {
-  background: rgba(140, 140, 140, 0.35);
+  background: rgba(55, 55, 55, 0.3);
 }
 
 /* wide sky strip pinned to the very top, tiling horizontally only — the
@@ -168,37 +147,68 @@
   right: 0;
   z-index: -1;
   pointer-events: none;
-  height: 220px;
+  height: 660px;
   background-image: url("../img/backgrounds/blog2.png");
-  background-repeat: repeat-x;
+  /* "round" (not repeat-x) — with an auto-computed tile width, the
+     browser has to round to a whole pixel somewhere, and with plain
+     repeat that rounding shows up as a 1px seam between tiles; round
+     nudges the tile width itself so a whole number of tiles fits exactly,
+     no fractional-pixel boundary left over */
+  background-repeat: round no-repeat;
   background-position: top center;
-  background-size: auto 220px;
+  background-size: auto 660px;
+  animation: notes-sky-drift 1080s linear infinite;
+}
+
+/* scrolls one full tile width so the repeat-x pattern loops seamlessly;
+   base.css's prefers-reduced-motion rule already freezes this for users
+   who have that OS setting on */
+@keyframes notes-sky-drift {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 5157px;
+  }
 }
 
 /* decorative character art flanking the content, vertically centered */
 .notes-char-bg {
   position: fixed;
   top: 50%;
-  transform: translateY(calc(-50% + 400px)) scale(2);
   z-index: -1;
   pointer-events: none;
   height: 70vh;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  filter: grayscale(100%);
+  filter: grayscale(100%) brightness(0%);
 }
 
+/* position only — which side an element sits on is swappable via JS
+   toggling these two classes between the elements */
 .notes-char-bg--left {
   left: 4.5rem;
-  aspect-ratio: 459 / 926;
-  background-image: url("../img/backgrounds/New_hikari.png");
 }
 
 .notes-char-bg--right {
   right: 4.5rem;
+}
+
+/* identity only — tied to the element itself (not to which side class it
+   currently has), so swapping sides always keeps each image as itself */
+#notes-char-hikari {
+  aspect-ratio: 459 / 926;
+  background-image: url("../img/backgrounds/hikari.png");
+  left: 2rem;
+  transform: translateY(calc(-50% + -39px)) scale(2);
+}
+
+#notes-char-homura {
   aspect-ratio: 460 / 927;
-  background-image: url("../img/backgrounds/New_homura.png");
+  background-image: url("../img/backgrounds/homura.png");
+  right: -1rem;
+  transform: translateY(calc(-50% + -90px)) scale(2.45);
 }
 
 .notes-bg-ascii {
@@ -517,6 +527,18 @@
   border: 1px solid var(--border);
   background: var(--bg-raised);
   cursor: pointer;
+}
+
+/* the "Tint" style option, picked as the permanent look for these two —
+   spread (how far down the tint extends before fading to --bg-raised) is
+   still a temporary slider, remove the var()/fallback split once fixed */
+.home-nav-vertical__link,
+.notes-row {
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    var(--bg-raised) var(--notes-tint-spread, 35%)
+  );
 }
 
 /* the full article content, revealed in place when its .notes-row is

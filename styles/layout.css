@@ -14,34 +14,6 @@
   padding-inline: var(--container-pad);
 }
 
-/* ---------------------------------- header --------------------------- */
-
-/* the same compact site-header markup is reused on every page, including
-   the homepage — it carries a view-transition-name so navigating between
-   pages doesn't jar (Chromium only; see @view-transition rule below) */
-/* the sticky positioning has to live on .site-header, not .page-title-bar
-   itself — .site-header has no explicit height, so without this its box
-   would be exactly as tall as .page-title-bar, leaving sticky nowhere to
-   "hold onto" past the first scrolled pixel */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--bg);
-}
-
-.page-title-bar {
-  border-bottom: 1px solid var(--border);
-  view-transition-name: site-header-shape;
-}
-
-.page-title-bar__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: var(--header-height);
-}
-
 /* ---------------------------------- home frame --------------------------- */
 
 /* locked to exactly one viewport, no scrolling — this is the whole point
@@ -140,95 +112,6 @@
   border-color: var(--accent);
 }
 
-/* temporary: Notes page background test buttons, remove along with the
-   markup once values are picked */
-.notes-bg-color-test {
-  top: 3.5rem;
-}
-
-.notes-bg-size-test {
-  top: 7rem;
-}
-
-.notes-bg-invert-test {
-  top: 24rem;
-}
-
-.notes-shell-sliders {
-  top: 28rem;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-
-.notes-shell-sliders label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  white-space: nowrap;
-}
-
-.notes-shell-sliders input[type="number"] {
-  width: 3.5em;
-  border: 1px solid var(--border-strong);
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  padding: var(--space-1);
-}
-
-/* master show/hide toggle for all the .hue-test panels — takes the top
-   slot the background-image buttons used to occupy, now that those are
-   gone */
-.notes-test-toggle {
-  position: fixed;
-  top: var(--space-3);
-  right: var(--space-3);
-  z-index: 10;
-  border: 1px solid var(--border-strong);
-  background: var(--bg);
-  padding: var(--space-1) var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-
-.notes-test-toggle:hover {
-  color: var(--text);
-  border-color: var(--accent);
-}
-
-.notes-bg-filter-sliders {
-  top: 9.75rem;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-
-.notes-bg-filter-sliders label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  white-space: nowrap;
-}
-
-.notes-bg-filter-sliders input[type="number"] {
-  width: 3.5em;
-  border: 1px solid var(--border-strong);
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  padding: var(--space-1);
-}
-
 /* the "window": centered, opaque (so the starfield only shows in the
    margins around it, not bleeding through behind the text inside). No
    outer glow — just a plain border. The composition reads as a tight
@@ -310,25 +193,3 @@
   min-width: 0;
 }
 
-/* ---------------------------------- footer ------------------------------ */
-
-.site-footer {
-  border-top: 1px solid var(--border);
-  padding-block: var(--space-5);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.site-footer__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.site-footer__row a:hover {
-  color: var(--accent);
-}

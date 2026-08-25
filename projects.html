@@ -13,15 +13,14 @@
   <link rel="stylesheet" href="styles/components.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="page-title-bar">
-      <div class="container page-title-bar__row">
-        <a class="site-wordmark-link" href="index.html">Thread <span class="wordmark-33">33</span></a>
-      </div>
-    </div>
-  </header>
+  <!-- decorative sky banner, top strip only, tiles horizontally -->
+  <div class="notes-top-banner" aria-hidden="true"></div>
 
-  <main class="container shell" id="main-content">
+  <!-- decorative character art, flanking the content left/right -->
+  <div class="notes-char-bg notes-char-bg--left" id="notes-char-hikari" aria-hidden="true"></div>
+  <div class="notes-char-bg notes-char-bg--right" id="notes-char-homura" aria-hidden="true"></div>
+
+  <main class="container shell notes-shell" id="main-content">
     <aside class="sidebar-col" aria-label="Navigation">
       <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
 
@@ -63,13 +62,6 @@
       </section>
     </div>
   </main>
-
-  <footer class="site-footer">
-    <div class="container site-footer__row">
-      <span>THREAD 33 / ryoku33r / 2026</span>
-      <a href="#">GitHub</a>
-    </div>
-  </footer>
 
   <script src="scripts/main.js"></script>
 </body>
