@@ -1,5 +1,20 @@
 ---
 import InnerLayout from "../layouts/InnerLayout.astro";
+import { getCollection, render } from "astro:content";
+
+const entries = await getCollection("projects");
+
+const rendered = await Promise.all(
+  entries.map(async (entry) => {
+    const { Content } = await render(entry);
+    const id = `project-modal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+    const d = entry.data.date;
+    const dateDisplay = `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(
+      d.getUTCDate()
+    ).padStart(2, "0")}`;
+    return { entry, Content, id, dateDisplay };
+  })
+);
 ---
 
 <InnerLayout
@@ -9,28 +24,28 @@ import InnerLayout from "../layouts/InnerLayout.astro";
 >
   <h1 class="page-title">Projects</h1>
 
-  <section class="block-project" aria-labelledby="project-1-heading">
-    <div class="project-block">
-      <div class="project-screenshot" data-label="SCREENSHOT"></div>
-      <div>
-        <h2 id="project-1-heading" class="project-title">Untitled RPG Project</h2>
-        <div class="project-tags">
-          <span class="project-tag">Unreal Engine 5</span>
-          <span class="project-tag">Turn-Based × Action RPG</span>
-          <span class="project-tag">In Development</span>
-        </div>
-        <p class="project-desc">
-          A turn-based × action combat RPG built in Unreal Engine 5. Combat
-          blends real-time positioning with a turn-based skill system —
-          currently prototyping the skill-slot design and encounter flow.
-        </p>
-        <p class="project-desc">
-          This is the first entry here. Screenshots, a proper name and a
-          devlog will replace this placeholder as the project moves past
-          early prototyping — see <a href="/notes">Notes</a> for
-          development log entries in the meantime.
-        </p>
+  <div class="projects-list" id="projects-list">
+    {rendered.map(({ entry, Content, id, dateDisplay }) => (
+      <div class="project-item">
+        <a class="project-row bracket-hover" role="button" tabindex="0" data-project-open={id}>
+          <div class="project-screenshot" data-label="SCREENSHOT"></div>
+          <div class="project-row__info">
+            <span class="project-row__title">{entry.data.title}</span>
+            <p class="project-row__desc">{entry.data.summary}</p>
+          </div>
+        </a>
+
+        <dialog class="project-modal" id={id} aria-labelledby={`${id}-heading`} tabindex="-1">
+          <span class="project-modal__date">{dateDisplay}</span>
+          <h2 id={`${id}-heading`} class="project-title">{entry.data.title}</h2>
+          <div class="project-tags">
+            {entry.data.tags.map((tag) => <span class="project-tag">{tag}</span>)}
+          </div>
+          <div class="article-body">
+            <Content />
+          </div>
+        </dialog>
       </div>
-    </div>
-  </section>
+    ))}
+  </div>
 </InnerLayout>

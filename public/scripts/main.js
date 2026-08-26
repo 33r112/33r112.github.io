@@ -196,10 +196,10 @@
     });
   }
 
-  /* Notes list accordion: clicking a row's preview toggles its sibling
-     .notes-expand open/closed in place, instead of navigating to a
-     separate article page. Rows above/below stay put; only the flow
-     below the opened row shifts down. */
+  /* Accordion rows: clicking a [data-notes-toggle] trigger toggles its
+     matching #id panel open/closed in place. Originally built for Notes'
+     article list, reused as-is for Library's review rows since the
+     mechanism doesn't care what the trigger/panel actually contain. */
   function initNotesAccordion() {
     var triggers = document.querySelectorAll("[data-notes-toggle]");
     if (!triggers.length) return;
@@ -222,6 +222,52 @@
           event.preventDefault();
           toggle(trigger);
         }
+      });
+    });
+  }
+
+  /* Project rows open their detail as a floating modal instead of
+     expanding in place — a native <dialog>, shown with showModal() so
+     the browser handles focus-trapping, the ::backdrop and Esc-to-close
+     without any of that needing to be hand-rolled here. */
+  function initProjectModals() {
+    var triggers = document.querySelectorAll("[data-project-open]");
+    if (!triggers.length) return;
+
+    function open(trigger) {
+      var dialog = document.getElementById(trigger.dataset.projectOpen);
+      if (!dialog || typeof dialog.showModal !== "function") return;
+      dialog.showModal();
+      /* showModal() auto-focuses the first focusable descendant — with
+         no close button left, that's whatever link happens to be
+         furthest down in the write-up, and the browser scrolls it into
+         view, opening the dialog already scrolled to the bottom.
+         Focusing the dialog itself instead (it's given tabindex="-1" in
+         the markup so it CAN take focus without joining the tab order)
+         keeps the initial scroll position at the top. */
+      dialog.focus();
+      dialog.scrollTop = 0;
+    }
+
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener("click", function () {
+        open(trigger);
+      });
+
+      trigger.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open(trigger);
+        }
+      });
+    });
+
+    document.querySelectorAll(".project-modal").forEach(function (dialog) {
+      // click on the ::backdrop itself (not any of the dialog's content)
+      // closes it — Esc already closes a <dialog> natively, so between
+      // the two there's no separate close button to wire up
+      dialog.addEventListener("click", function (event) {
+        if (event.target === dialog) dialog.close();
       });
     });
   }
@@ -304,6 +350,7 @@
     initBgImageToggle();
     initFilterTabs();
     initNotesAccordion();
+    initProjectModals();
     syncPersistentBackground();
   });
 })();

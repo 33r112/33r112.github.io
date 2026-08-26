@@ -130,6 +130,21 @@
   opacity: 1;
 }
 
+/* same lingering-focus fix as .notes-row above — clicking a Library row
+   opens its review in place, and clicking a Project row opens a modal;
+   either way the row stays focused afterward (a <dialog> closing even
+   returns focus to whatever triggered it), which would otherwise keep
+   the bracket showing with the mouse nowhere near it */
+.library-row:focus-within::after,
+.project-row:focus-within::after {
+  opacity: 0;
+}
+
+.library-row:hover::after,
+.project-row:hover::after {
+  opacity: 1;
+}
+
 /* ---- decorative background ASCII art (Notes page only) ---- */
 
 /* frames the whole sidebar+content area in a translucent gray panel so
@@ -433,6 +448,176 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---- library (accordion rows, click anywhere on the row to expand) ---- */
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* wraps one row + its (hidden by default) expanded review, so they move
+   together as a unit within .library-list's gap — same pattern as
+   .notes-item */
+.library-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.library-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  /* same "Tint" treatment as .notes-row/.home-nav-vertical__link */
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    var(--bg-raised) var(--notes-tint-spread, 35%)
+  );
+}
+
+.library-row:hover .library-title,
+.library-row:focus-visible .library-title {
+  color: var(--accent);
+}
+
+.library-row .cover-placeholder {
+  flex-shrink: 0;
+  width: 100px;
+  margin-block-end: 0;
+}
+
+.library-row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.library-row__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.library-title {
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.library-year {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+}
+
+.library-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+
+/* the full review, revealed in place when its row is clicked — same
+   treatment as .notes-expand */
+.library-expand {
+  border: 1px solid var(--border);
+  border-top: none;
+  background: var(--bg-raised);
+  padding: var(--space-4);
+}
+
+/* ---- projects list (click a row to open its full detail as a modal) ---- */
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.project-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    var(--bg-raised) var(--notes-tint-spread, 35%)
+  );
+}
+
+.project-row:hover .project-row__title,
+.project-row:focus-visible .project-row__title {
+  color: var(--accent);
+}
+
+.project-row .project-screenshot {
+  flex-shrink: 0;
+  width: 160px;
+}
+
+.project-row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-row__title {
+  display: block;
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.project-row__desc {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* the detail popup itself — a native <dialog>, opened via showModal() so
+   the browser handles focus-trapping, the backdrop and Esc-to-close for
+   free instead of hand-rolling them */
+.project-modal {
+  /* the browser centers a <dialog> shown via showModal() using
+     position:fixed + inset-block:0 + margin:auto on its own — but our
+     global "* { margin: 0; }" reset (base.css) overrides that auto
+     margin, which is what was pinning it to the top-left instead.
+     Restoring margin:auto here is what actually centers it. */
+  margin: auto;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  color: var(--text);
+  padding: var(--space-6);
+  width: min(90vw, 640px);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.project-modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* the write-up's rendered Markdown reuses .article-body's typography
+   (headings, lists, etc., in case a future project needs them) but
+   keeps the old .project-desc look — muted color, a readable line
+   length — for its own plain paragraphs */
+.project-modal .article-body {
+  color: var(--text-muted);
+  max-width: 42em;
+}
+
+/* closing now happens via Esc or a click on the backdrop (both native
+   <dialog> behavior) — this is just a label, not a control */
+.project-modal__date {
+  float: right;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
 
 /* ---- featured project ---- */
@@ -750,6 +935,12 @@
 .article-figure img {
   display: inline-block;
   max-width: 100%;
+  /* keeps the image's own aspect ratio when its CSS width is constrained
+     below its intrinsic size — matters now that <Image> (astro:assets)
+     sets explicit width/height attributes on the <img> itself; without
+     this, that attribute-derived height wins over a CSS-only width and
+     the image renders squashed/stretched */
+  height: auto;
   border: 1px solid var(--border);
 }
 
@@ -769,23 +960,25 @@
   color: var(--text-muted);
 }
 
-/* markdown task list ("- [x] ...") */
-.article-body .article-tasklist {
+/* markdown task list ("- [x] ..."), rendered by remark-gfm inside MDX
+   content — .contains-task-list / .task-list-item are its own default
+   class names, not ones we chose */
+.article-body .contains-task-list {
   list-style: none;
   padding-inline-start: 0;
 }
 
-.article-tasklist li {
+.task-list-item {
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
 }
 
-.article-tasklist input {
+.task-list-item input {
   accent-color: var(--accent);
 }
 
-.article-tasklist .is-done {
+.task-list-item:has(input:checked) {
   color: var(--text-muted);
   text-decoration: line-through;
 }

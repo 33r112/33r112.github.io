@@ -1,0 +1,30 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+export interface Props {
+  src: ImageMetadata | string;
+  alt: string;
+  caption: string;
+  /* space-separated modifier names, e.g. "half bw" — mapped onto the
+     existing article-figure--<name> CSS classes */
+  variant?: string;
+}
+
+const { src, alt, caption, variant } = Astro.props;
+
+const variantClasses = (variant ?? "")
+  .split(" ")
+  .filter(Boolean)
+  .map((name) => `article-figure--${name}`)
+  .join(" ");
+---
+
+<figure class:list={["article-figure", variantClasses]}>
+  {typeof src === "string" ? (
+    <img src={src} alt={alt} />
+  ) : (
+    <Image src={src} alt={alt} />
+  )}
+  <figcaption>{caption}</figcaption>
+</figure>
