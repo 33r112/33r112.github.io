@@ -1,0 +1,32 @@
+---
+import { ClientRouter } from "astro:transitions";
+
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en" transition:animate="none">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/layout.css" />
+  <link rel="stylesheet" href="/styles/components.css" />
+
+  <ClientRouter />
+</head>
+<body>
+  <slot />
+
+  <script is:inline src="/scripts/main.js"></script>
+</body>
+</html>

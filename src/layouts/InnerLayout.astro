@@ -1,0 +1,35 @@
+---
+import Layout from "./Layout.astro";
+import NavVertical from "../components/NavVertical.astro";
+
+export interface Props {
+  current: "library" | "projects" | "notes" | "about";
+  title: string;
+  description: string;
+}
+
+const { current, title, description } = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <!-- the decorative sky banner + character art are NOT rendered here.
+       Astro's ClientRouter replaces <body> wholesale on every navigation
+       (only re-attaching transition:persist elements that also have a
+       matching one in the *new* page's template), and that reparenting
+       was itself causing a visible repaint on these large fixed
+       background layers even with transitions disabled. They're instead
+       injected once, outside <body> entirely, by
+       initPersistentBackground() in main.js — see base.css for the
+       matching stacking-context notes. -->
+
+  <main class="container shell notes-shell" id="main-content">
+    <aside class="sidebar-col" aria-label="Navigation">
+      <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
+      <NavVertical current={current} />
+    </aside>
+
+    <div class="main-col">
+      <slot />
+    </div>
+  </main>
+</Layout>

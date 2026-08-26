@@ -16,6 +16,15 @@ html {
      content is actually tall enough to scroll — otherwise pages that scroll
      render measurably narrower than pages that don't (the bug you spotted) */
   scrollbar-gutter: stable;
+  /* lives here (not on body) because the persisted decorative background
+     elements are injected as direct children of <html>, siblings of
+     <body> — see initPersistentBackground() in main.js — specifically so
+     Astro's ClientRouter (which replaces <body> wholesale on every
+     navigation and only re-attaches persist elements that have a
+     matching one in the *new* page's own template) never touches them.
+     body's own background must stay transparent so it doesn't paint over
+     this layer, which sits behind it in the root stacking context. */
+  background: var(--bg);
 }
 
 body {
@@ -27,10 +36,11 @@ body {
      a large/filtered fixed background can get promoted to its own
      compositing layer and paint on top of later content instead of
      behind it (this is what caused the Notes page's "flash then the
-     title/text disappear behind the background" bug) */
+     title/text disappear behind the background" bug). Still needed for
+     the home page's own .home-frame__bg, which remains a body child. */
   position: relative;
   z-index: 0;
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--text-base);

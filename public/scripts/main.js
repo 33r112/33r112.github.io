@@ -19,29 +19,6 @@
     setInterval(update, 15000);
   }
 
-  /* hidden egg: press "3" twice quickly (echoing the site's own "33") to
-     briefly light up the thread line and reveal a small hidden line of
-     text near it. Purely decorative, no functional purpose. */
-  function initHiddenEgg() {
-    var lastPress = 0;
-    var timeoutId;
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key !== "3") return;
-      var now = Date.now();
-      if (now - lastPress < 500) {
-        root.classList.add("egg-active");
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(function () {
-          root.classList.remove("egg-active");
-        }, 1600);
-        lastPress = 0;
-      } else {
-        lastPress = now;
-      }
-    });
-  }
-
   /* Shared by Library (category) and Notes (topic) filter tabs. A
      [data-filter-group] element points at a target list via its
      data-filter-group value (an id selector); clicking a [data-filter]
@@ -249,6 +226,56 @@
     });
   }
 
+  /* the sky banner + character art backgrounds are intentionally NOT part
+     of any .astro page template. Astro's ClientRouter replaces <body>
+     wholesale on every navigation (only re-attaching transition:persist
+     elements that also have a matching one in the *new* page's own
+     template) — for a large fixed background image, that reparenting
+     itself was enough to force a visible repaint even with the
+     transition's fade animation fully disabled via transition:animate.
+     Creating these once as direct children of <html> (a sibling of
+     <body>, which Astro never replaces — only <body>'s content and
+     <html>'s attributes are touched by a navigation) keeps them
+     completely outside anything the router ever touches, so there is
+     nothing left for it to disturb. See base.css for the matching
+     stacking-context change (the true page background now lives on
+     <html>, not <body>, so body can stay transparent and not paint over
+     this layer). */
+  function initPersistentBackground() {
+    var banner = document.createElement("div");
+    banner.className = "notes-top-banner";
+    banner.setAttribute("aria-hidden", "true");
+
+    var hikari = document.createElement("div");
+    hikari.className = "notes-char-bg notes-char-bg--left";
+    hikari.id = "notes-char-hikari";
+    hikari.setAttribute("aria-hidden", "true");
+
+    var homura = document.createElement("div");
+    homura.className = "notes-char-bg notes-char-bg--right";
+    homura.id = "notes-char-homura";
+    homura.setAttribute("aria-hidden", "true");
+
+    root.appendChild(banner);
+    root.appendChild(hikari);
+    root.appendChild(homura);
+
+    syncPersistentBackground();
+  }
+
+  /* shows the background only on pages built on InnerLayout (marked by
+     .notes-shell) and hides it on the home page. Re-run on every
+     astro:page-load, since <body>'s content has just been replaced by
+     the time that event fires. */
+  function syncPersistentBackground() {
+    var visible = !!document.querySelector(".notes-shell");
+    document
+      .querySelectorAll(".notes-top-banner, #notes-char-hikari, #notes-char-homura")
+      .forEach(function (el) {
+        el.hidden = !visible;
+      });
+  }
+
   function initConsoleGreeting() {
     console.log(
       "%cTHREAD 33",
@@ -260,13 +287,23 @@
     );
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  // runs exactly once for the whole client-router session — document
+  // itself is never torn down across astro:page-load transitions, so
+  // anything re-run here on every soft navigation would either
+  // duplicate (a listener) or recreate (DOM nodes) needlessly
+  initConsoleGreeting();
+  initPersistentBackground();
+
+  // astro:page-load fires after the initial load AND after every
+  // subsequent soft navigation (DOMContentLoaded only ever saw the
+  // former) — everything that depends on page-specific DOM must re-run
+  // here so it rebinds to whatever just got swapped in
+  document.addEventListener("astro:page-load", function () {
     initClock();
-    initHiddenEgg();
     initBgTestControls();
     initBgImageToggle();
     initFilterTabs();
     initNotesAccordion();
-    initConsoleGreeting();
+    syncPersistentBackground();
   });
 })();

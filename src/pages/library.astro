@@ -1,0 +1,101 @@
+---
+import InnerLayout from "../layouts/InnerLayout.astro";
+---
+
+<InnerLayout
+  current="library"
+  title="Library — THREAD 33"
+  description="Games, movies, TV, anime and manga — everything logged in THREAD 33's library."
+>
+  <h1 class="page-title">Library</h1>
+
+  <div>
+    <div class="filter-tabs" data-filter-group="#library-grid" role="tablist" aria-label="Filter by category">
+      <button type="button" class="filter-tab is-active" data-filter="all">All</button>
+      <button type="button" class="filter-tab" data-filter="game">Games</button>
+      <button type="button" class="filter-tab" data-filter="movie-tv">Movies &amp; TV</button>
+      <button type="button" class="filter-tab" data-filter="anime-manga">Anime &amp; Manga</button>
+    </div>
+
+    <div class="recent-grid" id="library-grid">
+      <a class="recent-item" href="#" data-category="game">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Persona 5 Royal</p>
+        <div class="recent-meta"><span>Game · PS5</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Still the best turn-based combat loop I've played.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="game">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Hollow Knight</p>
+        <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.5</span></div>
+        <p class="recent-comment">Every area layout is a small masterclass in itself.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="game">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Baldur's Gate 3</p>
+        <div class="recent-meta"><span>Game · PC</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Too much reactivity, in the best way possible.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="game">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Celeste</p>
+        <div class="recent-meta"><span>Game · Switch</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Tight movement, tighter writing.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="movie-tv">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Get Out</p>
+        <div class="recent-meta"><span>Movie</span><span class="recent-rating">8.0</span></div>
+        <p class="recent-comment">Rewatched it for the direction, not the scares.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="movie-tv">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Severance</p>
+        <div class="recent-meta"><span>TV</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Currently watching — the sound design is doing a lot.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="movie-tv">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Parasite</p>
+        <div class="recent-meta"><span>Movie</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">The staircase says everything the dialogue doesn't.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="movie-tv">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">The Bear</p>
+        <div class="recent-meta"><span>TV</span><span class="recent-rating">8.5</span></div>
+        <p class="recent-comment">Stressful in a way that's oddly compelling.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="anime-manga">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Invincible</p>
+        <div class="recent-meta"><span>Manga</span><span class="recent-rating">8.0</span></div>
+        <p class="recent-comment">Currently reading — the pacing keeps surprising me.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="anime-manga">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Frieren: Beyond Journey's End</p>
+        <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Quietly devastating in a way most fantasy isn't.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="anime-manga">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Chainsaw Man</p>
+        <div class="recent-meta"><span>Manga · Vol. 12</span><span class="recent-rating">8.5</span></div>
+        <p class="recent-comment">Never know where the next chapter is going.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="anime-manga">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Vinland Saga</p>
+        <div class="recent-meta"><span>Anime</span><span class="recent-rating">9.0</span></div>
+        <p class="recent-comment">Started as a revenge story, became something else entirely.</p>
+      </a>
+      <a class="recent-item" href="#" data-category="anime-manga">
+        <div class="cover-placeholder bracket-hover" data-label="COVER"></div>
+        <p class="recent-title">Berserk</p>
+        <div class="recent-meta"><span>Manga</span><span class="recent-rating">9.5</span></div>
+        <p class="recent-comment">The art alone is worth the reread.</p>
+      </a>
+    </div>
+  </div>
+</InnerLayout>

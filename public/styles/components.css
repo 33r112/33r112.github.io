@@ -147,6 +147,12 @@
   right: 0;
   z-index: -1;
   pointer-events: none;
+  /* keeps this element on its own GPU compositing layer at all times,
+     so Astro's ClientRouter moving the (persisted) node into the next
+     page's DOM doesn't force the browser to tear down and rebuild that
+     layer from scratch — that rebuild is what shows up as a flash even
+     though the DOM node itself is never destroyed */
+  will-change: transform;
   height: 660px;
   background-image: url("../img/backgrounds/blog2.png");
   /* "round" (not repeat-x) — with an auto-computed tile width, the
@@ -157,19 +163,6 @@
   background-repeat: round no-repeat;
   background-position: top center;
   background-size: auto 660px;
-  animation: notes-sky-drift 1080s linear infinite;
-}
-
-/* scrolls one full tile width so the repeat-x pattern loops seamlessly;
-   base.css's prefers-reduced-motion rule already freezes this for users
-   who have that OS setting on */
-@keyframes notes-sky-drift {
-  from {
-    background-position-x: 0;
-  }
-  to {
-    background-position-x: 5157px;
-  }
 }
 
 /* decorative character art flanking the content, vertically centered */
@@ -178,6 +171,7 @@
   top: 50%;
   z-index: -1;
   pointer-events: none;
+  will-change: transform;
   height: 70vh;
   background-repeat: no-repeat;
   background-position: center;

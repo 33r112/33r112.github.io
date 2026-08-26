@@ -1,18 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark" />
-  <title>THREAD 33</title>
-  <meta name="description" content="THREAD 33 is a personal archive for media, projects and notes." />
+---
+import Layout from "../layouts/Layout.astro";
+import NavVertical from "../components/NavVertical.astro";
+---
 
-  <link rel="stylesheet" href="styles/tokens.css" />
-  <link rel="stylesheet" href="styles/base.css" />
-  <link rel="stylesheet" href="styles/layout.css" />
-  <link rel="stylesheet" href="styles/components.css" />
-</head>
-<body>
+<Layout title="THREAD 33" description="THREAD 33 is a personal archive for media, projects and notes.">
   <div class="home-frame">
     <div class="home-frame__bg" aria-hidden="true"></div>
 
@@ -81,13 +72,7 @@
         <aside class="home-left" aria-label="Navigation">
           <div class="placeholder-fill home-portrait-placeholder" data-label="PORTRAIT"></div>
 
-          <ul class="home-nav-vertical">
-            <li><a class="home-nav-vertical__link is-active" href="index.html" aria-current="page">Home</a></li>
-            <li><a class="home-nav-vertical__link" href="library.html">Library</a></li>
-            <li><a class="home-nav-vertical__link" href="projects.html">Projects</a></li>
-            <li><a class="home-nav-vertical__link" href="notes.html">Notes</a></li>
-            <li><a class="home-nav-vertical__link" href="about.html">About</a></li>
-          </ul>
+          <NavVertical current="home" />
 
           <div class="placeholder-fill home-info-placeholder" data-label="INFO"></div>
         </aside>
@@ -111,7 +96,4 @@
       </div>
     </div>
   </div>
-
-  <script src="scripts/main.js"></script>
-</body>
-</html>
+</Layout>

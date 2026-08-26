@@ -1,12 +1,5 @@
 /* THREAD 33 — page shell: header, home frame, content shell, footer */
 
-/* opt in to cross-document view transitions for same-origin navigations.
-   Unsupported browsers (Safari, Firefox as of this writing) just ignore
-   this and navigate normally — no fallback code needed. */
-@view-transition {
-  navigation: auto;
-}
-
 .container {
   width: 100%;
   max-width: var(--container-max);

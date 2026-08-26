@@ -1,0 +1,29 @@
+---
+export interface Props {
+  current: "home" | "library" | "projects" | "notes" | "about";
+}
+
+const { current } = Astro.props;
+
+const links: { key: Props["current"]; href: string; label: string }[] = [
+  { key: "home", href: "/", label: "Home" },
+  { key: "library", href: "/library", label: "Library" },
+  { key: "projects", href: "/projects", label: "Projects" },
+  { key: "notes", href: "/notes", label: "Notes" },
+  { key: "about", href: "/about", label: "About" },
+];
+---
+
+<ul class="home-nav-vertical">
+  {links.map((link) => (
+    <li>
+      <a
+        class:list={["home-nav-vertical__link", { "is-active": link.key === current }]}
+        href={link.href}
+        aria-current={link.key === current ? "page" : undefined}
+      >
+        {link.label}
+      </a>
+    </li>
+  ))}
+</ul>
