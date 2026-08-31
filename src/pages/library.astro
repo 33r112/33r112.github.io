@@ -72,6 +72,128 @@ const libraryStats = {
     </label>
   </div>
 
+
+  <!-- master show/hide for the panel below, same button Writing uses.
+       Starts collapsed. Remove along with the panel itself. -->
+  <button type="button" class="fx-test-toggle" id="fx-test-toggle" data-fx-test-toggle>
+    展开测试按钮
+  </button>
+
+  <!-- temporary: size/position/filter sliders for the sidebar portrait,
+       plus how long she faces front and how long before she can be
+       clicked again. Remove along with the matching CSS/JS once values
+       are picked. -->
+  <div class="hue-test fx-test sleep-anim-test" id="sleep-anim-test-panel">
+    <div class="fx-test__group">
+      <span class="fx-test__label">导航栏立绘</span>
+      <label>
+        大小
+        <input type="number" autocomplete="off" data-portrait-size min="40" max="400" step="1" value="120" />
+        <input type="range" autocomplete="off" data-portrait-size-slider min="40" max="400" step="1" value="120" />
+      </label>
+      <label>
+        横向偏移
+        <input type="number" autocomplete="off" data-portrait-x min="-300" max="300" step="1" value="120" />
+        <input type="range" autocomplete="off" data-portrait-x-slider min="-300" max="300" step="1" value="120" />
+      </label>
+      <label>
+        纵向偏移
+        <input type="number" autocomplete="off" data-portrait-y min="-300" max="300" step="1" value="-90" />
+        <input type="range" autocomplete="off" data-portrait-y-slider min="-300" max="300" step="1" value="-90" />
+      </label>
+      <label>
+        正面停留
+        <input type="number" autocomplete="off" data-portrait-hold min="200" max="6000" step="100" value="2000" />
+        <input type="range" autocomplete="off" data-portrait-hold-slider min="200" max="6000" step="100" value="2000" />
+      </label>
+      <label>
+        冷却时间
+        <input type="number" autocomplete="off" data-portrait-cooldown min="0" max="6000" step="100" value="2000" />
+        <input type="range" autocomplete="off" data-portrait-cooldown-slider min="0" max="6000" step="100" value="2000" />
+      </label>
+      <label>
+        黑白
+        <input type="number" autocomplete="off" data-portrait-grayscale min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-grayscale-slider min="0" max="100" step="1" value="0" />
+      </label>
+      <label>
+        亮度
+        <input type="number" autocomplete="off" data-portrait-brightness min="0" max="300" step="1" value="90" />
+        <input type="range" autocomplete="off" data-portrait-brightness-slider min="0" max="300" step="1" value="90" />
+      </label>
+      <label>
+        对比度
+        <input type="number" autocomplete="off" data-portrait-contrast min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-portrait-contrast-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        饱和度
+        <input type="number" autocomplete="off" data-portrait-saturate min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-portrait-saturate-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        色相
+        <input type="number" autocomplete="off" data-portrait-hue min="0" max="360" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-hue-slider min="0" max="360" step="1" value="0" />
+      </label>
+      <label>
+        复古
+        <input type="number" autocomplete="off" data-portrait-sepia min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-sepia-slider min="0" max="100" step="1" value="0" />
+      </label>
+      <label>
+        表情大小
+        <input type="number" autocomplete="off" data-emote-size min="16" max="200" step="1" value="35" />
+        <input type="range" autocomplete="off" data-emote-size-slider min="16" max="200" step="1" value="35" />
+      </label>
+      <label>
+        表情播放速度
+        <input type="number" autocomplete="off" data-emote-speed min="50" max="3000" step="50" value="1000" />
+        <input type="range" autocomplete="off" data-emote-speed-slider min="50" max="3000" step="50" value="1000" />
+      </label>
+      <label>
+        表情横向
+        <input type="number" autocomplete="off" data-emote-x min="-300" max="400" step="1" value="165" />
+        <input type="range" autocomplete="off" data-emote-x-slider min="-300" max="400" step="1" value="165" />
+      </label>
+      <label>
+        表情纵向
+        <input type="number" autocomplete="off" data-emote-y min="-300" max="300" step="1" value="-90" />
+        <input type="range" autocomplete="off" data-emote-y-slider min="-300" max="300" step="1" value="-90" />
+      </label>
+      <label>
+        描边粗细
+        <input type="number" autocomplete="off" data-portrait-outline-w min="0" max="12" step="0.1" value="1.4" />
+        <input type="range" autocomplete="off" data-portrait-outline-w-slider min="0" max="12" step="0.1" value="1.4" />
+      </label>
+      <label>
+        描边 R
+        <input type="number" autocomplete="off" data-portrait-outline-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-outline-r-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        描边 G
+        <input type="number" autocomplete="off" data-portrait-outline-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-outline-g-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        描边 B
+        <input type="number" autocomplete="off" data-portrait-outline-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-portrait-outline-b-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        描边透明度
+        <input type="number" autocomplete="off" data-portrait-outline-a min="0" max="100" step="1" value="100" />
+        <input type="range" autocomplete="off" data-portrait-outline-a-slider min="0" max="100" step="1" value="100" />
+      </label>
+      <label>
+        透明度
+        <input type="number" autocomplete="off" data-portrait-a min="0" max="100" step="1" value="100" />
+        <input type="range" autocomplete="off" data-portrait-a-slider min="0" max="100" step="1" value="100" />
+      </label>
+    </div>
+  </div>
+
   <div class="page-header">
     <h1 class="page-title"><img src="/img/headers/reviews.png" alt="Reviews" /></h1>
     <StatsGroup items={categoryFilters} filterTarget="#library-list" filterAttr="category" defaultFilter="game" />

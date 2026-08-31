@@ -13,6 +13,12 @@ export interface Props {
 }
 
 const { current, title, description, sidebarStats } = Astro.props;
+
+// Library, Projects and Writing are one visual set — same background
+// effect layers, same quadrant divider, same everything. About is the
+// odd one out: no wordmark, no filter row and no list, so there's
+// nothing for the divider to line up with and it keeps the plain panel.
+const decorated = current !== "about";
 ---
 
 <Layout title={title} description={description}>
@@ -26,17 +32,24 @@ const { current, title, description, sidebarStats } = Astro.props;
        initPersistentBackground() in main.js — see base.css for the
        matching stacking-context notes. -->
 
-  <main class="container shell notes-shell" class:list={[current === "notes" && "shell--quadrant"]} id="main-content">
+  <main class="container shell notes-shell" class:list={[decorated && "shell--quadrant"]} id="main-content">
     <aside class="sidebar-col" class:list={[current !== "about" && "sidebar-col--titled"]} aria-label="Navigation">
-      <div class="sleep-anim" aria-hidden="true">
-        <div class="sleep-anim__sprite"></div>
-      </div>
-      {current === "notes" && <div class="quadrant-divider--h-left" aria-hidden="true"></div>}
+      {current === "library" ? (
+        <>
+          <div class="nav-portrait" aria-hidden="true"></div>
+          <div class="nav-emote" aria-hidden="true"></div>
+        </>
+      ) : (
+        <div class="sleep-anim" aria-hidden="true">
+          <div class="sleep-anim__sprite"></div>
+        </div>
+      )}
+      {decorated && <div class="quadrant-divider--h-left" aria-hidden="true"></div>}
       <NavVertical current={current} />
       {sidebarStats && <SidebarStats {...sidebarStats} />}
     </aside>
 
-    {current === "notes" && (
+    {decorated && (
       <>
         <div class="quadrant-divider--v" aria-hidden="true"></div>
         <div class="quadrant-divider--h" aria-hidden="true"></div>

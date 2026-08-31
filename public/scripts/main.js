@@ -302,7 +302,7 @@
 
     var sidebar = shell.querySelector(".sidebar-col");
     var mainCol = shell.querySelector(".main-col");
-    var header = shell.querySelector(".page-header--quadrant");
+    var header = shell.querySelector(".page-header");
     var vLine = shell.querySelector(".quadrant-divider--v");
     var hLine = shell.querySelector(".quadrant-divider--h");
     var hLeft = shell.querySelector(".quadrant-divider--h-left");
@@ -312,27 +312,55 @@
     var V_TOP_ADJUST = 10;
     var V_BOTTOM_ADJUST = -300;
 
-    var shellRect = shell.getBoundingClientRect();
-    var sidebarRect = sidebar.getBoundingClientRect();
-    var mainRect = mainCol.getBoundingClientRect();
-    var headerRect = header.getBoundingClientRect();
+    /* Everything below is measured from the elements' layout boxes
+       (offsetTop/offsetLeft/offsetHeight), never from their on-screen
+       rects. getBoundingClientRect is relative to the viewport, so
+       running this while the page happened to be scrolled — on a resize,
+       or on a soft navigation that lands before the scroll position has
+       been reset — produced a wildly too-tall line: the shell's own top
+       was far above the viewport, and every height measured against it
+       came out that much larger. An absolutely-positioned line taller
+       than the panel then hangs off the bottom of the document and adds
+       real scrollable space below the content, which is what let the
+       page keep scrolling long after the last card. The sidebar being
+       sticky is the other reason: its rect reports wherever it's
+       currently pinned, its layout box doesn't move.
 
-    var top = Math.min(sidebarRect.top, mainRect.top) - shellRect.top + V_TOP_ADJUST;
-    var bottom = Math.max(sidebarRect.bottom, mainRect.bottom) - shellRect.top + V_BOTTOM_ADJUST;
-    var left = (sidebarRect.right + mainRect.left) / 2 - shellRect.left;
+       .sidebar-col and .main-col both take .shell--quadrant as their
+       offset parent; .page-header takes .main-col, so its offset has to
+       be added onto .main-col's own. */
+    var sidebarTop = sidebar.offsetTop;
+    var sidebarBottom = sidebarTop + sidebar.offsetHeight;
+    var mainTop = mainCol.offsetTop;
+    var mainBottom = mainTop + mainCol.offsetHeight;
+
+    var top = Math.min(sidebarTop, mainTop) + V_TOP_ADJUST;
+    var bottom = Math.max(sidebarBottom, mainBottom) + V_BOTTOM_ADJUST;
+    var left = (sidebar.offsetLeft + sidebar.offsetWidth + mainCol.offsetLeft) / 2;
+
+    // V_BOTTOM_ADJUST is a fixed pull-in, which a short page (Projects,
+    // with one entry) would otherwise eat almost all of, leaving a stub
+    // instead of a divider. Floor it at the bottom of the nav column —
+    // separating the nav from the content is the line's whole job, so it
+    // should never stop short of it. Longer pages clear this floor
+    // anyway and are unaffected.
+    bottom = Math.max(bottom, sidebarBottom);
+    // and never past the panel itself, so the line can't add scrollable
+    // space below the page no matter what the numbers above come out as
+    bottom = Math.min(bottom, shell.clientHeight);
 
     vLine.style.top = top + "px";
-    vLine.style.height = bottom - top + "px";
+    vLine.style.height = Math.max(0, bottom - top) + "px";
     vLine.style.left = left + "px";
 
     // the horizontal line's y, in the shell's own coordinates
-    var hY = headerRect.bottom - shellRect.top + H_Y_ADJUST;
+    var hY = mainTop + header.offsetTop + header.offsetHeight + H_Y_ADJUST;
 
     // right half: from the vertical line to the end of the article
     // column, scrolling with the page like the rest of the panel
     hLine.style.top = hY + "px";
     hLine.style.left = left + "px";
-    hLine.style.width = mainRect.right - shellRect.left - left + "px";
+    hLine.style.width = Math.max(0, mainCol.offsetLeft + mainCol.offsetWidth - left) + "px";
 
     // left half: a child of the pinned nav column, so it stays with it
     // instead of sliding away. offsetTop/offsetLeft rather than
@@ -340,10 +368,27 @@
     // position and so don't change with however far the page happens to
     // be scrolled when this runs.
     if (hLeft) {
-      hLeft.style.top = hY - sidebar.offsetTop + "px";
+      hLeft.style.top = hY - sidebarTop + "px";
       hLeft.style.left = "0px";
-      hLeft.style.width = left - sidebar.offsetLeft + "px";
+      hLeft.style.width = Math.max(0, left - sidebar.offsetLeft) + "px";
     }
+  }
+
+  /* Anything that changes how tall the panel is has to re-measure the
+     lines, or they keep the length they had before: picking a category
+     hides most of the cards, expanding an article adds a body, and both
+     left the line hanging past the (now shorter) panel, where it added
+     real scrollable space below the page. A category filter is the
+     obvious one because it can hide nine cards at once, which is why
+     Reviews showed this and All didn't. Watching the panel's box covers
+     all of them at once, including anything added later. */
+  function initQuadrantDividerWatch() {
+    var shell = document.querySelector(".shell--quadrant");
+    if (!shell || !window.ResizeObserver || shell.dataset.dividerWatched) return;
+    shell.dataset.dividerWatched = "1";
+    new ResizeObserver(function () {
+      initQuadrantDividers();
+    }).observe(shell);
   }
 
   /* temporary: the FX/border test panels render inside .notes-shell
@@ -368,6 +413,33 @@
      whatever value is in the DOM at the time. Remove along with the
      panels themselves. */
   var TUNING_KEY = "thread33-tuning";
+
+  /* the effect toggles and every tuned value are written onto <html>,
+     which survives soft navigation — so Writing hands its current look
+     to Library/Projects for free, but a hard load of one of those two
+     would drop back to the values baked into the CSS and look subtly
+     different from the page you'd just been on. Replaying the stored
+     property dump on every page keeps all three identical either way.
+     Remove along with the panels themselves. */
+  function initTuningReplay() {
+    try {
+      var saved = JSON.parse(window.localStorage.getItem(TUNING_KEY) || "null");
+      if (!saved) return;
+      if (saved.props) {
+        Object.keys(saved.props).forEach(function (name) {
+          root.style.setProperty(name, saved.props[name]);
+        });
+      }
+      if (saved.toggles) {
+        Object.keys(saved.toggles).forEach(function (key) {
+          root.dataset[key] = saved.toggles[key];
+        });
+      }
+    } catch (err) {
+      /* private mode, cleared storage, corrupt JSON — fall back to the
+         values baked into the CSS */
+    }
+  }
 
   function initTuningPersistence() {
     var panels = document.querySelectorAll(".fx-test");
@@ -408,7 +480,17 @@
     }
 
     function save() {
+      // start from whatever is already stored — Writing and Library each
+      // carry only part of the full field set, so rebuilding from just
+      // the panels on this page would drop the other page's values
       var fields = {};
+      try {
+        var prev = JSON.parse(window.localStorage.getItem(TUNING_KEY) || "null");
+        if (prev && prev.fields) fields = prev.fields;
+      } catch (err) {
+        /* unreadable storage — start clean rather than lose this page's
+           values too */
+      }
       eachField(function (el, key) {
         fields[key] = el.value;
       });
@@ -418,8 +500,20 @@
         if (key.indexOf("fx") === 0) toggles[key] = root.dataset[key];
       });
 
+      // the resolved custom properties too, not just the control values
+      // they came from — that's all initTuningReplay() needs on a page
+      // with no panel to read
+      var props = {};
+      for (var i = 0; i < root.style.length; i++) {
+        var name = root.style[i];
+        if (name.indexOf("--") === 0) props[name] = root.style.getPropertyValue(name);
+      }
+
       try {
-        window.localStorage.setItem(TUNING_KEY, JSON.stringify({ fields: fields, toggles: toggles }));
+        window.localStorage.setItem(
+          TUNING_KEY,
+          JSON.stringify({ fields: fields, toggles: toggles, props: props })
+        );
       } catch (err) {
         /* nothing to do if storage is unavailable — tuning still works,
            it just won't survive a reload */
@@ -455,6 +549,114 @@
      values are — the panels start collapsed on every load, so the page
      can be judged on its own before opening them. Remove along with the
      panels themselves. */
+  /* Library's sidebar portrait: 007 (looking away) at rest, click to
+     turn her front-on (015) for --portrait-hold, then she turns back and
+     stays unclickable for a further --portrait-cooldown. Clicks during
+     either stretch do nothing at all. */
+  function initNavPortrait() {
+    var portrait = document.querySelector(".nav-portrait");
+    if (!portrait) return;
+
+    function ms(name, fallback) {
+      var raw = parseFloat(getComputedStyle(root).getPropertyValue(name));
+      return isNaN(raw) ? fallback : raw;
+    }
+
+    /* Both drawings sit in the middle of a mostly-transparent square, so
+       hit-testing the element's box would light the cursor up over a lot
+       of empty space. Each is drawn once into an offscreen canvas so the
+       alpha at the cursor can be read back, and the element only accepts
+       the pointer where that alpha is non-zero. */
+    var masks = {};
+    var ALPHA_MIN = 20;
+
+    function loadMask(name, src) {
+      var img = new Image();
+      img.addEventListener("load", function () {
+        try {
+          var canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          masks[name] = {
+            data: ctx.getImageData(0, 0, canvas.width, canvas.height).data,
+            w: canvas.width,
+            h: canvas.height,
+          };
+        } catch (err) {
+          // no readback available — fall back to the whole box being live
+          portrait.style.pointerEvents = "auto";
+        }
+      });
+      img.addEventListener("error", function () {
+        portrait.style.pointerEvents = "auto";
+      });
+      img.src = src;
+    }
+
+    loadMask("back", "/img/portraits/ch00202_007.png");
+    loadMask("front", "/img/portraits/ch00202_015.png");
+
+    function isOverDrawing(event) {
+      var mask = masks[portrait.classList.contains("is-front") ? "front" : "back"];
+      if (!mask) return false;
+
+      var rect = portrait.getBoundingClientRect();
+      if (
+        event.clientX < rect.left ||
+        event.clientX >= rect.right ||
+        event.clientY < rect.top ||
+        event.clientY >= rect.bottom
+      ) {
+        return false;
+      }
+
+      // the drawing is stretched to fill the box, so box coords map
+      // straight onto source pixels
+      var x = Math.floor(((event.clientX - rect.left) / rect.width) * mask.w);
+      var y = Math.floor(((event.clientY - rect.top) / rect.height) * mask.h);
+      return mask.data[(y * mask.w + x) * 4 + 3] > ALPHA_MIN;
+    }
+
+    document.addEventListener("mousemove", function (event) {
+      portrait.style.pointerEvents = isOverDrawing(event) ? "auto" : "none";
+    });
+
+    // the sheet's second row, read as four two-frame loops — the number
+    // is the column its first frame sits in
+    var EMOTE_COLS = [0, 2, 4, 6];
+    var emote = document.querySelector(".nav-emote");
+
+    function rollEmote() {
+      if (!emote) return;
+      emote.style.setProperty(
+        "--emote-col",
+        EMOTE_COLS[Math.floor(Math.random() * EMOTE_COLS.length)]
+      );
+    }
+
+
+    var busy = false;
+
+    portrait.addEventListener("click", function () {
+      if (busy) return;
+      busy = true;
+      portrait.classList.add("is-front");
+
+      rollEmote();
+      if (emote) emote.classList.add("is-visible");
+
+      setTimeout(function () {
+        portrait.classList.remove("is-front");
+        if (emote) emote.classList.remove("is-visible");
+        setTimeout(function () {
+          busy = false;
+        }, ms("--portrait-cooldown", 2000));
+      }, ms("--portrait-hold", 2000));
+    });
+  }
+
   function initFxTestToggle() {
     var button = document.getElementById("fx-test-toggle");
     if (!button) return;
@@ -528,7 +730,10 @@
      slider→property binder. Remove this function (and the 面板* groups
      in notes.astro) once values are picked. */
   function initPanelTest() {
-    if (!document.querySelector("[data-panel-r-slider]")) return;
+    // any tuning panel will do — each page carries whichever subset of
+    // the fields below it actually has controls for, and apply() skips
+    // the rest
+    if (!document.querySelector(".fx-test")) return;
 
     var fields = [
       { key: "panel-r", cssVar: "--panel-r" },
@@ -610,6 +815,29 @@
       { key: "sleep-hue", cssVar: "--sleep-hue", unit: "deg" },
       { key: "sleep-sepia", cssVar: "--sleep-sepia", unit: "%" },
       { key: "sleep-a", cssVar: "--sleep-a", isAlpha: true },
+      // Library's sidebar portrait — hold/cooldown are read back out of
+      // these by initNavPortrait() rather than used by CSS directly
+      { key: "portrait-size", cssVar: "--portrait-size", unit: "px" },
+      { key: "portrait-x", cssVar: "--portrait-x", unit: "px" },
+      { key: "portrait-y", cssVar: "--portrait-y", unit: "px" },
+      { key: "portrait-hold", cssVar: "--portrait-hold", unit: "ms" },
+      { key: "portrait-cooldown", cssVar: "--portrait-cooldown", unit: "ms" },
+      { key: "portrait-grayscale", cssVar: "--portrait-grayscale", unit: "%" },
+      { key: "portrait-brightness", cssVar: "--portrait-brightness", unit: "%" },
+      { key: "portrait-contrast", cssVar: "--portrait-contrast", unit: "%" },
+      { key: "portrait-saturate", cssVar: "--portrait-saturate", unit: "%" },
+      { key: "portrait-hue", cssVar: "--portrait-hue", unit: "deg" },
+      { key: "portrait-sepia", cssVar: "--portrait-sepia", unit: "%" },
+      { key: "portrait-a", cssVar: "--portrait-a", isAlpha: true },
+      { key: "portrait-outline-w", cssVar: "--portrait-outline-w", unit: "px" },
+      { key: "portrait-outline-r", cssVar: "--portrait-outline-r" },
+      { key: "portrait-outline-g", cssVar: "--portrait-outline-g" },
+      { key: "portrait-outline-b", cssVar: "--portrait-outline-b" },
+      { key: "portrait-outline-a", cssVar: "--portrait-outline-a", isAlpha: true },
+      { key: "emote-size", cssVar: "--emote-size", unit: "px" },
+      { key: "emote-speed", cssVar: "--emote-speed", unit: "ms" },
+      { key: "emote-x", cssVar: "--emote-x", unit: "px" },
+      { key: "emote-y", cssVar: "--emote-y", unit: "px" },
     ];
 
     function apply() {
@@ -766,6 +994,29 @@
      separate attributes (not one shared "pick one" value) is what lets
      any combination run at once. Remove this function (and the button
      rows in notes.astro) once values are picked. */
+  /* which effect layers a page starts with. Lives out here rather than
+     inside initFxTest because Library and Projects show the same layers
+     as Writing but carry no test panel — without this they'd render with
+     every layer off on a hard load, then silently switch on the moment
+     you soft-navigated over from Writing (the flags live on <html>,
+     which survives navigation). Bake these in and delete along with the
+     panels. */
+  var FX_DEFAULT_ON = ["frost", "gradient", "vignette", "divider"];
+
+  function fxAttr(key) {
+    // "text-glow" -> "fxTextGlow" (the dataset property for data-fx-text-glow)
+    return ("fx-" + key).replace(/-([a-z])/g, function (_, c) {
+      return c.toUpperCase();
+    });
+  }
+
+  function initFxDefaults() {
+    FX_DEFAULT_ON.forEach(function (key) {
+      var attr = fxAttr(key);
+      if (root.dataset[attr] === undefined) root.dataset[attr] = "on";
+    });
+  }
+
   function initFxTest() {
     var toggles = document.querySelectorAll("[data-fx-toggle]");
     if (!toggles.length) return;
@@ -780,23 +1031,10 @@
       "torn-edge": "撕纸边缘",
       divider: "分割线",
     };
-    // the combination picked while tuning — vignette/scanlines and the
-    // two decoration Extras stay off unless switched on here. The
-    // divider lines are part of the page's real layout rather than an
-    // experiment, so they default the other way.
-    var defaultOn = ["frost", "gradient", "vignette", "divider"];
-
     toggles.forEach(function (button) {
       var key = button.dataset.fxToggle;
       var label = labels[key] || key;
-      // "text-glow" -> "fxTextGlow" (the dataset property for data-fx-text-glow)
-      var attr = ("fx-" + key).replace(/-([a-z])/g, function (_, c) {
-        return c.toUpperCase();
-      });
-
-      if (root.dataset[attr] === undefined && defaultOn.indexOf(key) !== -1) {
-        root.dataset[attr] = "on";
-      }
+      var attr = fxAttr(key);
 
       // <html> keeps this state across soft navigation even though the
       // button itself is a fresh element each time — sync its label to
@@ -1046,6 +1284,17 @@
   initConsoleGreeting();
   initPersistentBackground();
 
+  // the divider lines are sized from measured geometry, so a resized
+  // window leaves them the wrong length until something re-measures.
+  // Registered once here rather than per page-load so soft navigation
+  // doesn't stack up duplicate listeners; the function is a no-op on
+  // pages that don't draw the lines.
+  var dividerResizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(dividerResizeTimer);
+    dividerResizeTimer = setTimeout(initQuadrantDividers, 100);
+  });
+
   // astro:page-load fires after the initial load AND after every
   // subsequent soft navigation (DOMContentLoaded only ever saw the
   // former) — everything that depends on page-specific DOM must re-run
@@ -1057,8 +1306,10 @@
     initPageTitleImageTest();
     initPageTitleImageTestToggle();
     initTestPanelsToBody();
-    // must precede the appliers below — they read whatever is in the
+    // both must precede the appliers below — they read whatever is in the
     // controls at the time, so the stored values have to be in place first
+    initFxDefaults();
+    initTuningReplay();
     initTuningPersistence();
     initFxTest();
     initGradientTest();
@@ -1068,10 +1319,13 @@
     // last of the panel wiring, so it hides panels the appliers above
     // have already read their starting values out of
     initFxTestToggle();
-    // after the appliers, since it measures rendered geometry and those
-    // can change the panel's own box (radius, frame width, and so on)
-    initQuadrantDividers();
+    initNavPortrait();
     initFilterTabs();
+    // after the appliers and after the filter, since both change the
+    // panel's own box — the appliers via radius/frame width, the filter
+    // by hiding most of the cards
+    initQuadrantDividers();
+    initQuadrantDividerWatch();
     initNotesAccordion();
     initNotesMicroStyleTest();
     initNotesMicroBgTest();

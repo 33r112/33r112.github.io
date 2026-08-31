@@ -674,6 +674,96 @@
 /* absolutely positioned, so scaling or moving it never pushes the nav
    links below it around — the sidebar's own layout stays exactly as it
    was before this was added */
+/* Library's sidebar art. Not a sprite sheet like .sleep-anim above —
+   two complete drawings that swap on click, so nothing here crops or
+   animates frames. 007 (looking away) is the resting state; a click
+   turns her to face front (015) for --portrait-hold, then she turns
+   back, and further clicks are ignored until --portrait-cooldown has
+   passed on top of that. Both timings are read by initNavPortrait().
+   temporary: size/position/filter sliders (the 导航栏立绘 group in
+   library.astro's panel) drive these — bake in literal values and
+   remove the var()/fallback split once picked. */
+/* The emote that pops up beside the Library portrait when she's
+   clicked. One 8x8 sheet of 64px cells; only its second row is used, and
+   that row reads as four two-frame loops — note, heart, cross-eyes,
+   scribble — so --emote-col picks which pair (0, 2, 4 or 6) and the
+   keyframes below step across the two cells from there. temporary:
+   size/position/speed sliders (the 导航栏立绘 group in library.astro's
+   panel) drive these. */
+.nav-emote {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--emote-size, 35px);
+  height: var(--emote-size, 35px);
+  transform: translate(var(--emote-x, 165px), var(--emote-y, -90px));
+  pointer-events: none;
+  background-image: url("../img/portraits/c_emotio.png");
+  background-size: calc(var(--emote-size, 35px) * 8) calc(var(--emote-size, 35px) * 8);
+  /* row 2 of 8 */
+  background-position-y: calc(var(--emote-size, 35px) * -1);
+}
+
+.nav-emote.is-visible {
+  display: block;
+  animation: nav-emote var(--emote-speed, 1000ms) steps(2) infinite;
+}
+
+@keyframes nav-emote {
+  from {
+    background-position-x: calc(var(--emote-col, 0) * var(--emote-size, 35px) * -1);
+  }
+  to {
+    background-position-x: calc((var(--emote-col, 0) + 2) * var(--emote-size, 35px) * -1);
+  }
+}
+
+.nav-portrait {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--portrait-size, 120px);
+  height: var(--portrait-size, 120px);
+  transform: translate(var(--portrait-x, 120px), var(--portrait-y, -90px));
+  background-image: url("../img/portraits/ch00202_007.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  /* the drawing only fills the middle of its own box — the rest is
+     transparent, and a plain div would still take the hover and the
+     click out there. initNavPortrait() flips this to "auto" only while
+     the cursor is actually over an opaque pixel, which also lets clicks
+     on the empty margin fall through to whatever is underneath. The
+     cursor: pointer above then only ever shows over the drawing itself,
+     since a pointer-events: none element hands the cursor off too. */
+  pointer-events: none;
+  opacity: var(--portrait-a, 1);
+  /* the outline traces the drawing itself, not the square it sits in —
+     drop-shadow reads the image's own transparency, so it hugs the hair,
+     the weapon and everything else the silhouette does, and the empty
+     margin around her stays empty. Four of them chained (each casting
+     from the previous one's result) is what fills the diagonals in. */
+  --portrait-outline: rgb(
+    var(--portrait-outline-r, 0) var(--portrait-outline-g, 0) var(--portrait-outline-b, 0) /
+      var(--portrait-outline-a, 1)
+  );
+  /* same color filters as .sleep-anim__sprite and the avatars, so all
+     three read at the same brightness — outline last, so the color
+     chain never tints it */
+  filter: grayscale(var(--portrait-grayscale, 0%)) brightness(var(--portrait-brightness, 90%))
+    contrast(var(--portrait-contrast, 100%)) saturate(var(--portrait-saturate, 100%))
+    hue-rotate(var(--portrait-hue, 0deg)) sepia(var(--portrait-sepia, 0%))
+    drop-shadow(var(--portrait-outline-w, 1.4px) 0 0 var(--portrait-outline))
+    drop-shadow(calc(var(--portrait-outline-w, 1.4px) * -1) 0 0 var(--portrait-outline))
+    drop-shadow(0 var(--portrait-outline-w, 1.4px) 0 var(--portrait-outline))
+    drop-shadow(0 calc(var(--portrait-outline-w, 1.4px) * -1) 0 var(--portrait-outline));
+}
+
+.nav-portrait.is-front {
+  background-image: url("../img/portraits/ch00202_015.png");
+}
+
 .sleep-anim {
   position: absolute;
   top: 0;
@@ -888,7 +978,19 @@
   align-items: center;
   gap: var(--space-5);
   padding: var(--space-4);
-  border: 1px solid var(--border);
+  /* same frame as .notes-row — Library, Projects and Writing rows are
+     one look, driven by the same 文章边框 sliders. Inset shadow rather
+     than a border so changing its width never reflows anything, with a
+     1px transparent border holding the space the real one used to take
+     and background-clip keeping the row's own fill from showing through
+     that ring as a hairline. */
+  box-shadow: inset 0 0 0 var(--blog-border-w, 2px)
+    rgb(
+      var(--blog-border-r, 0) var(--blog-border-g, 0) var(--blog-border-b, 0) /
+        var(--blog-border-a, 0.8)
+    );
+  border: 1px solid transparent;
+  border-radius: var(--blog-radius, 10px);
   cursor: pointer;
   /* same "Tint" treatment as .notes-row/.home-nav-vertical__link */
   background: linear-gradient(
@@ -896,6 +998,13 @@
     rgba(110, 123, 145, 0.1),
     var(--bg-raised) var(--notes-tint-spread, 35%)
   );
+}
+
+/* after the rule above, since the background shorthand there resets
+   background-clip back to border-box */
+.library-row,
+.project-row {
+  background-clip: padding-box;
 }
 
 .library-row:hover .library-title,
@@ -960,7 +1069,19 @@
   align-items: center;
   gap: var(--space-5);
   padding: var(--space-4);
-  border: 1px solid var(--border);
+  /* same frame as .notes-row — Library, Projects and Writing rows are
+     one look, driven by the same 文章边框 sliders. Inset shadow rather
+     than a border so changing its width never reflows anything, with a
+     1px transparent border holding the space the real one used to take
+     and background-clip keeping the row's own fill from showing through
+     that ring as a hairline. */
+  box-shadow: inset 0 0 0 var(--blog-border-w, 2px)
+    rgb(
+      var(--blog-border-r, 0) var(--blog-border-g, 0) var(--blog-border-b, 0) /
+        var(--blog-border-a, 0.8)
+    );
+  border: 1px solid transparent;
+  border-radius: var(--blog-radius, 10px);
   cursor: pointer;
   background: linear-gradient(
     180deg,
@@ -1303,7 +1424,9 @@
    Bake in literal values and remove the var()/fallback split once
    picked. */
 .notes-row__thumb img,
-.notes-micro-thumb img {
+.notes-micro-thumb img,
+.library-row .cover-placeholder,
+.project-row .project-screenshot {
   filter: grayscale(var(--avatar-grayscale, 0%)) brightness(var(--avatar-brightness, 80%))
     contrast(var(--avatar-contrast, 100%)) saturate(var(--avatar-saturate, 100%))
     hue-rotate(var(--avatar-hue, 0deg)) sepia(var(--avatar-sepia, 0%));

@@ -50,7 +50,9 @@ const rendered = await Promise.all(
     </label>
   </div>
 
-  <h1 class="page-title"><img src="/img/headers/projects.png" alt="Projects" /></h1>
+  <div class="page-header">
+    <h1 class="page-title"><img src="/img/headers/projects.png" alt="Projects" /></h1>
+  </div>
 
   <div class="projects-list" id="projects-list">
     {rendered.map(({ entry, Content, id, dateDisplay }) => (
