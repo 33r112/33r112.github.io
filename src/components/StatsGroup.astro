@@ -4,9 +4,11 @@ export interface Props {
   items: { text: string; filter?: string }[];
   filterTarget?: string;
   filterAttr?: string;
+  // which filter starts out selected; "all" if not given
+  defaultFilter?: string;
 }
 
-const { label, items, filterTarget, filterAttr } = Astro.props;
+const { label, items, filterTarget, filterAttr, defaultFilter = "all" } = Astro.props;
 // only worth turning into filter buttons where there's more than one
 // category to switch between, and somewhere to point the filter at
 const filterable = Boolean(filterTarget) && items.some((item) => item.filter);
@@ -15,19 +17,28 @@ const filterable = Boolean(filterTarget) && items.some((item) => item.filter);
 <div class="stats-group">
   {label && <p class="section-heading stats-group__label">{label}</p>}
   <ul class="stats-group__list" data-filter-group={filterable ? filterTarget : undefined} data-filter-attr={filterable ? filterAttr : undefined}>
-    {filterable && (
-      <li>
-        <button type="button" class="is-active" data-filter="all">All</button>
-      </li>
-    )}
     {items.map((item) =>
       item.filter ? (
         <li>
-          <button type="button" data-filter={item.filter}>{item.text}</button>
+          <button
+            type="button"
+            class:list={[item.filter === defaultFilter && "is-active"]}
+            data-filter={item.filter}
+          >
+            {item.text}
+          </button>
         </li>
       ) : (
         <li>{item.text}</li>
       )
+    )}
+    {/* "All" sits last, after the specific categories */}
+    {filterable && (
+      <li>
+        <button type="button" class:list={[defaultFilter === "all" && "is-active"]} data-filter="all">
+          All
+        </button>
+      </li>
     )}
   </ul>
 </div>

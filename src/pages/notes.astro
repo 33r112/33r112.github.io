@@ -83,43 +83,48 @@ const rendered = await Promise.all(
       <span class="fx-test__label">渐变参数</span>
       <label>
         位置
-        <input type="number" autocomplete="off" data-gradient-pos min="0" max="100" step="1" value="100" />
-        <input type="range" autocomplete="off" data-gradient-pos-slider min="0" max="100" step="1" value="100" />
+        <input type="number" autocomplete="off" data-gradient-pos min="0" max="300" step="1" value="275" />
+        <input type="range" autocomplete="off" data-gradient-pos-slider min="0" max="300" step="1" value="275" />
       </label>
       <label>
         起始 R
-        <input type="number" autocomplete="off" data-gradient-start-r min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-gradient-start-r-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-gradient-start-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-gradient-start-r-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         起始 G
-        <input type="number" autocomplete="off" data-gradient-start-g min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-gradient-start-g-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-gradient-start-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-gradient-start-g-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         起始 B
-        <input type="number" autocomplete="off" data-gradient-start-b min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-gradient-start-b-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-gradient-start-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-gradient-start-b-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         结束 R
-        <input type="number" autocomplete="off" data-gradient-end-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-gradient-end-r-slider min="0" max="255" step="1" value="0" />
+        <input type="number" autocomplete="off" data-gradient-end-r min="0" max="255" step="1" value="255" />
+        <input type="range" autocomplete="off" data-gradient-end-r-slider min="0" max="255" step="1" value="255" />
       </label>
       <label>
         结束 G
-        <input type="number" autocomplete="off" data-gradient-end-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-gradient-end-g-slider min="0" max="255" step="1" value="0" />
+        <input type="number" autocomplete="off" data-gradient-end-g min="0" max="255" step="1" value="255" />
+        <input type="range" autocomplete="off" data-gradient-end-g-slider min="0" max="255" step="1" value="255" />
       </label>
       <label>
         结束 B
-        <input type="number" autocomplete="off" data-gradient-end-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-gradient-end-b-slider min="0" max="255" step="1" value="0" />
+        <input type="number" autocomplete="off" data-gradient-end-b min="0" max="255" step="1" value="255" />
+        <input type="range" autocomplete="off" data-gradient-end-b-slider min="0" max="255" step="1" value="255" />
       </label>
       <label>
-        透明度
-        <input type="number" autocomplete="off" data-gradient-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-gradient-a-slider min="0" max="100" step="1" value="0" />
+        起始透明度
+        <input type="number" autocomplete="off" data-gradient-start-a min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-gradient-start-a-slider min="0" max="100" step="1" value="0" />
+      </label>
+      <label>
+        结束透明度
+        <input type="number" autocomplete="off" data-gradient-end-a min="0" max="100" step="1" value="5" />
+        <input type="range" autocomplete="off" data-gradient-end-a-slider min="0" max="100" step="1" value="5" />
       </label>
     </div>
     <div class="fx-test__group">
@@ -411,13 +416,13 @@ const rendered = await Promise.all(
       <span class="fx-test__label">面板边框</span>
       <label>
         红
-        <input type="number" autocomplete="off" data-panel-border-r min="0" max="255" step="1" value="90" />
-        <input type="range" autocomplete="off" data-panel-border-r-slider min="0" max="255" step="1" value="90" />
+        <input type="number" autocomplete="off" data-panel-border-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-panel-border-r-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         绿
-        <input type="number" autocomplete="off" data-panel-border-g min="0" max="255" step="1" value="90" />
-        <input type="range" autocomplete="off" data-panel-border-g-slider min="0" max="255" step="1" value="90" />
+        <input type="number" autocomplete="off" data-panel-border-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-panel-border-g-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         蓝
@@ -565,7 +570,7 @@ const rendered = await Promise.all(
 
   <div class="page-header page-header--quadrant">
     <h1 class="page-title"><img src="/img/headers/writing.png" alt="Writing" /></h1>
-    <StatsGroup items={writingCounts} filterTarget="#notes-list" filterAttr="kind" />
+    <StatsGroup items={writingCounts} filterTarget="#notes-list" filterAttr="kind" defaultFilter="article" />
   </div>
 
   <div class="notes-list" id="notes-list">

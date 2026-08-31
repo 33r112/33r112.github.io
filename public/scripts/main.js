@@ -34,19 +34,29 @@
       var items = target.querySelectorAll("[data-" + attr + "]");
       var tabs = group.querySelectorAll("[data-filter]");
 
+      function select(tab) {
+        tabs.forEach(function (t) {
+          t.classList.remove("is-active");
+        });
+        tab.classList.add("is-active");
+
+        var filter = tab.dataset.filter;
+        items.forEach(function (item) {
+          item.hidden = filter !== "all" && item.dataset[attr] !== filter;
+        });
+      }
+
       tabs.forEach(function (tab) {
         tab.addEventListener("click", function () {
-          tabs.forEach(function (t) {
-            t.classList.remove("is-active");
-          });
-          tab.classList.add("is-active");
-
-          var filter = tab.dataset.filter;
-          items.forEach(function (item) {
-            item.hidden = filter !== "all" && item.dataset[attr] !== filter;
-          });
+          select(tab);
         });
       });
+
+      // apply whichever tab the markup starts out marking active, so a
+      // page whose default isn't "all" actually opens filtered rather
+      // than showing everything under a highlighted category tab
+      var initial = group.querySelector("[data-filter].is-active");
+      if (initial) select(initial);
     });
   }
 
@@ -682,7 +692,8 @@
       { key: "end-r", cssVar: "--gradient-end-r" },
       { key: "end-g", cssVar: "--gradient-end-g" },
       { key: "end-b", cssVar: "--gradient-end-b" },
-      { key: "a", cssVar: "--gradient-a", isAlpha: true },
+      { key: "start-a", cssVar: "--gradient-start-a", isAlpha: true },
+      { key: "end-a", cssVar: "--gradient-end-a", isAlpha: true },
     ];
 
     function apply() {
@@ -739,7 +750,7 @@
     // two decoration Extras stay off unless switched on here. The
     // divider lines are part of the page's real layout rather than an
     // experiment, so they default the other way.
-    var defaultOn = ["frost", "noise", "vignette", "divider"];
+    var defaultOn = ["frost", "gradient", "vignette", "divider"];
 
     toggles.forEach(function (button) {
       var key = button.dataset.fxToggle;

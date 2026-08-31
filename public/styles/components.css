@@ -171,7 +171,7 @@
   pointer-events: none;
   border-radius: inherit;
   box-shadow: inset 0 0 0 var(--panel-border-w, 0px)
-    rgb(var(--panel-border-r, 90) var(--panel-border-g, 90) var(--panel-border-b, 0) /
+    rgb(var(--panel-border-r, 0) var(--panel-border-g, 0) var(--panel-border-b, 0) /
         var(--panel-border-a, 0));
 }
 
@@ -307,10 +307,11 @@
      finishes instead, which moves the visible transition up or down */
   background: linear-gradient(
     180deg,
-    rgb(var(--gradient-start-r, 255) var(--gradient-start-g, 255) var(--gradient-start-b, 255) /
-        var(--gradient-a, 0)),
-    rgb(var(--gradient-end-r, 0) var(--gradient-end-g, 0) var(--gradient-end-b, 0) / var(--gradient-a, 0))
-      var(--gradient-pos, 100%)
+    rgb(var(--gradient-start-r, 0) var(--gradient-start-g, 0) var(--gradient-start-b, 0) /
+        var(--gradient-start-a, 0)),
+    rgb(var(--gradient-end-r, 255) var(--gradient-end-g, 255) var(--gradient-end-b, 255) /
+        var(--gradient-end-a, 0.05))
+      var(--gradient-pos, 275%)
   );
   /* see the vignette layer above — keeps the ramp viewport-sized so a
      taller panel doesn't stretch it */
@@ -1153,6 +1154,17 @@
     rgba(110, 123, 145, 0.1),
     var(--bg-raised) var(--notes-tint-spread, 35%)
   );
+}
+
+/* .notes-row carries a 1px transparent spacer border (see above), and a
+   background paints under a border by default — so the row's own lighter
+   fill was showing through that ring as a faint hairline just outside
+   the frame, which .notes-micro-item doesn't have since it has no such
+   spacer. Clipping to the padding box stops the fill short of it.
+   Has to sit after every `background` shorthand on this element, since
+   the shorthand resets background-clip back to border-box. */
+.notes-row {
+  background-clip: padding-box;
 }
 
 /* temporary: same Tint treatment as above, but with the base color the
