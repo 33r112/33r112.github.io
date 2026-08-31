@@ -1,14 +1,23 @@
 ---
 import Layout from "./Layout.astro";
 import NavVertical from "../components/NavVertical.astro";
+import SidebarStats from "../components/SidebarStats.astro";
 
 export interface Props {
   current: "library" | "projects" | "notes" | "about";
   title: string;
   description: string;
+  sidebarStats?: {
+    label: string;
+    items: { text: string; filter?: string }[];
+    latest: string;
+    filterTarget?: string;
+    filterAttr?: string;
+    showCounts?: boolean;
+  };
 }
 
-const { current, title, description } = Astro.props;
+const { current, title, description, sidebarStats } = Astro.props;
 ---
 
 <Layout title={title} description={description}>
@@ -22,11 +31,27 @@ const { current, title, description } = Astro.props;
        initPersistentBackground() in main.js — see base.css for the
        matching stacking-context notes. -->
 
-  <main class="container shell notes-shell" id="main-content">
-    <aside class="sidebar-col" aria-label="Navigation">
-      <p class="sidebar-intro">THREAD 33 is a personal archive for media, projects and notes.</p>
+  <main class="container shell notes-shell" class:list={[current === "notes" && "shell--quadrant"]} id="main-content">
+    <aside class="sidebar-col" class:list={[current !== "about" && "sidebar-col--titled"]} aria-label="Navigation">
+      <div class="sleep-anim" aria-hidden="true">
+        <div class="sleep-anim__sprite"></div>
+      </div>
+      {current === "notes" && <div class="quadrant-divider--h-left" aria-hidden="true"></div>}
       <NavVertical current={current} />
+      {sidebarStats && <SidebarStats {...sidebarStats} />}
     </aside>
+
+    {current === "notes" && (
+      <>
+        <div class="quadrant-divider--v" aria-hidden="true"></div>
+        <div class="quadrant-divider--h" aria-hidden="true"></div>
+        <div class="fx-layer fx-layer--frost" aria-hidden="true"></div>
+        <div class="fx-layer fx-layer--vignette" aria-hidden="true"></div>
+        <div class="fx-layer fx-layer--noise" aria-hidden="true"></div>
+        <div class="fx-layer fx-layer--scanlines" aria-hidden="true"></div>
+        <div class="fx-layer fx-layer--gradient" aria-hidden="true"></div>
+      </>
+    )}
 
     <div class="main-col">
       <slot />

@@ -10,6 +10,14 @@
   margin: 0;
 }
 
+/* the browser's own [hidden]{display:none} UA rule loses to any author
+   rule that sets display on the same element (e.g. .notes-item's own
+   display:flex) — restore hidden's guarantee so JS toggling the attribute
+   (filter tabs, accordions) actually hides things instead of no-op'ing */
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   /* reserve the scrollbar's width on every page, whether or not that page's

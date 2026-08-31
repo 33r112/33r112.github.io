@@ -32,48 +32,41 @@
   letter-spacing: 0.02em;
 }
 
+/* Library/Projects/Notes show a wordmark image here instead of plain
+   text. Size/position are still being tuned via test sliders — see
+   .page-title-img-test in layout.css — hence the var()/fallback split;
+   bake in literal values and remove that once picked. */
+.page-title img {
+  /* block, not inline (the default for an img inside an h1) — inline
+     leaves a few px of line-height slop under the image that would throw
+     off .sidebar-col--titled's height-matching calc below */
+  display: block;
+  height: var(--page-title-img-height, 150px);
+  width: auto;
+  transform: translate(var(--page-title-img-x, 0px), var(--page-title-img-y, 0px));
+}
+
 /* .main-col's flex gap (--space-8) is too wide specifically between the
    page title and the section right after it — pull that one gap in
    without touching the rhythm between other .main-col children. "* " (not
-   "div") so this still applies when that next sibling is an <hr> instead */
-.page-title + * {
+   "div") so this still applies when that next sibling is an <hr> instead.
+   Scoped to a direct .main-col child so this doesn't also match the
+   StatsGroup sitting next to .page-title inside Notes' .page-header. */
+.main-col > .page-title + * {
   margin-block-start: calc(var(--space-5) - var(--space-8));
 }
 
-/* ---- filter tabs: shared by Library and Notes ---- */
-
-.filter-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  margin-block-end: var(--space-5);
-}
-
-.filter-tab {
-  display: inline-flex;
-  align-items: center;
-  padding-block: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.filter-tab:hover {
-  color: var(--text);
-}
-
-.filter-tab.is-active {
-  color: var(--text);
-}
-
-.filter-tab.is-active::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  margin-inline-end: var(--space-2);
+/* Library/Projects/Notes: pushes the sidebar nav down to start level with
+   the content list, not with the page-title wordmark image above it —
+   matches the same (image height + .page-title + *'s gap) that content
+   sits at. Not applied on About, which has no wordmark image. */
+.sidebar-col--titled {
+  margin-block-start: calc(var(--page-title-img-height, 150px) + var(--space-5));
+  /* the sticky offset has to match that push-down as well as .shell's
+     padding, otherwise the column scrolls all the way up to the smaller
+     offset before catching — which is exactly the bit of travel that
+     made the nav look like it still moved */
+  top: calc(var(--space-7) + var(--page-title-img-height, 150px) + var(--space-5));
 }
 
 /* corner-bracket hover mark — the site's signature hover state */
@@ -148,9 +141,214 @@
 /* ---- decorative background ASCII art (Notes page only) ---- */
 
 /* frames the whole sidebar+content area in a translucent gray panel so
-   it reads clearly over the background image behind it */
+   it reads clearly over the background image behind it.
+   temporary: color/opacity/radius/border/shadow sliders (see
+   .panel-test) drive these — defaults are the original flat
+   rgba(55,55,55,0.3) with no radius, border or shadow. Bake in literal
+   values and remove the var()/fallback split once picked. */
 .notes-shell {
-  background: rgba(55, 55, 55, 0.3);
+  position: relative;
+  background: rgb(
+    var(--panel-r, 100) var(--panel-g, 100) var(--panel-b, 100) / var(--panel-a, 0.15)
+  );
+  border-radius: var(--panel-radius, 0px);
+  box-shadow: var(--panel-shadow-x, 0px) var(--panel-shadow-y, -100px)
+    var(--panel-shadow-blur, 60px) var(--panel-shadow-spread, 0px)
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        var(--panel-shadow-a, 1));
+}
+
+/* separate element-less layer for the panel's own frame: an inset
+   shadow can't coexist with the outer shadow above in one declaration
+   without them fighting over the shorthand, so it lives on ::after —
+   which also keeps it above the panel's background but below the
+   .fx-layer stack */
+.notes-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--panel-border-w, 0px)
+    rgb(var(--panel-border-r, 90) var(--panel-border-g, 90) var(--panel-border-b, 0) /
+        var(--panel-border-a, 0));
+}
+
+/* temporary: Notes-page background-effect experiments — five real,
+   independently-toggleable overlay layers (rendered by InnerLayout.astro
+   only for current="notes") instead of one shared pseudo-element, so any
+   combination of them can be switched on together, not just one at a
+   time. Each is hidden unless its own data-fx-* attribute on <html> says
+   "on" — see .fx-test. Remove this whole block (and the matching
+   markup/JS) once picked, or none. */
+/* these come after .sidebar-col in DOM order and are positioned, so
+   without an explicit stacking order they'd paint on top of the nav,
+   the quadrant divider lines and the article list — everything they're
+   meant to sit behind. Each gets its own z-index below the content's
+   (10, set right after) so the layers stack in a deliberate order
+   rather than by DOM position: noise sits above the flat color washes
+   so its grain still reads even when gradient/vignette are at full
+   opacity, and frost stays at the bottom since it blurs what's behind
+   the panel entirely. */
+.fx-layer {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* follows the panel's own rounding rather than overflowing square
+     corners past it — .notes-shell can't just use overflow:hidden here,
+     that would break .sidebar-col's position:sticky */
+  border-radius: inherit;
+}
+
+.fx-layer--frost {
+  z-index: 1;
+}
+
+.fx-layer--vignette {
+  z-index: 2;
+}
+
+.fx-layer--gradient {
+  z-index: 3;
+}
+
+.fx-layer--scanlines {
+  z-index: 4;
+}
+
+.fx-layer--noise {
+  z-index: 5;
+}
+
+/* .sidebar-col is already sticky and the dividers already absolute, so
+   z-index alone applies to them — only .main-col is static and needs a
+   position to make z-index take effect (already has position: relative
+   from layout.css) */
+.shell--quadrant > .sidebar-col,
+.shell--quadrant > .main-col,
+.shell--quadrant > .quadrant-divider--v,
+.shell--quadrant > .quadrant-divider--h {
+  z-index: 10;
+}
+
+/* temporary: blur/brightness/contrast/saturation sliders (see .fx-test's
+   毛玻璃参数 group) drive these — backdrop-filter takes a whole list of
+   functions, not just blur, so the frost can also lighten/deepen or
+   drain the color out of whatever shows through. Bake in literal values
+   and remove the var()/fallback split once picked. */
+/* temporary: blur/brightness/contrast/saturation sliders (see .fx-test's
+   毛玻璃参数 group) drive these — backdrop-filter takes a whole list of
+   functions, not just blur, so the frost can also lighten/deepen or
+   drain the color out of whatever shows through. Bake in literal values
+   and remove the var()/fallback split once picked. */
+/* temporary: blur/brightness/contrast/saturation sliders (see .fx-test's
+   毛玻璃参数 group) drive these — backdrop-filter takes a whole list of
+   functions, not just blur, so the frost can also lighten/deepen or
+   drain the color out of whatever shows through. Bake in literal values
+   and remove the var()/fallback split once picked. */
+[data-fx-frost="on"] .fx-layer--frost {
+  display: block;
+  backdrop-filter: blur(var(--frost-blur, 0px)) brightness(var(--frost-brightness, 100%))
+    contrast(var(--frost-contrast, 100%)) saturate(var(--frost-saturate, 5%));
+  -webkit-backdrop-filter: blur(var(--frost-blur, 0px)) brightness(var(--frost-brightness, 100%))
+    contrast(var(--frost-contrast, 100%)) saturate(var(--frost-saturate, 5%));
+}
+
+/* background-attachment: fixed sizes/positions the gradient against the
+   viewport rather than the layer's own box, so expanding an article
+   (which makes the panel taller) doesn't stretch the ramp out with it —
+   the wash stays exactly as it looks on screen right now. Still clipped
+   to the panel; only the gradient's own geometry is viewport-based. */
+/* temporary: color/opacity/spread sliders (see .fx-test's 暗角参数 group)
+   drive these — 起始 is how far out the clear center reaches before the
+   darkening begins. Bake in literal values and remove the var()/fallback
+   split once picked. */
+[data-fx-vignette="on"] .fx-layer--vignette {
+  display: block;
+  background: radial-gradient(
+    ellipse at center,
+    transparent var(--vignette-start, 35%),
+    rgb(var(--vignette-r, 0) var(--vignette-g, 0) var(--vignette-b, 0) / var(--vignette-a, 0.55))
+      100%
+  );
+  background-attachment: fixed;
+}
+
+/* opacity/tile-size/blend sliders (see .fx-test's 噪点参数 group) drive
+   these; the background-image itself is regenerated in JS by
+   initNoiseTest(), since grain density lives inside the SVG's
+   feTurbulence baseFrequency and can't be reached from CSS */
+[data-fx-noise="on"] .fx-layer--noise {
+  display: block;
+  opacity: var(--noise-opacity, 0.1);
+  background-size: var(--noise-size, 250px) var(--noise-size, 250px);
+  mix-blend-mode: var(--noise-blend, normal);
+}
+
+[data-fx-scanlines="on"] .fx-layer--scanlines {
+  display: block;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.18) 0px,
+    rgba(0, 0, 0, 0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* angle/start-color/end-color/opacity sliders (see .fx-test's Gradient
+   group) drive these — defaults are a very faint top-down black-to-gray
+   wash, matching the values picked while tuning */
+[data-fx-gradient="on"] .fx-layer--gradient {
+  display: block;
+  /* fixed top-to-bottom; --gradient-pos slides the point where the ramp
+     finishes instead, which moves the visible transition up or down */
+  background: linear-gradient(
+    180deg,
+    rgb(var(--gradient-start-r, 255) var(--gradient-start-g, 255) var(--gradient-start-b, 255) /
+        var(--gradient-a, 0)),
+    rgb(var(--gradient-end-r, 0) var(--gradient-end-g, 0) var(--gradient-end-b, 0) / var(--gradient-a, 0))
+      var(--gradient-pos, 100%)
+  );
+  /* see the vignette layer above — keeps the ramp viewport-sized so a
+     taller panel doesn't stretch it */
+  background-attachment: fixed;
+}
+
+/* text glow only shows up on hover (same trigger as the existing accent
+   color change on .notes-title) — a much larger/doubled shadow than a
+   first pass so it reads clearly even against that already-bright color */
+[data-fx-text-glow="on"] .notes-row:hover .notes-title {
+  text-shadow: 0 0 6px var(--accent), 0 0 16px var(--accent);
+}
+
+[data-fx-torn-edge="on"] .notes-shell {
+  clip-path: polygon(
+    0% 0%,
+    10% 2.5%,
+    20% 0%,
+    30% 2.5%,
+    40% 0%,
+    50% 2.5%,
+    60% 0%,
+    70% 2.5%,
+    80% 0%,
+    90% 2.5%,
+    100% 0%,
+    100% 100%,
+    90% 97.5%,
+    80% 100%,
+    70% 97.5%,
+    60% 100%,
+    50% 97.5%,
+    40% 100%,
+    30% 97.5%,
+    20% 100%,
+    10% 97.5%,
+    0% 100%
+  );
 }
 
 /* wide sky strip pinned to the very top, tiling horizontally only — the
@@ -246,13 +444,154 @@
   transform: scaleX(-1);
 }
 
-/* ---- sidebar (Library/Projects/Notes/About): intro blurb + reuses
-   .home-nav-vertical from the home page for the nav list itself ---- */
+/* ---- stats group: post/review/project counts + latest date. Used both
+   in the sidebar (Library/Projects/Notes' LATEST, plus Library/Projects'
+   own counts) and, on Notes, inline next to the page title (see
+   .page-header) for the clickable Posts/Thoughts/All group instead ---- */
 
-.sidebar-intro {
+.sidebar-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.stats-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stats-group__label {
+  margin-block-end: 0;
+}
+
+.stats-group__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--text-muted);
-  max-width: 22em;
+}
+
+/* plain (non-clickable) stat lines get a dash marker; lines with a filter
+   button get the button's own active-state square marker instead below */
+.stats-group__list li:not(:has(button))::before {
+  content: "- ";
+}
+
+.stats-group__list button {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.stats-group__list button:hover {
+  color: var(--text);
+}
+
+.stats-group__list button.is-active {
+  color: var(--text);
+}
+
+/* reserved on every button, not just the active one — otherwise the
+   active button's own width changes when the marker appears/disappears,
+   nudging every button after it sideways each time the filter changes */
+.stats-group__list button::before {
+  content: "";
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-inline-end: var(--space-2);
+  background: transparent;
+}
+
+.stats-group__list button.is-active::before {
+  background: var(--accent);
+}
+
+/* Library/Notes: page title + its StatsGroup (category tabs, or
+   Posts/Thoughts/All) share one row, the latter right-aligned and laid
+   out horizontally instead of the sidebar's stacked list */
+.page-header {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* Notes: a real structural divider, not decoration, splitting the page
+   into four regions — top-left stays empty (reserved for future art),
+   top-right holds the title + Posts/Thoughts/All, bottom-left holds the
+   nav, bottom-right holds the article list. Both lines are single
+   elements (not two borders meeting at a seam) sized/positioned by
+   initQuadrantDividers() in main.js: their exact position depends on
+   the sidebar column's rendered width (a minmax() range, not fixed) and
+   the title image's height (a live-adjustable value), neither of which
+   CSS alone can hand a border or grid track without either guessing a
+   px value or risking a sub-pixel mismatch between two separately-drawn
+   lines. Both use a plain background fill (not border) so they render
+   at identically the same weight. */
+.shell--quadrant {
+  position: relative;
+}
+
+.quadrant-divider--v,
+.quadrant-divider--h,
+.quadrant-divider--h-left {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+/* The horizontal line is drawn as two separate segments because the two
+   halves have to behave differently once the page scrolls: the right one
+   belongs to the article column and travels with it, while the left one
+   has to stay glued to the nav, which is pinned. Keeping it a child of
+   .sidebar-col is what does that — the sticky column carries it along,
+   so the line never drifts away from the nav underneath it. */
+[data-fx-divider="off"] .quadrant-divider--v,
+[data-fx-divider="off"] .quadrant-divider--h,
+[data-fx-divider="off"] .quadrant-divider--h-left {
+  display: none;
+}
+
+.quadrant-divider--v {
+  width: 2px;
+}
+
+.quadrant-divider--h,
+.quadrant-divider--h-left {
+  height: 2px;
+}
+
+/* never let the wordmark image get squeezed narrower than its natural
+   size if the StatsGroup next to it needs more room than is left —
+   .stats-group__list wraps onto another line instead (flex-wrap above) */
+.page-header .page-title {
+  flex-shrink: 0;
+}
+
+.page-header + * {
+  margin-block-start: calc(var(--space-5) - var(--space-8));
+}
+
+.page-header .stats-group__list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.page-header .stats-group__list li:not(:has(button))::before {
+  content: none;
 }
 
 /* ---- shared block heading ---- */
@@ -325,6 +664,55 @@
   height: calc(220px * 2 / 3);
 }
 
+/* two-frame pixel sprite above the sidebar nav. The sheet is 48x32 —
+   two 24x32 frames side by side — stepped through with steps(2) rather
+   than being an actual GIF, so the frame rate is controllable from CSS.
+   temporary: scale/position/speed sliders (see .sleep-anim-test) drive
+   these; bake in literal values and remove the var()/fallback split
+   once picked. */
+/* absolutely positioned, so scaling or moving it never pushes the nav
+   links below it around — the sidebar's own layout stays exactly as it
+   was before this was added */
+.sleep-anim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(24px * var(--sleep-scale, 2));
+  height: calc(32px * var(--sleep-scale, 2));
+  transform: translate(var(--sleep-x, 150px), var(--sleep-y, -40px));
+  pointer-events: none;
+}
+
+/* the sprite stays at its native 24x32 and is scaled by transform, so
+   the @keyframes below can stay in native pixel offsets regardless of
+   the scale factor. image-rendering: pixelated keeps the enlargement
+   hard-edged instead of smoothing the pixel art into mush. */
+.sleep-anim__sprite {
+  width: 24px;
+  height: 32px;
+  transform: scale(var(--sleep-scale, 2));
+  transform-origin: top left;
+  background-image: url("../img/sleep-anim.png");
+  background-size: 48px 32px;
+  image-rendering: pixelated;
+  /* temporary: the 导航栏动画 group's filter sliders drive these — same
+     chain the avatar thumbnails use, so the two stay comparable */
+  opacity: var(--sleep-a, 0.8);
+  filter: grayscale(var(--sleep-grayscale, 0%)) brightness(var(--sleep-brightness, 80%))
+    contrast(var(--sleep-contrast, 100%)) saturate(var(--sleep-saturate, 100%))
+    hue-rotate(var(--sleep-hue, 0deg)) sepia(var(--sleep-sepia, 0%));
+  animation: sleep-anim var(--sleep-speed, 2000ms) steps(2) infinite;
+}
+
+@keyframes sleep-anim {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -48px 0;
+  }
+}
+
 /* each link is its own bordered box, not lines inside one shared panel */
 .home-nav-vertical {
   display: flex;
@@ -332,19 +720,44 @@
   gap: var(--space-2);
 }
 
+/* the frame is an inset box-shadow, not a border, so changing its width
+   never reflows anything — a border's width is part of the box model
+   and would push the element's own size (and everything after it)
+   around as the width slider moves */
 .home-nav-vertical__link {
   display: block;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 var(--nav-border-w, 2px)
+    rgb(
+      var(--nav-border-r, 0) var(--nav-border-g, 0) var(--nav-border-b, 0) /
+        var(--nav-border-a, 0.5)
+    );
+  /* holds the 1px the real border used to occupy, so the button's outer
+     size is unchanged from before the switch to box-shadow */
+  border: 1px solid transparent;
+  border-radius: var(--nav-radius, 4px);
   background: var(--bg-raised);
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
+  transition: color var(--transition-base);
 }
 
-.home-nav-vertical__link:hover {
+/* text color, plus the fill snapping back to the original --bg-raised
+   Tint the button had before its base color became adjustable — the
+   frame still deliberately stays put, same as .notes-row's.
+   :not(.is-active) because the current page's own button doesn't go
+   anywhere when clicked, so it shouldn't light up under the cursor
+   either — and its accent-colored label over the lightened fill read as
+   an odd pairing besides. */
+.home-nav-vertical__link:not(.is-active):hover {
   color: var(--text);
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    var(--bg-raised) var(--notes-tint-spread, 35%)
+  );
 }
 
 .home-nav-vertical__link.is-active::before {
@@ -359,6 +772,9 @@
 .home-nav-vertical__link.is-active {
   color: var(--accent);
 }
+
+/* the current page's own button deliberately has no hover state at all —
+   clicking it goes nowhere, so it stays exactly as it sits */
 
 /* info slot below the nav buttons — where the reference site has its
    visit-count / WIP / guestbook block; content not decided yet, so it's
@@ -703,10 +1119,29 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid var(--border);
+  /* temporary: R/G/B/opacity/width/radius sliders (see the 文章边框 group
+     in .fx-test) drive the frame — defaults match --border (50 47 44) at
+     2px. Bake in literal values and remove the var()/fallback split once
+     picked. An inset box-shadow, not a border, so changing its width
+     never reflows anything (see .home-nav-vertical__link for the same
+     note). */
+  box-shadow: inset 0 0 0 var(--blog-border-w, 2px)
+    rgb(
+      var(--blog-border-r, 0) var(--blog-border-g, 0) var(--blog-border-b, 0) /
+        var(--blog-border-a, 0.8)
+    );
+  /* holds the 1px the real border used to occupy, so the row's outer
+     size still lines up with .notes-expand's own 1px border below it */
+  border: 1px solid transparent;
+  border-radius: var(--blog-radius, 10px);
   background: var(--bg-raised);
   cursor: pointer;
 }
+
+/* deliberately no :hover/:focus-within override of the frame here — the
+   row's hover feedback is the corner brackets (.bracket-hover) and the
+   title turning accent-colored, and the frame is meant to stay put
+   through all of it */
 
 /* the "Tint" style option, picked as the permanent look for these two —
    spread (how far down the tint extends before fading to --bg-raised) is
@@ -720,14 +1155,55 @@
   );
 }
 
+/* temporary: same Tint treatment as above, but with the base color the
+   gradient settles into driven by the 导航栏底色 sliders instead of
+   --bg-raised. Split out from the shared rule so tuning the nav doesn't
+   drag .notes-row along with it. Defaults are --bg-raised's own
+   30/28/26, so this starts out identical. Bake in literal values and
+   remove the var()/fallback split once picked. */
+.home-nav-vertical__link {
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    rgb(var(--nav-bg-r, 25) var(--nav-bg-g, 25) var(--nav-bg-b, 25) / var(--nav-bg-a, 0.6))
+      var(--notes-tint-spread, 35%)
+  );
+}
+
 /* the full article content, revealed in place when its .notes-row is
    clicked — same treatment as the article-body typography used to have
    its own standalone page */
 .notes-expand {
+  position: relative;
   border: 1px solid var(--border);
   border-top: none;
   background: var(--bg-raised);
   padding: var(--space-4);
+}
+
+/* collapse control — absolutely positioned so it never adds to
+   .notes-expand's own height/flow; ">>" rotated to point up reads as
+   "collapse" the same way the down-triangle on the row reads as
+   "expand" */
+.notes-collapse {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: var(--space-1);
+  cursor: pointer;
+  transform: rotate(-90deg);
+}
+
+.notes-collapse:hover,
+.notes-collapse:focus-visible {
+  color: var(--accent);
 }
 
 .notes-row__body {
@@ -750,6 +1226,39 @@
 .notes-row:hover .notes-title,
 .notes-row:focus-visible .notes-title {
   color: var(--accent);
+}
+
+/* small bobbing "you can expand this" hint after the title, only while
+   collapsed and hovering — reserves its space at all times (opacity
+   only) so nothing shifts when it fades in */
+.notes-title::after {
+  content: "▾";
+  display: inline-block;
+  margin-inline-start: var(--space-2);
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.notes-row:hover .notes-title::after {
+  opacity: 1;
+  animation: notes-title-arrow-bob 1s ease-in-out infinite;
+}
+
+/* flips to point up once expanded — "hover to collapse" mirrors the
+   collapsed state's "hover to expand", instead of just disappearing */
+.notes-row[aria-expanded="true"] .notes-title::after {
+  content: "▴";
+}
+
+@keyframes notes-title-arrow-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
 
 .notes-date {
@@ -776,10 +1285,170 @@
   overflow: hidden;
 }
 
+/* temporary: grayscale/brightness/contrast/saturation/hue/sepia sliders
+   (see the 头像滤镜 group in .fx-test) drive this, shared with
+   .notes-micro-thumb img below so both kinds of entry stay in step.
+   Bake in literal values and remove the var()/fallback split once
+   picked. */
+.notes-row__thumb img,
+.notes-micro-thumb img {
+  filter: grayscale(var(--avatar-grayscale, 0%)) brightness(var(--avatar-brightness, 80%))
+    contrast(var(--avatar-contrast, 100%)) saturate(var(--avatar-saturate, 100%))
+    hue-rotate(var(--avatar-hue, 0deg)) sepia(var(--avatar-sepia, 0%));
+}
+
 .notes-row__thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Micro entries: no title/accordion — just a date, whatever short
+   Markdown content follows, and an optional avatar, visually lighter
+   than a full .notes-row so the two read as clearly different weights in
+   the same timeline */
+.notes-micro-item {
+  position: relative;
+  display: flex;
+  /* top-aligned, not centered, so the first line of text starts level
+     with the top of the avatar next to it */
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
+  /* temporary: R/G/B/opacity sliders drive the background, and a second
+     set drives the frame/rounding below (see the 随手记背景 and 随手记边框
+     groups in .fx-test) — defaults are #202020 at 60% opacity with no
+     frame and square corners. Bake in literal values and remove the
+     var()/fallback split once picked. */
+  background: rgb(
+    var(--micro-bg-r, 32) var(--micro-bg-g, 32) var(--micro-bg-b, 32) /
+      var(--micro-bg-a, 0.6)
+  );
+  border-radius: var(--micro-radius, 10px);
+  /* an inset shadow rather than a border, for the same reason
+     .notes-row's frame is one — a border's width is part of the box
+     model, so widening it would reflow the row */
+  box-shadow: inset 0 0 0 var(--micro-border-w, 2px)
+    rgb(var(--micro-border-r, 0) var(--micro-border-g, 0) var(--micro-border-b, 0) /
+        var(--micro-border-a, 0.8));
+}
+
+/* an entry with no avatar reserves the space one would have taken, so
+   its date still lines up with the ones that do have it (and with a
+   normal blog row's date: row padding + gap + 70px thumb) */
+.notes-micro-item:not(:has(.notes-micro-thumb)) {
+  padding-inline-end: calc(70px + (2 * var(--space-4)));
+}
+
+/* same 70px box as .notes-row__thumb so both kinds of entry read as one
+   column of avatars. Pinned to the bottom, unlike the text beside it
+   (which is top-aligned via .notes-micro-item's align-items) — on a
+   short entry the row is exactly this tall so the two coincide, but on
+   a taller one (multiple lines, or its own figure) the avatar stays in
+   the bottom-right corner instead of riding up with the first line. */
+.notes-micro-thumb {
+  flex-shrink: 0;
+  align-self: flex-end;
+  width: 70px;
+  height: 70px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.notes-micro-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* wraps date + body as one column, separate from the optional thumbnail,
+   so the "avatar" test style can add a thumbnail without having to
+   fight the date's own positioning */
+.notes-micro-main {
+  display: flex;
+  flex-direction: column-reverse;
+  flex: 1;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+/* column-reverse puts this (first in the markup) at the bottom visually;
+   align-self pins it to the right */
+.notes-micro-date {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* temporary: compares the default Micro entry width against "Narrow".
+   Remove this whole block (and the button row in notes.astro) once one
+   is picked. */
+.notes-micro-style-test {
+  top: var(--space-3);
+}
+
+/* "Narrow" — actually shrinks the card's own box (not just its inner
+   padding) by twice a .notes-row__thumb's reserved width (70px + gap)
+   and centers what's left, instead of padding the content inward while
+   the card's background/border stay full width */
+#notes-list[data-micro-style="narrow"] .notes-micro-item {
+  width: calc(100% - (2 * (70px + var(--space-4))));
+  margin-inline: auto;
+  /* the width shrink above already insets the right edge by 70px + gap,
+     the same amount .notes-micro-item reserves via padding-inline-end —
+     drop back to the plain row padding here so the date doesn't shift
+     again on top of that and end up moving when this style is toggled */
+  padding-inline-end: var(--space-4);
+}
+
+/* tighter than a full article's .article-body — a couple of sentences
+   don't need the same generous margins/line-height a long piece does */
+.notes-micro-body {
+  line-height: var(--leading-snug);
+  /* .notes-micro-item reserves a thumbnail-width strip on the right so
+     the date lines up with a normal blog row's date (see that rule) —
+     that strip is otherwise empty space, so let the body text alone
+     (not .notes-micro-date, which must stay put) push into part of it
+     for a bit more room to wrap, rather than stranding a couple of
+     trailing characters on their own line. Approximate, not measured
+     against a specific browser — nudge this if a line still runs short. */
+  margin-inline-end: -40px;
+}
+
+.notes-micro-body p {
+  margin-block: var(--space-2);
+}
+
+.notes-micro-body p:first-child {
+  margin-block-start: 0;
+}
+
+.notes-micro-body p:last-child {
+  margin-block-end: 0;
+}
+
+/* images default to left-aligned inside a Micro entry unless the entry
+   overrides it itself (e.g. wrapping a <Figure> in <Center>) — long-form
+   Notes articles keep their own default (centered) via .article-figure.
+   Margin is tightened to match the compact paragraph spacing above —
+   .article-figure's own margin-block:var(--space-5) is sized for a
+   long-form piece and read as a mismatched gap next to it. */
+.notes-micro-body .article-figure {
+  text-align: left;
+  margin-block: var(--space-2);
+}
+
+.notes-micro-body {
+  min-width: 0;
+}
+
+/* used inside Markdown/MDX content via the <Center> component, since
+   plain Markdown has no way to express text alignment itself */
+.center-text {
+  text-align: center;
 }
 
 /* ---- article: note detail page ---- */

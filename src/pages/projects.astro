@@ -1,17 +1,25 @@
 ---
 import InnerLayout from "../layouts/InnerLayout.astro";
 import { getCollection, render } from "astro:content";
+import { formatDate } from "../utils/formatDate";
 
 const entries = await getCollection("projects");
+
+const latestDate = entries.reduce(
+  (latest, entry) => (entry.data.date > latest ? entry.data.date : latest),
+  entries[0].data.date
+);
+const projectsStats = {
+  label: "PROJECTS",
+  items: [{ text: `${entries.length} Projects` }],
+  latest: formatDate(latestDate),
+};
 
 const rendered = await Promise.all(
   entries.map(async (entry) => {
     const { Content } = await render(entry);
     const id = `project-modal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
-    const d = entry.data.date;
-    const dateDisplay = `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(
-      d.getUTCDate()
-    ).padStart(2, "0")}`;
+    const dateDisplay = formatDate(entry.data.date);
     return { entry, Content, id, dateDisplay };
   })
 );
@@ -21,8 +29,30 @@ const rendered = await Promise.all(
   current="projects"
   title="Projects — THREAD 33"
   description="Things ryoku33r has built — starting with a turn-based × action RPG in Unreal Engine 5."
+  sidebarStats={projectsStats}
 >
-  <h1 class="page-title">Projects</h1>
+  <!-- temporary: size/position sliders for the header wordmark image,
+       remove along with the matching CSS/JS once values are picked -->
+  <button type="button" class="page-title-img-test-toggle" data-title-img-test-toggle>Show Test Controls</button>
+  <div class="hue-test page-title-img-test" id="page-title-img-test-panel" hidden>
+    <label>
+      Height
+      <input type="number" data-title-img-height min="20" max="300" step="1" value="150" />px
+      <input type="range" data-title-img-height-slider min="20" max="300" step="1" value="150" />
+    </label>
+    <label>
+      X
+      <input type="number" data-title-img-x min="-100" max="100" step="1" value="0" />px
+      <input type="range" data-title-img-x-slider min="-100" max="100" step="1" value="0" />
+    </label>
+    <label>
+      Y
+      <input type="number" data-title-img-y min="-100" max="100" step="1" value="0" />px
+      <input type="range" data-title-img-y-slider min="-100" max="100" step="1" value="0" />
+    </label>
+  </div>
+
+  <h1 class="page-title"><img src="/img/headers/projects.png" alt="Projects" /></h1>
 
   <div class="projects-list" id="projects-list">
     {rendered.map(({ entry, Content, id, dateDisplay }) => (

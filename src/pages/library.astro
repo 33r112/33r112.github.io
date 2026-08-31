@@ -1,70 +1,112 @@
 ---
 import InnerLayout from "../layouts/InnerLayout.astro";
+import StatsGroup from "../components/StatsGroup.astro";
+import { formatDate } from "../utils/formatDate";
 
 const placeholderReview =
   "Full review placeholder — replace with the real write-up when it's ready. This is where a longer breakdown goes: what worked, what didn't, and why it's still worth remembering months later, instead of just the one-line summary above.";
 
+// dateAdded is when the review itself was written (placeholder values for
+// now, same as the review text above) — distinct from year, which is the
+// reviewed work's own release year.
 const items = [
-  { title: "Persona 5 Royal", year: 2020, category: "game", tags: ["PS5", "JRPG"], rating: "9.0" },
-  { title: "Hollow Knight", year: 2017, category: "game", tags: ["PC", "Metroidvania"], rating: "9.5" },
-  { title: "Baldur's Gate 3", year: 2023, category: "game", tags: ["PC", "RPG"], rating: "9.0" },
-  { title: "Celeste", year: 2018, category: "game", tags: ["Switch", "Platformer"], rating: "9.0" },
-  { title: "Get Out", year: 2017, category: "movie-tv", tags: ["Movie", "Horror"], rating: "8.0" },
-  { title: "Severance", year: 2022, category: "movie-tv", tags: ["TV", "Sci-Fi"], rating: "9.0" },
-  { title: "Parasite", year: 2019, category: "movie-tv", tags: ["Movie", "Thriller"], rating: "9.0" },
-  { title: "The Bear", year: 2022, category: "movie-tv", tags: ["TV", "Drama"], rating: "8.5" },
-  { title: "Invincible", year: 2003, category: "anime-manga", tags: ["Manga"], rating: "8.0" },
-  { title: "Frieren: Beyond Journey's End", year: 2023, category: "anime-manga", tags: ["Anime"], rating: "9.0" },
-  { title: "Chainsaw Man", year: 2018, category: "anime-manga", tags: ["Manga", "Vol. 12"], rating: "8.5" },
-  { title: "Vinland Saga", year: 2019, category: "anime-manga", tags: ["Anime"], rating: "9.0" },
-  { title: "Berserk", year: 1989, category: "anime-manga", tags: ["Manga"], rating: "9.5" },
+  { title: "Persona 5 Royal", year: 2020, category: "game", tags: ["PS5", "JRPG"], rating: "9.0", dateAdded: "2026-02-03" },
+  { title: "Hollow Knight", year: 2017, category: "game", tags: ["PC", "Metroidvania"], rating: "9.5", dateAdded: "2026-02-18" },
+  { title: "Baldur's Gate 3", year: 2023, category: "game", tags: ["PC", "RPG"], rating: "9.0", dateAdded: "2026-03-05" },
+  { title: "Celeste", year: 2018, category: "game", tags: ["Switch", "Platformer"], rating: "9.0", dateAdded: "2026-03-22" },
+  { title: "Get Out", year: 2017, category: "movie-tv", tags: ["Movie", "Horror"], rating: "8.0", dateAdded: "2026-04-10" },
+  { title: "Severance", year: 2022, category: "movie-tv", tags: ["TV", "Sci-Fi"], rating: "9.0", dateAdded: "2026-04-27" },
+  { title: "Parasite", year: 2019, category: "movie-tv", tags: ["Movie", "Thriller"], rating: "9.0", dateAdded: "2026-05-14" },
+  { title: "The Bear", year: 2022, category: "movie-tv", tags: ["TV", "Drama"], rating: "8.5", dateAdded: "2026-06-02" },
+  { title: "Invincible", year: 2003, category: "anime-manga", tags: ["Manga"], rating: "8.0", dateAdded: "2026-06-19" },
+  { title: "Frieren: Beyond Journey's End", year: 2023, category: "anime-manga", tags: ["Anime"], rating: "9.0", dateAdded: "2026-07-08" },
+  { title: "Chainsaw Man", year: 2018, category: "anime-manga", tags: ["Manga", "Vol. 12"], rating: "8.5", dateAdded: "2026-07-25" },
+  { title: "Vinland Saga", year: 2019, category: "anime-manga", tags: ["Anime"], rating: "9.0", dateAdded: "2026-08-11" },
+  { title: "Berserk", year: 1989, category: "anime-manga", tags: ["Manga"], rating: "9.5", dateAdded: "2026-08-24" },
 ].map((item, i) => ({ ...item, id: `library-review-${i}` }));
+
+const latestAdded = items.reduce(
+  (latest, item) => (item.dateAdded > latest ? item.dateAdded : latest),
+  items[0].dateAdded
+);
+
+const categoryCounts = items.reduce((counts, item) => {
+  counts[item.category] = (counts[item.category] || 0) + 1;
+  return counts;
+}, {});
+
+const categoryFilters = [
+  { text: `Games(${categoryCounts.game ?? 0})`, filter: "game" },
+  { text: `Movies/TV(${categoryCounts["movie-tv"] ?? 0})`, filter: "movie-tv" },
+  { text: `Anime/Manga(${categoryCounts["anime-manga"] ?? 0})`, filter: "anime-manga" },
+];
+const libraryStats = {
+  label: "LIBRARY",
+  items: [{ text: `${items.length} Reviews` }],
+  latest: formatDate(new Date(`${latestAdded}T00:00:00Z`)),
+};
 ---
 
 <InnerLayout
   current="library"
   title="Library — THREAD 33"
   description="Games, movies, TV, anime and manga — everything logged in THREAD 33's library."
+  sidebarStats={libraryStats}
 >
-  <h1 class="page-title">Library</h1>
+  <!-- temporary: size/position sliders for the header wordmark image,
+       remove along with the matching CSS/JS once values are picked -->
+  <button type="button" class="page-title-img-test-toggle" data-title-img-test-toggle>Show Test Controls</button>
+  <div class="hue-test page-title-img-test" id="page-title-img-test-panel" hidden>
+    <label>
+      Height
+      <input type="number" data-title-img-height min="20" max="300" step="1" value="150" />px
+      <input type="range" data-title-img-height-slider min="20" max="300" step="1" value="150" />
+    </label>
+    <label>
+      X
+      <input type="number" data-title-img-x min="-100" max="100" step="1" value="0" />px
+      <input type="range" data-title-img-x-slider min="-100" max="100" step="1" value="0" />
+    </label>
+    <label>
+      Y
+      <input type="number" data-title-img-y min="-100" max="100" step="1" value="0" />px
+      <input type="range" data-title-img-y-slider min="-100" max="100" step="1" value="0" />
+    </label>
+  </div>
 
-  <div>
-    <div class="filter-tabs" data-filter-group="#library-list" role="tablist" aria-label="Filter by category">
-      <button type="button" class="filter-tab is-active" data-filter="all">All</button>
-      <button type="button" class="filter-tab" data-filter="game">Games</button>
-      <button type="button" class="filter-tab" data-filter="movie-tv">Movies &amp; TV</button>
-      <button type="button" class="filter-tab" data-filter="anime-manga">Anime &amp; Manga</button>
-    </div>
+  <div class="page-header">
+    <h1 class="page-title"><img src="/img/headers/reviews.png" alt="Reviews" /></h1>
+    <StatsGroup items={categoryFilters} filterTarget="#library-list" filterAttr="category" />
+  </div>
 
-    <div class="library-list" id="library-list">
-      {items.map((item) => (
-        <div class="library-item" data-category={item.category}>
-          <a
-            class="library-row bracket-hover"
-            role="button"
-            tabindex="0"
-            aria-expanded="false"
-            data-notes-toggle={item.id}
-          >
-            <div class="cover-placeholder" data-label="COVER"></div>
-            <div class="library-row__info">
-              <div class="library-row__head">
-                <span class="library-title">{item.title}</span>
-                <span class="library-year">{item.year}</span>
-              </div>
-              <div class="library-tags">
-                {item.tags.map((tag) => <span class="project-tag">{tag}</span>)}
-                <span class="project-tag">{item.rating}</span>
-              </div>
+  <div class="library-list" id="library-list">
+    {items.map((item) => (
+      <div class="library-item" data-category={item.category}>
+        <a
+          class="library-row bracket-hover"
+          role="button"
+          tabindex="0"
+          aria-expanded="false"
+          data-notes-toggle={item.id}
+        >
+          <div class="cover-placeholder" data-label="COVER"></div>
+          <div class="library-row__info">
+            <div class="library-row__head">
+              <span class="library-title">{item.title}</span>
+              <span class="library-year">{item.year}</span>
             </div>
-          </a>
-          <div class="library-expand" id={item.id} hidden>
-            <div class="article-body">
-              <p>{placeholderReview}</p>
+            <div class="library-tags">
+              {item.tags.map((tag) => <span class="project-tag">{tag}</span>)}
+              <span class="project-tag">{item.rating}</span>
             </div>
           </div>
+        </a>
+        <div class="library-expand" id={item.id} hidden>
+          <div class="article-body">
+            <p>{placeholderReview}</p>
+          </div>
         </div>
+      </div>
       ))}
     </div>
-  </div>
 </InnerLayout>

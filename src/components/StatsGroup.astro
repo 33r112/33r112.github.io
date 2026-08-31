@@ -1,0 +1,33 @@
+---
+export interface Props {
+  label?: string;
+  items: { text: string; filter?: string }[];
+  filterTarget?: string;
+  filterAttr?: string;
+}
+
+const { label, items, filterTarget, filterAttr } = Astro.props;
+// only worth turning into filter buttons where there's more than one
+// category to switch between, and somewhere to point the filter at
+const filterable = Boolean(filterTarget) && items.some((item) => item.filter);
+---
+
+<div class="stats-group">
+  {label && <p class="section-heading stats-group__label">{label}</p>}
+  <ul class="stats-group__list" data-filter-group={filterable ? filterTarget : undefined} data-filter-attr={filterable ? filterAttr : undefined}>
+    {filterable && (
+      <li>
+        <button type="button" class="is-active" data-filter="all">All</button>
+      </li>
+    )}
+    {items.map((item) =>
+      item.filter ? (
+        <li>
+          <button type="button" data-filter={item.filter}>{item.text}</button>
+        </li>
+      ) : (
+        <li>{item.text}</li>
+      )
+    )}
+  </ul>
+</div>
