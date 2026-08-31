@@ -185,6 +185,27 @@
   border-color: var(--accent);
 }
 
+/* master show/hide for both .fx-test panels on Notes, parked in the
+   bottom-left corner where neither panel reaches. Same look as
+   .page-title-img-test-toggle above, just a different corner. */
+.fx-test-toggle {
+  position: fixed;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  z-index: 10;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.fx-test-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 /* temporary: background/decoration effect experiments for the content
    panel — remove this block (and the matching markup/CSS/JS) once one
    is picked, or none. Fixed width (not sized to content) so the panel's

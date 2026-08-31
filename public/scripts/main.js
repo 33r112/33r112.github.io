@@ -438,11 +438,45 @@
   }
 
   function initTestPanelsToBody() {
-    ["fx-test-panel", "sleep-anim-test-panel"].forEach(function (id) {
+    // the toggle button rides along for the same reason the panels do —
+    // it's position: fixed, and the .main-col it's authored in sits under
+    // ancestors carrying filter/backdrop-filter, which would make one of
+    // them its containing block and clip it
+    ["fx-test-panel", "sleep-anim-test-panel", "fx-test-toggle"].forEach(function (id) {
       var panel = document.getElementById(id);
       if (panel && panel.parentElement !== document.body) {
         document.body.appendChild(panel);
       }
+    });
+  }
+
+  /* temporary: one button in the bottom-left corner that shows/hides both
+     test panels at once. Deliberately not persisted like the slider
+     values are — the panels start collapsed on every load, so the page
+     can be judged on its own before opening them. Remove along with the
+     panels themselves. */
+  function initFxTestToggle() {
+    var button = document.getElementById("fx-test-toggle");
+    if (!button) return;
+
+    var panels = ["fx-test-panel", "sleep-anim-test-panel"]
+      .map(function (id) {
+        return document.getElementById(id);
+      })
+      .filter(Boolean);
+    if (!panels.length) return;
+
+    function apply(open) {
+      panels.forEach(function (panel) {
+        panel.hidden = !open;
+      });
+      button.textContent = open ? "收起测试按钮" : "展开测试按钮";
+    }
+
+    apply(false);
+
+    button.addEventListener("click", function () {
+      apply(panels[0].hidden);
     });
   }
 
@@ -1031,6 +1065,9 @@
     initNoiseTest();
     initPanelTest();
     initSettingsExport();
+    // last of the panel wiring, so it hides panels the appliers above
+    // have already read their starting values out of
+    initFxTestToggle();
     // after the appliers, since it measures rendered geometry and those
     // can change the panel's own box (radius, frame width, and so on)
     initQuadrantDividers();

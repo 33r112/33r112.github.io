@@ -19,13 +19,7 @@ const writingCounts = [
 ];
 
 const writingStats = {
-  label: "WRITING",
-  items: writingCounts,
   latest: formatDate(combined[0].entry.data.date),
-  filterTarget: "#notes-list",
-  filterAttr: "kind",
-  // this group renders next to the page title instead — see .page-header
-  showCounts: false,
 };
 
 const rendered = await Promise.all(
@@ -56,6 +50,13 @@ const rendered = await Promise.all(
        untouched, see library.astro/projects.astro for the header-image
        test still live there. Re-add the same three blocks here once
        this is done. -->
+
+  <!-- master show/hide for both test panels below, so the page can be
+       looked at without them in the way. Starts collapsed. Remove along
+       with the panels themselves. -->
+  <button type="button" class="fx-test-toggle" id="fx-test-toggle" data-fx-test-toggle>
+    展开测试按钮
+  </button>
 
   <!-- temporary: background/decoration effect experiments for the
        content panel, remove once one is picked -->

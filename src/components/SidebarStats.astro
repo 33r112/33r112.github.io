@@ -2,20 +2,16 @@
 import StatsGroup from "./StatsGroup.astro";
 
 export interface Props {
-  label: string;
-  items: { text: string; filter?: string }[];
   latest: string;
-  filterTarget?: string;
-  filterAttr?: string;
-  // Notes/Writing moves its Posts/Thoughts/All group up next to the page
-  // title instead — pass false there so this doesn't render it twice
-  showCounts?: boolean;
 }
 
-const { label, items, latest, filterTarget, filterAttr, showCounts = true } = Astro.props;
+// the per-category counts each page used to show above this (13 Reviews,
+// 7 Projects, Posts/Thoughts) are gone — Writing and Library already
+// carry theirs as the filter tabs next to the page title, and Projects
+// didn't need a bare total. Only LATEST is left in the sidebar.
+const { latest } = Astro.props;
 ---
 
 <div class="sidebar-stats">
-  {showCounts && <StatsGroup label={label} items={items} filterTarget={filterTarget} filterAttr={filterAttr} />}
   <StatsGroup label="LATEST" items={[{ text: latest }]} />
 </div>
