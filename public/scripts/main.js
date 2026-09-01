@@ -626,30 +626,71 @@
     // the sheet's second row, read as four two-frame loops — the number
     // is the column its first frame sits in
     var EMOTE_COLS = [0, 2, 4, 6];
+    // she only ever hums to herself in the first two (note and heart);
+    // the cross-eyes and the scribble are reserved for being clicked, so
+    // the two kinds of reaction stay tellable apart
+    var IDLE_COLS = [0, 2];
     var emote = document.querySelector(".nav-emote");
 
-    function rollEmote() {
+    function showEmote(cols) {
       if (!emote) return;
-      emote.style.setProperty(
-        "--emote-col",
-        EMOTE_COLS[Math.floor(Math.random() * EMOTE_COLS.length)]
-      );
+      emote.style.setProperty("--emote-col", cols[Math.floor(Math.random() * cols.length)]);
+      emote.classList.add("is-visible");
     }
 
+    function hideEmote() {
+      if (emote) emote.classList.remove("is-visible");
+    }
 
     var busy = false;
+    var idleTimer;
+    var idleHideTimer;
+
+    /* She pipes up on her own every --emote-idle-min to --emote-idle-max,
+       for as long as she'd stay turned around if you'd clicked her. The
+       countdown is torn down and restarted from scratch the moment she's
+       clicked, and only starts again once she's turned back — so a click
+       always resets the wait rather than leaving a stray one queued up
+       right behind it. */
+    function scheduleIdle() {
+      clearTimeout(idleTimer);
+      var min = ms("--emote-idle-min", 8000);
+      var max = ms("--emote-idle-max", 20000);
+      if (max < min) max = min;
+
+      idleTimer = setTimeout(function () {
+        // the page this was scheduled on is gone (soft navigation
+        // replaces the whole body) — let the chain end rather than tick
+        // on forever against a detached element
+        if (!portrait.isConnected) return;
+        showEmote(IDLE_COLS);
+        idleHideTimer = setTimeout(function () {
+          hideEmote();
+          scheduleIdle();
+        }, ms("--portrait-hold", 2000));
+      }, min + Math.random() * (max - min));
+    }
+
+    scheduleIdle();
 
     portrait.addEventListener("click", function () {
+      // clicking through an emote she brought up herself is fine — it
+      // just gets replaced. Only the stretch where she's actually turned
+      // around, and the cooldown after it, ignore the click.
       if (busy) return;
       busy = true;
-      portrait.classList.add("is-front");
 
-      rollEmote();
-      if (emote) emote.classList.add("is-visible");
+      clearTimeout(idleTimer);
+      clearTimeout(idleHideTimer);
+
+      portrait.classList.add("is-front");
+      showEmote(EMOTE_COLS);
 
       setTimeout(function () {
         portrait.classList.remove("is-front");
-        if (emote) emote.classList.remove("is-visible");
+        hideEmote();
+        // back to resting, so the wait starts over from here
+        scheduleIdle();
         setTimeout(function () {
           busy = false;
         }, ms("--portrait-cooldown", 2000));
@@ -836,6 +877,8 @@
       { key: "portrait-outline-a", cssVar: "--portrait-outline-a", isAlpha: true },
       { key: "emote-size", cssVar: "--emote-size", unit: "px" },
       { key: "emote-speed", cssVar: "--emote-speed", unit: "ms" },
+      { key: "emote-idle-min", cssVar: "--emote-idle-min", unit: "ms" },
+      { key: "emote-idle-max", cssVar: "--emote-idle-max", unit: "ms" },
       { key: "emote-x", cssVar: "--emote-x", unit: "px" },
       { key: "emote-y", cssVar: "--emote-y", unit: "px" },
     ];
