@@ -34,7 +34,7 @@
 
 /* Library/Projects/Notes show a wordmark image here instead of plain
    text. Size/position are still being tuned via test sliders — see
-   .page-title-img-test in layout.css — hence the var()/fallback split;
+   the 标题图片 group in notes.astro's left panel — hence the split;
    bake in literal values and remove that once picked. */
 .page-title img {
   /* block, not inline (the default for an img inside an h1) — inline
@@ -380,6 +380,135 @@
 }
 
 /* decorative character art flanking the content, vertically centered */
+/* Reviews only. The cloud strip stays on the element itself as the
+   bottom layer, and the station illustration is laid over it in two
+   pieces — one either side of the content panel — so the panel's width
+   is skipped rather than covered: mentally cut the panel out and the two
+   halves join up into one continuous picture, with the old sky showing
+   through the gap the panel leaves. initKisekiSplit() measures the panel
+   and sizes/offsets the halves; everything else is driven by the 页面背景
+   groups in library.astro's right-hand panel. Bake in literals and drop
+   the var()/fallback split once picked. */
+.notes-top-banner--kiseki {
+  height: var(--kbg-height, 990px);
+  /* deliberately no background-size here: the sky has to be drawn from
+     exactly the same declarations as on every other page, so raising the
+     band's height stretches nothing — it just leaves more room under the
+     clouds for the station halves to fill */
+}
+
+.kbg-half {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-repeat: no-repeat;
+  filter: grayscale(var(--kbg-grayscale, 0%)) brightness(var(--kbg-brightness, 90%))
+    contrast(var(--kbg-contrast, 90%)) saturate(var(--kbg-saturate, 90%))
+    hue-rotate(var(--kbg-hue, 0deg)) sepia(var(--kbg-sepia, 0%));
+}
+
+.notes-top-banner--kiseki .kbg-half {
+  display: block;
+}
+
+/* the strip above each picture is filled by a flat colour block instead
+   of the picture continuing — a flat fill under a gradient, deliberately
+   outside the pictures' filter chain so its colour is exactly the colour
+   set here. Each block sits at the bottom of its own gap, so
+   shortening it leaves empty space above rather than a seam below. The
+   colour and gradient are shared across all three; only the height is
+   per-region, since the three pictures don't start at the same height. */
+.kbg-cap {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(var(--cap-grad-start-r, 0) var(--cap-grad-start-g, 0) var(--cap-grad-start-b, 24) /
+          var(--cap-grad-start-a, 1)),
+      rgb(var(--cap-grad-end-r, 0) var(--cap-grad-end-g, 0) var(--cap-grad-end-b, 0) /
+          var(--cap-grad-end-a, 0))
+        var(--cap-grad-pos, 0%)
+    ),
+    rgb(var(--cap-r, 36) var(--cap-g, 36) var(--cap-b, 36) / var(--cap-a, 1));
+}
+
+.notes-top-banner--kiseki .kbg-cap {
+  display: block;
+}
+
+/* Three illustrations, one per region: the empty landscape on the left
+   running off the left of the screen, a middle piece filling the gap the
+   content panel leaves, and the station on the right. Each carries its
+   own size, horizontal offset, vertical nudge, opacity and reflection,
+   so the three can be lined up against each other; the colour filters and
+   the base vertical offset stay shared, so they still read as one scene.
+   All three pictures are 1920 tall, which is what makes a shared vertical
+   offset line the horizon up across the whole width. */
+
+.kbg-half--left {
+  background-image: url("../img/backgrounds/kiseki_bg_empty.png");
+  background-size: calc(var(--kbg-size-left, 35) * 1vw) auto;
+  background-position: left var(--kbg-x-left, -22px) top
+    calc(var(--kbg-y, 136px) + var(--kbg-y-left, 0px));
+  opacity: var(--kbg-a-left, 0.7);
+}
+
+.kbg-cap--left {
+  /* --cap-offset slides the block down from where it would sit, so it can
+     overlap the picture instead of only stacking above it */
+  top: calc(
+    var(--kbg-y, 136px) + var(--kbg-y-left, 0px) - var(--cap-height-left, 179px) +
+      var(--cap-offset-left, 0px)
+  );
+  height: var(--cap-height-left, 179px);
+}
+
+.kbg-half--mid {
+  background-image: url("../img/backgrounds/kiseki_bg_mid.png");
+  background-size: calc(var(--kbg-size-mid, 30) * 1vw) auto;
+  background-position: left var(--kbg-x-mid, 420px) top
+    calc(var(--kbg-y, 136px) + var(--kbg-y-mid, -7px));
+  opacity: var(--kbg-a-mid, 0.15);
+}
+
+.kbg-half--right {
+  background-image: url("../img/backgrounds/kiseki_bg.png");
+  background-size: calc(var(--kbg-size-right, 60) * 1vw) auto;
+  background-position: left var(--kbg-x-right, -600px) top
+    calc(var(--kbg-y, 136px) + var(--kbg-y-right, -10px));
+  opacity: var(--kbg-a-right, 0.7);
+}
+
+.kbg-cap--right {
+  /* --cap-offset slides the block down from where it would sit, so it can
+     overlap the picture instead of only stacking above it */
+  top: calc(
+    var(--kbg-y, 136px) + var(--kbg-y-right, -10px) - var(--cap-height-right, 190px) +
+      var(--cap-offset-right, 0px)
+  );
+  height: var(--cap-height-right, 190px);
+}
+
+.notes-top-banner--kiseki::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(var(--kbg-grad-start-r, 0) var(--kbg-grad-start-g, 0) var(--kbg-grad-start-b, 0) /
+          var(--kbg-grad-start-a, 0.2)),
+      rgb(var(--kbg-grad-end-r, 255) var(--kbg-grad-end-g, 255) var(--kbg-grad-end-b, 255) /
+          var(--kbg-grad-end-a, 0.05))
+        var(--kbg-grad-pos, 90%)
+    ),
+    rgb(var(--kbg-tint-r, 0) var(--kbg-tint-g, 0) var(--kbg-tint-b, 0) / var(--kbg-tint-a, 0));
+}
+
 .notes-char-bg {
   position: fixed;
   top: 50%;
@@ -697,7 +826,7 @@
   left: 0;
   width: var(--emote-size, 35px);
   height: var(--emote-size, 35px);
-  transform: translate(var(--emote-x, 165px), var(--emote-y, -90px));
+  transform: translate(var(--emote-x, 160px), var(--emote-y, -90px));
   pointer-events: none;
   background-image: url("../img/portraits/c_emotio.png");
   background-size: calc(var(--emote-size, 35px) * 8) calc(var(--emote-size, 35px) * 8);
@@ -754,10 +883,10 @@
   filter: grayscale(var(--portrait-grayscale, 0%)) brightness(var(--portrait-brightness, 90%))
     contrast(var(--portrait-contrast, 100%)) saturate(var(--portrait-saturate, 100%))
     hue-rotate(var(--portrait-hue, 0deg)) sepia(var(--portrait-sepia, 0%))
-    drop-shadow(var(--portrait-outline-w, 1.4px) 0 0 var(--portrait-outline))
-    drop-shadow(calc(var(--portrait-outline-w, 1.4px) * -1) 0 0 var(--portrait-outline))
-    drop-shadow(0 var(--portrait-outline-w, 1.4px) 0 var(--portrait-outline))
-    drop-shadow(0 calc(var(--portrait-outline-w, 1.4px) * -1) 0 var(--portrait-outline));
+    drop-shadow(var(--portrait-outline-w, 1px) 0 0 var(--portrait-outline))
+    drop-shadow(calc(var(--portrait-outline-w, 1px) * -1) 0 0 var(--portrait-outline))
+    drop-shadow(0 var(--portrait-outline-w, 1px) 0 var(--portrait-outline))
+    drop-shadow(0 calc(var(--portrait-outline-w, 1px) * -1) 0 var(--portrait-outline));
 }
 
 .nav-portrait.is-front {
@@ -770,7 +899,7 @@
   left: 0;
   width: calc(24px * var(--sleep-scale, 2));
   height: calc(32px * var(--sleep-scale, 2));
-  transform: translate(var(--sleep-x, 150px), var(--sleep-y, -40px));
+  transform: translate(var(--sleep-x, 150px), var(--sleep-y, -39px));
   pointer-events: none;
 }
 

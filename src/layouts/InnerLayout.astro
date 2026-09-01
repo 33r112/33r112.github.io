@@ -32,7 +32,7 @@ const decorated = current !== "about";
        initPersistentBackground() in main.js — see base.css for the
        matching stacking-context notes. -->
 
-  <main class="container shell notes-shell" class:list={[decorated && "shell--quadrant"]} id="main-content">
+  <main data-page={current} class="container shell notes-shell" class:list={[decorated && "shell--quadrant"]} id="main-content">
     <aside class="sidebar-col" class:list={[current !== "about" && "sidebar-col--titled"]} aria-label="Navigation">
       {current === "library" ? (
         <>

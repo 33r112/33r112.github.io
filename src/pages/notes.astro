@@ -43,19 +43,11 @@ const rendered = await Promise.all(
   description="Game design, development and media notes worth keeping around."
   sidebarStats={writingStats}
 >
-  <!-- page-title-img-test, notes-micro-style-test and notes-micro-bg-test
-       (header image size/position, Micro width preset, Micro background
-       color) are temporarily removed from this page to declutter while
-       tuning the quadrant divider lines below — their CSS/JS is
-       untouched, see library.astro/projects.astro for the header-image
-       test still live there. Re-add the same three blocks here once
-       this is done. -->
-
   <!-- master show/hide for both test panels below, so the page can be
        looked at without them in the way. Starts collapsed. Remove along
        with the panels themselves. -->
   <button type="button" class="fx-test-toggle" id="fx-test-toggle" data-fx-test-toggle>
-    展开测试按钮
+    收起测试按钮
   </button>
 
   <!-- temporary: background/decoration effect experiments for the
@@ -523,8 +515,8 @@ const rendered = await Promise.all(
       </label>
       <label>
         纵向偏移
-        <input type="number" autocomplete="off" data-sleep-y min="-300" max="300" step="1" value="-40" />
-        <input type="range" autocomplete="off" data-sleep-y-slider min="-300" max="300" step="1" value="-40" />
+        <input type="number" autocomplete="off" data-sleep-y min="-300" max="300" step="1" value="-39" />
+        <input type="range" autocomplete="off" data-sleep-y-slider min="-300" max="300" step="1" value="-39" />
       </label>
       <label>
         播放间隔

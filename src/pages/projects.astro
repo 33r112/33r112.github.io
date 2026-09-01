@@ -29,27 +29,6 @@ const rendered = await Promise.all(
   description="Things ryoku33r has built — starting with a turn-based × action RPG in Unreal Engine 5."
   sidebarStats={projectsStats}
 >
-  <!-- temporary: size/position sliders for the header wordmark image,
-       remove along with the matching CSS/JS once values are picked -->
-  <button type="button" class="page-title-img-test-toggle" data-title-img-test-toggle>Show Test Controls</button>
-  <div class="hue-test page-title-img-test" id="page-title-img-test-panel" hidden>
-    <label>
-      Height
-      <input type="number" data-title-img-height min="20" max="300" step="1" value="150" />px
-      <input type="range" data-title-img-height-slider min="20" max="300" step="1" value="150" />
-    </label>
-    <label>
-      X
-      <input type="number" data-title-img-x min="-100" max="100" step="1" value="0" />px
-      <input type="range" data-title-img-x-slider min="-100" max="100" step="1" value="0" />
-    </label>
-    <label>
-      Y
-      <input type="number" data-title-img-y min="-100" max="100" step="1" value="0" />px
-      <input type="range" data-title-img-y-slider min="-100" max="100" step="1" value="0" />
-    </label>
-  </div>
-
   <div class="page-header">
     <h1 class="page-title"><img src="/img/headers/projects.png" alt="Projects" /></h1>
   </div>

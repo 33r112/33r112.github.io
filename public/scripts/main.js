@@ -209,84 +209,6 @@
     });
   }
 
-  /* temporary: size/position sliders for the header wordmark images
-     (.page-title img on Library/Notes/Projects) — sets CSS custom
-     properties on <html> so the same values apply no matter which of
-     the three pages you're currently looking at. Remove this function
-     (and the slider markup on those three pages) once values are
-     picked. */
-  function initPageTitleImageTest() {
-    var img = document.querySelector(".page-title img");
-    var heightSlider = document.querySelector("[data-title-img-height-slider]");
-    if (!img || !heightSlider) return;
-
-    var heightNumber = document.querySelector("[data-title-img-height]");
-    var xSlider = document.querySelector("[data-title-img-x-slider]");
-    var xNumber = document.querySelector("[data-title-img-x]");
-    var ySlider = document.querySelector("[data-title-img-y-slider]");
-    var yNumber = document.querySelector("[data-title-img-y]");
-
-    function apply() {
-      root.style.setProperty("--page-title-img-height", heightSlider.value + "px");
-      root.style.setProperty("--page-title-img-x", (xSlider ? xSlider.value : 0) + "px");
-      root.style.setProperty("--page-title-img-y", (ySlider ? ySlider.value : 0) + "px");
-    }
-
-    heightSlider.addEventListener("input", function () {
-      if (heightNumber) heightNumber.value = heightSlider.value;
-      apply();
-    });
-    if (heightNumber) {
-      heightNumber.addEventListener("input", function () {
-        heightSlider.value = heightNumber.value;
-        apply();
-      });
-    }
-
-    if (xSlider) {
-      xSlider.addEventListener("input", function () {
-        if (xNumber) xNumber.value = xSlider.value;
-        apply();
-      });
-    }
-    if (xNumber) {
-      xNumber.addEventListener("input", function () {
-        if (xSlider) xSlider.value = xNumber.value;
-        apply();
-      });
-    }
-
-    if (ySlider) {
-      ySlider.addEventListener("input", function () {
-        if (yNumber) yNumber.value = ySlider.value;
-        apply();
-      });
-    }
-    if (yNumber) {
-      yNumber.addEventListener("input", function () {
-        if (ySlider) ySlider.value = yNumber.value;
-        apply();
-      });
-    }
-
-    apply();
-  }
-
-  /* master show/hide toggle for the .page-title-img-test panel, hidden
-     by default so it doesn't clutter the page. Remove along with that
-     panel once values are picked. */
-  function initPageTitleImageTestToggle() {
-    var panel = document.getElementById("page-title-img-test-panel");
-    var toggle = document.querySelector("[data-title-img-test-toggle]");
-    if (!panel || !toggle) return;
-
-    toggle.addEventListener("click", function () {
-      var willHide = !panel.hidden;
-      panel.hidden = willHide;
-      toggle.textContent = willHide ? "Show Test Controls" : "Hide Test Controls";
-    });
-  }
-
   /* Notes' quadrant divider lines (see .shell--quadrant in
      components.css) — sized/positioned here rather than in CSS because
      both depend on measurements CSS can't express as a fixed value: the
@@ -388,6 +310,7 @@
     shell.dataset.dividerWatched = "1";
     new ResizeObserver(function () {
       initQuadrantDividers();
+      initKisekiSplit();
     }).observe(shell);
   }
 
@@ -544,11 +467,10 @@
     });
   }
 
-  /* temporary: one button in the bottom-left corner that shows/hides both
+  /* temporary: one button in the bottom-left corner that shows/hides the
      test panels at once. Deliberately not persisted like the slider
-     values are — the panels start collapsed on every load, so the page
-     can be judged on its own before opening them. Remove along with the
-     panels themselves. */
+     values are — the panels start open on every load, since they're
+     still being worked in. Remove along with the panels themselves. */
   /* Library's sidebar portrait: 007 (looking away) at rest, click to
      turn her front-on (015) for --portrait-hold, then she turns back and
      stays unclickable for a further --portrait-cooldown. Clicks during
@@ -716,7 +638,7 @@
       button.textContent = open ? "收起测试按钮" : "展开测试按钮";
     }
 
-    apply(false);
+    apply(true);
 
     button.addEventListener("click", function () {
       apply(panels[0].hidden);
@@ -879,6 +801,60 @@
       { key: "emote-speed", cssVar: "--emote-speed", unit: "ms" },
       { key: "emote-idle-min", cssVar: "--emote-idle-min", unit: "ms" },
       { key: "emote-idle-max", cssVar: "--emote-idle-max", unit: "ms" },
+      // Reviews' own background illustration
+      // Reviews' own background illustrations
+      { key: "kbg-height", cssVar: "--kbg-height", unit: "px" },
+      { key: "kbg-y", cssVar: "--kbg-y", unit: "px" },
+      { key: "kbg-grayscale", cssVar: "--kbg-grayscale", unit: "%" },
+      { key: "kbg-brightness", cssVar: "--kbg-brightness", unit: "%" },
+      { key: "kbg-contrast", cssVar: "--kbg-contrast", unit: "%" },
+      { key: "kbg-saturate", cssVar: "--kbg-saturate", unit: "%" },
+      { key: "kbg-hue", cssVar: "--kbg-hue", unit: "deg" },
+      { key: "kbg-sepia", cssVar: "--kbg-sepia", unit: "%" },
+      { key: "kbg-size-left", cssVar: "--kbg-size-left" },
+      { key: "kbg-x-left", cssVar: "--kbg-x-left", unit: "px" },
+      { key: "kbg-y-left", cssVar: "--kbg-y-left", unit: "px" },
+      { key: "kbg-a-left", cssVar: "--kbg-a-left", isAlpha: true },
+      { key: "cap-height-left", cssVar: "--cap-height-left", unit: "px" },
+      { key: "cap-offset-left", cssVar: "--cap-offset-left", unit: "px" },
+      { key: "kbg-size-mid", cssVar: "--kbg-size-mid" },
+      { key: "kbg-x-mid", cssVar: "--kbg-x-mid", unit: "px" },
+      { key: "kbg-y-mid", cssVar: "--kbg-y-mid", unit: "px" },
+      { key: "kbg-a-mid", cssVar: "--kbg-a-mid", isAlpha: true },
+      { key: "kbg-size-right", cssVar: "--kbg-size-right" },
+      { key: "kbg-x-right", cssVar: "--kbg-x-right", unit: "px" },
+      { key: "kbg-y-right", cssVar: "--kbg-y-right", unit: "px" },
+      { key: "kbg-a-right", cssVar: "--kbg-a-right", isAlpha: true },
+      { key: "cap-height-right", cssVar: "--cap-height-right", unit: "px" },
+      { key: "cap-offset-right", cssVar: "--cap-offset-right", unit: "px" },
+      // the flat block filling the strip above each picture — one colour
+      // and one gradient shared by all three
+      { key: "cap-r", cssVar: "--cap-r" },
+      { key: "cap-g", cssVar: "--cap-g" },
+      { key: "cap-b", cssVar: "--cap-b" },
+      { key: "cap-a", cssVar: "--cap-a", isAlpha: true },
+      { key: "cap-grad-start-r", cssVar: "--cap-grad-start-r" },
+      { key: "cap-grad-start-g", cssVar: "--cap-grad-start-g" },
+      { key: "cap-grad-start-b", cssVar: "--cap-grad-start-b" },
+      { key: "cap-grad-start-a", cssVar: "--cap-grad-start-a", isAlpha: true },
+      { key: "cap-grad-end-r", cssVar: "--cap-grad-end-r" },
+      { key: "cap-grad-end-g", cssVar: "--cap-grad-end-g" },
+      { key: "cap-grad-end-b", cssVar: "--cap-grad-end-b" },
+      { key: "cap-grad-end-a", cssVar: "--cap-grad-end-a", isAlpha: true },
+      { key: "cap-grad-pos", cssVar: "--cap-grad-pos", unit: "%" },
+      { key: "kbg-tint-r", cssVar: "--kbg-tint-r" },
+      { key: "kbg-tint-g", cssVar: "--kbg-tint-g" },
+      { key: "kbg-tint-b", cssVar: "--kbg-tint-b" },
+      { key: "kbg-tint-a", cssVar: "--kbg-tint-a", isAlpha: true },
+      { key: "kbg-grad-start-r", cssVar: "--kbg-grad-start-r" },
+      { key: "kbg-grad-start-g", cssVar: "--kbg-grad-start-g" },
+      { key: "kbg-grad-start-b", cssVar: "--kbg-grad-start-b" },
+      { key: "kbg-grad-start-a", cssVar: "--kbg-grad-start-a", isAlpha: true },
+      { key: "kbg-grad-end-r", cssVar: "--kbg-grad-end-r" },
+      { key: "kbg-grad-end-g", cssVar: "--kbg-grad-end-g" },
+      { key: "kbg-grad-end-b", cssVar: "--kbg-grad-end-b" },
+      { key: "kbg-grad-end-a", cssVar: "--kbg-grad-end-a", isAlpha: true },
+      { key: "kbg-grad-pos", cssVar: "--kbg-grad-pos", unit: "%" },
       { key: "emote-x", cssVar: "--emote-x", unit: "px" },
       { key: "emote-y", cssVar: "--emote-y", unit: "px" },
     ];
@@ -1289,6 +1265,24 @@
     homura.id = "notes-char-homura";
     homura.setAttribute("aria-hidden", "true");
 
+    // the station illustration on Reviews is drawn in two pieces, one
+    // either side of the content panel — see initKisekiSplit()
+    // pictures first, then the colour blocks — a block has to paint over
+    // the picture, and same-stacking siblings paint in DOM order
+    // the middle deliberately gets no colour block — the sky is meant to
+    // show right up to the top there
+    [
+      ["kbg-half", ["left", "mid", "right"]],
+      ["kbg-cap", ["left", "right"]],
+    ].forEach(function (pair) {
+      pair[1].forEach(function (region) {
+        var el = document.createElement("div");
+        el.className = pair[0] + " " + pair[0] + "--" + region;
+        el.setAttribute("aria-hidden", "true");
+        banner.appendChild(el);
+      });
+    });
+
     root.appendChild(banner);
     root.appendChild(hikari);
     root.appendChild(homura);
@@ -1300,13 +1294,109 @@
      .notes-shell) and hides it on the home page. Re-run on every
      astro:page-load, since <body>'s content has just been replaced by
      the time that event fires. */
+  /* Reviews' two background illustrations flank the content panel rather
+     than running behind it: the left strip covers everything up to the
+     panel's left edge, the right strip everything past its right edge,
+     and the old sky shows through the gap between them. Only the strips'
+     boxes are measured here — which picture each one carries and how it's
+     anchored is CSS's job. Re-measured whenever the panel's box changes,
+     since its width comes from a max-width'd, centered container. */
+  function initKisekiSplit() {
+    var banner = document.querySelector(".notes-top-banner--kiseki");
+    var shell = document.querySelector(".notes-shell");
+    if (!banner || !shell) return;
+
+    var rect = shell.getBoundingClientRect();
+    var vw = document.documentElement.clientWidth;
+
+    // left of the panel, the panel's own width, and right of it — the
+    // colour blocks take exactly the same three boxes as the pictures
+    var boxes = {
+      left: [0, Math.max(0, rect.left)],
+      mid: [rect.left, Math.max(0, rect.width)],
+      right: [rect.right, Math.max(0, vw - rect.right)],
+    };
+
+    Object.keys(boxes).forEach(function (region) {
+      [".kbg-half--", ".kbg-cap--"].forEach(function (sel) {
+        var el = document.querySelector(sel + region);
+        if (!el) return;
+        el.style.left = boxes[region][0] + "px";
+        el.style.width = boxes[region][1] + "px";
+      });
+    });
+  }
+
+  /* temporary: the browser's own colour picker, wired to whichever R/G/B
+     trio a button names — so a colour can be lifted straight off the
+     picture instead of guessed at three sliders at a time. Chromium only;
+     the buttons hide themselves where it isn't available. Remove along
+     with the panels. */
+  function initEyeDropper() {
+    var buttons = document.querySelectorAll("[data-eyedrop]");
+    if (!buttons.length) return;
+
+    if (!window.EyeDropper) {
+      buttons.forEach(function (button) {
+        button.hidden = true;
+      });
+      return;
+    }
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        new window.EyeDropper()
+          .open()
+          .then(function (result) {
+            var hex = result.sRGBHex;
+            var channels = [
+              parseInt(hex.slice(1, 3), 16),
+              parseInt(hex.slice(3, 5), 16),
+              parseInt(hex.slice(5, 7), 16),
+            ];
+            ["r", "g", "b"].forEach(function (channel, i) {
+              var key = button.dataset.eyedrop + "-" + channel;
+              [
+                document.querySelector("[data-" + key + "]"),
+                document.querySelector("[data-" + key + "-slider]"),
+              ].forEach(function (el) {
+                if (!el) return;
+                el.value = channels[i];
+                // lets the appliers and the persistence save pick it up
+                // exactly as if the slider had been dragged
+                el.dispatchEvent(new Event("input", { bubbles: true }));
+              });
+            });
+          })
+          .catch(function () {
+            /* dismissed with Escape — nothing to do */
+          });
+      });
+    });
+  }
+
   function syncPersistentBackground() {
     var visible = !!document.querySelector(".notes-shell");
+    // these are persistent nodes shared by every page, so what they show
+    // has to be re-decided on each navigation rather than baked into the
+    // markup
+    var isLibrary = !!document.querySelector('[data-page="library"]');
+
+    var banner = document.querySelector(".notes-top-banner");
+    if (banner) {
+      banner.hidden = !visible;
+      banner.classList.toggle("notes-top-banner--kiseki", isLibrary);
+    }
+
+    // Reviews carries its own full illustration instead, which the two
+    // line-art figures would only fight with
     document
-      .querySelectorAll(".notes-top-banner, #notes-char-hikari, #notes-char-homura")
+      .querySelectorAll("#notes-char-hikari, #notes-char-homura")
       .forEach(function (el) {
-        el.hidden = !visible;
+        el.hidden = !visible || isLibrary;
       });
+
+    initKisekiSplit();
   }
 
   function initConsoleGreeting() {
@@ -1335,7 +1425,10 @@
   var dividerResizeTimer;
   window.addEventListener("resize", function () {
     clearTimeout(dividerResizeTimer);
-    dividerResizeTimer = setTimeout(initQuadrantDividers, 100);
+    dividerResizeTimer = setTimeout(function () {
+      initQuadrantDividers();
+      initKisekiSplit();
+    }, 100);
   });
 
   // astro:page-load fires after the initial load AND after every
@@ -1346,8 +1439,6 @@
     initClock();
     initBgTestControls();
     initBgImageToggle();
-    initPageTitleImageTest();
-    initPageTitleImageTestToggle();
     initTestPanelsToBody();
     // both must precede the appliers below — they read whatever is in the
     // controls at the time, so the stored values have to be in place first
@@ -1362,6 +1453,7 @@
     // last of the panel wiring, so it hides panels the appliers above
     // have already read their starting values out of
     initFxTestToggle();
+    initEyeDropper();
     initNavPortrait();
     initFilterTabs();
     // after the appliers and after the filter, since both change the
