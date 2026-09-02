@@ -450,12 +450,12 @@
 
 [data-fx-frostlib="on"] main[data-page="library"] .fx-layer--frost {
   display: block;
-  backdrop-filter: blur(var(--frost-lib-blur, 0px))
-    brightness(var(--frost-lib-brightness, 100%)) contrast(var(--frost-lib-contrast, 100%))
-    saturate(var(--frost-lib-saturate, 5%));
-  -webkit-backdrop-filter: blur(var(--frost-lib-blur, 0px))
-    brightness(var(--frost-lib-brightness, 100%)) contrast(var(--frost-lib-contrast, 100%))
-    saturate(var(--frost-lib-saturate, 5%));
+  backdrop-filter: blur(var(--frost-lib-blur, 2px))
+    brightness(var(--frost-lib-brightness, 120%)) contrast(var(--frost-lib-contrast, 100%))
+    saturate(var(--frost-lib-saturate, 110%));
+  -webkit-backdrop-filter: blur(var(--frost-lib-blur, 2px))
+    brightness(var(--frost-lib-brightness, 120%)) contrast(var(--frost-lib-contrast, 100%))
+    saturate(var(--frost-lib-saturate, 110%));
 }
 
 /* background-attachment: fixed sizes/positions the gradient against the
@@ -615,7 +615,7 @@
    a different problem from what flanks it */
 .kbg-half--left,
 .kbg-half--right {
-  filter: grayscale(var(--kbg-side-grayscale, 0%)) brightness(var(--kbg-side-brightness, 100%))
+  filter: grayscale(var(--kbg-side-grayscale, 10%)) brightness(var(--kbg-side-brightness, 100%))
     contrast(var(--kbg-side-contrast, 100%)) saturate(var(--kbg-side-saturate, 100%))
     hue-rotate(var(--kbg-side-hue, 0deg)) sepia(var(--kbg-side-sepia, 0%));
 }
@@ -629,7 +629,7 @@
   bottom: 0;
   pointer-events: none;
   background: rgb(
-    var(--sidetint-r, 0) var(--sidetint-g, 0) var(--sidetint-b, 0) / var(--sidetint-a, 0.5)
+    var(--sidetint-r, 0) var(--sidetint-g, 0) var(--sidetint-b, 0) / var(--sidetint-a, 0.1)
   );
 }
 
@@ -766,7 +766,7 @@
       var(--kbg-y, 136px) + var(--kbg-y-left, 0px) -
         var(--kbg-size-left, 66) * 1vw * 0.175733
     );
-  opacity: var(--kbg-a-sides, 1);
+  opacity: var(--kbg-a-sides, 0.4);
 }
 
 .kbg-half--mid {
@@ -788,7 +788,7 @@
       var(--kbg-y, 136px) + var(--kbg-y-right, -10px) -
         var(--kbg-size-right, 60) * 1vw * 0.197309
     );
-  opacity: var(--kbg-a-sides, 1);
+  opacity: var(--kbg-a-sides, 0.4);
 }
 
 .notes-top-banner--kiseki::after {
