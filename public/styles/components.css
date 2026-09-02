@@ -148,14 +148,21 @@
    values and remove the var()/fallback split once picked. */
 .notes-shell {
   position: relative;
-  background: rgb(
-    var(--panel-r, 100) var(--panel-g, 100) var(--panel-b, 100) / var(--panel-a, 0.15)
-  );
+  background: rgb(var(--panel-r, 100) var(--panel-g, 100) var(--panel-b, 100) / var(--panel-a, 0.15));
   border-radius: var(--panel-radius, 0px);
-  box-shadow: var(--panel-shadow-x, 0px) var(--panel-shadow-y, -100px)
-    var(--panel-shadow-blur, 60px) var(--panel-shadow-spread, 0px)
-    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
-        var(--panel-shadow-a, 1));
+  /* the pre-band look, kept as a button-triggered comparison rather than
+     the resting state — the band is the picked, live treatment now, so
+     this only shows up while [data-panel-shadow-style="classic"] is set,
+     and that never survives a reload. */
+}
+
+[data-panel-shadow-style="classic"] .notes-shell {
+  /* frozen — a fixed reference to compare the (tunable) band against, so
+     it has to stay exactly what it always was regardless of anything the
+     band's own sliders are currently set to. This is only ever a
+     comparison view, not the shipped look (band is), so it's left as
+     the single original shadow rather than reworked further. */
+  box-shadow: 0 -100px 60px 0 rgb(0 0 0 / 1);
 }
 
 /* separate element-less layer for the panel's own frame: an inset
@@ -163,6 +170,187 @@
    without them fighting over the shorthand, so it lives on ::after —
    which also keeps it above the panel's background but below the
    .fx-layer stack */
+/* the real fix: two bands living OUTSIDE the panel, one hugging its left
+   edge and one its right, each exactly as tall as the panel itself
+   (top:0/bottom:0 against .notes-shell's own box, which is what makes
+   them track its actual height automatically — no scroll-position math,
+   no reach that can fall short at one end, since they're not derived
+   from an offset+blur shape at all). Sits below the panel's own frame
+   (::after) and content in stacking order, so it reads as sitting behind
+   the panel rather than on top of it. */
+/* On by default — the classic look only reappears while
+   [data-panel-shadow-style="classic"] is toggled on for comparison.
+   Flush against the panel's sides and exactly as tall as it, always. */
+.panel-shadow-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--panel-shadow-reach, 200px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-panel-shadow-style="classic"] .panel-shadow-band {
+  display: none;
+}
+
+/* the endpoint is spelled out as rgb(0 0 0 / 0) rather than the bare
+   "transparent" keyword — some browsers interpolate transparent as if it
+   meant transparent black regardless of the gradient's own color, which
+   can leave a faint visible line right at the point it should have
+   already faded to nothing. Spelling out the same colour at zero alpha
+   removes any ambiguity about what's being faded to. */
+/* One continuous falloff, twenty-one stops: darkest right against the
+   panel and thinning all the way out, the way a shadow actually behaves.
+   The earlier version held most of its strength across the first 85% and
+   then shed all of it in the last 15%, which is backwards — and that
+   compressed drop was itself what read as a line, since a steep stretch
+   looks like an edge no matter how smoothly it's drawn.
+
+   The shape is a smoothstep raised to --panel-shadow-curve: 0 leaves the
+   plain S-curve, higher drops faster up front and drags a longer, fainter
+   tail. The slope reaches zero at the far end at any exponent, which is
+   the point — a straight ramp stops falling while still at full tilt, and
+   the eye reads that abrupt stop as a line even where the pixels there
+   already match what's behind (a Mach band). */
+.panel-shadow-band--left {
+  right: 100%;
+  background: linear-gradient(
+    to left,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        var(--panel-shadow-a, 0.4))
+      0,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.9928, (1 + var(--panel-shadow-curve, 5) * 2))))
+      5.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.972, (1 + var(--panel-shadow-curve, 5) * 2))))
+      10.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.9393, (1 + var(--panel-shadow-curve, 5) * 2))))
+      15.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.896, (1 + var(--panel-shadow-curve, 5) * 2))))
+      20.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.8438, (1 + var(--panel-shadow-curve, 5) * 2))))
+      25.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.784, (1 + var(--panel-shadow-curve, 5) * 2))))
+      30.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.7183, (1 + var(--panel-shadow-curve, 5) * 2))))
+      35.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.648, (1 + var(--panel-shadow-curve, 5) * 2))))
+      40.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.5747, (1 + var(--panel-shadow-curve, 5) * 2))))
+      45.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.5, (1 + var(--panel-shadow-curve, 5) * 2))))
+      50.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.4252, (1 + var(--panel-shadow-curve, 5) * 2))))
+      55.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.352, (1 + var(--panel-shadow-curve, 5) * 2))))
+      60.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.2818, (1 + var(--panel-shadow-curve, 5) * 2))))
+      65.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.216, (1 + var(--panel-shadow-curve, 5) * 2))))
+      70.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.1562, (1 + var(--panel-shadow-curve, 5) * 2))))
+      75.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.104, (1 + var(--panel-shadow-curve, 5) * 2))))
+      80.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.0607, (1 + var(--panel-shadow-curve, 5) * 2))))
+      85.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.028, (1 + var(--panel-shadow-curve, 5) * 2))))
+      90.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.0073, (1 + var(--panel-shadow-curve, 5) * 2))))
+      95.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) / 0)
+      100%
+  );
+}
+
+.panel-shadow-band--right {
+  left: 100%;
+  background: linear-gradient(
+    to right,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        var(--panel-shadow-a, 0.4))
+      0,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.9928, (1 + var(--panel-shadow-curve, 5) * 2))))
+      5.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.972, (1 + var(--panel-shadow-curve, 5) * 2))))
+      10.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.9393, (1 + var(--panel-shadow-curve, 5) * 2))))
+      15.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.896, (1 + var(--panel-shadow-curve, 5) * 2))))
+      20.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.8438, (1 + var(--panel-shadow-curve, 5) * 2))))
+      25.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.784, (1 + var(--panel-shadow-curve, 5) * 2))))
+      30.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.7183, (1 + var(--panel-shadow-curve, 5) * 2))))
+      35.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.648, (1 + var(--panel-shadow-curve, 5) * 2))))
+      40.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.5747, (1 + var(--panel-shadow-curve, 5) * 2))))
+      45.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.5, (1 + var(--panel-shadow-curve, 5) * 2))))
+      50.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.4252, (1 + var(--panel-shadow-curve, 5) * 2))))
+      55.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.352, (1 + var(--panel-shadow-curve, 5) * 2))))
+      60.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.2818, (1 + var(--panel-shadow-curve, 5) * 2))))
+      65.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.216, (1 + var(--panel-shadow-curve, 5) * 2))))
+      70.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.1562, (1 + var(--panel-shadow-curve, 5) * 2))))
+      75.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.104, (1 + var(--panel-shadow-curve, 5) * 2))))
+      80.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.0607, (1 + var(--panel-shadow-curve, 5) * 2))))
+      85.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.028, (1 + var(--panel-shadow-curve, 5) * 2))))
+      90.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) /
+        calc(var(--panel-shadow-a, 0.4) * pow(0.0073, (1 + var(--panel-shadow-curve, 5) * 2))))
+      95.0%,
+    rgb(var(--panel-shadow-r, 0) var(--panel-shadow-g, 0) var(--panel-shadow-b, 0) / 0)
+      100%
+  );
+}
+
 .notes-shell::after {
   content: "";
   position: absolute;
@@ -248,12 +436,26 @@
    functions, not just blur, so the frost can also lighten/deepen or
    drain the color out of whatever shows through. Bake in literal values
    and remove the var()/fallback split once picked. */
-[data-fx-frost="on"] .fx-layer--frost {
+/* Two separate frosts. Writing and Projects keep the settled values as
+   literals with only an on/off switch, while Reviews runs its own set of
+   sliders and its own switch — what the frost drains the colour out of
+   there is that page's own background art, which is a different problem
+   from the plain sky the other two sit on. Scoped by the page name on
+   <main> so neither can reach the other. */
+[data-fx-frost="on"] main:not([data-page="library"]) .fx-layer--frost {
   display: block;
-  backdrop-filter: blur(var(--frost-blur, 0px)) brightness(var(--frost-brightness, 100%))
-    contrast(var(--frost-contrast, 100%)) saturate(var(--frost-saturate, 5%));
-  -webkit-backdrop-filter: blur(var(--frost-blur, 0px)) brightness(var(--frost-brightness, 100%))
-    contrast(var(--frost-contrast, 100%)) saturate(var(--frost-saturate, 5%));
+  backdrop-filter: blur(0px) brightness(100%) contrast(100%) saturate(5%);
+  -webkit-backdrop-filter: blur(0px) brightness(100%) contrast(100%) saturate(5%);
+}
+
+[data-fx-frostlib="on"] main[data-page="library"] .fx-layer--frost {
+  display: block;
+  backdrop-filter: blur(var(--frost-lib-blur, 0px))
+    brightness(var(--frost-lib-brightness, 100%)) contrast(var(--frost-lib-contrast, 100%))
+    saturate(var(--frost-lib-saturate, 5%));
+  -webkit-backdrop-filter: blur(var(--frost-lib-blur, 0px))
+    brightness(var(--frost-lib-brightness, 100%)) contrast(var(--frost-lib-contrast, 100%))
+    saturate(var(--frost-lib-saturate, 5%));
 }
 
 /* background-attachment: fixed sizes/positions the gradient against the
@@ -408,34 +610,72 @@
     hue-rotate(var(--kbg-hue, 0deg)) sepia(var(--kbg-sepia, 0%));
 }
 
+/* the two side pictures run their own colour chain, tuned as a pair —
+   the middle keeps the original one, since what sits behind the panel is
+   a different problem from what flanks it */
+.kbg-half--left,
+.kbg-half--right {
+  filter: grayscale(var(--kbg-side-grayscale, 0%)) brightness(var(--kbg-side-brightness, 100%))
+    contrast(var(--kbg-side-contrast, 100%)) saturate(var(--kbg-side-saturate, 100%))
+    hue-rotate(var(--kbg-side-hue, 0deg)) sepia(var(--kbg-side-sepia, 0%));
+}
+
+/* a flat wash over each side picture, on top of it but under the
+   whole-banner tint and gradient */
+.kbg-sidetint {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: rgb(
+    var(--sidetint-r, 0) var(--sidetint-g, 0) var(--sidetint-b, 0) / var(--sidetint-a, 0.5)
+  );
+}
+
+.notes-top-banner--kiseki .kbg-sidetint {
+  display: block;
+}
+
 .notes-top-banner--kiseki .kbg-half {
   display: block;
 }
 
-/* the strip above each picture is filled by a flat colour block instead
-   of the picture continuing — a flat fill under a gradient, deliberately
-   outside the pictures' filter chain so its colour is exactly the colour
-   set here. Each block sits at the bottom of its own gap, so
-   shortening it leaves empty space above rather than a seam below. The
-   colour and gradient are shared across all three; only the height is
-   per-region, since the three pictures don't start at the same height. */
-.kbg-cap {
+/* the middle region's own base colour, painted straight onto the sky and
+   *under* both pictures that reach into it — so it acts as the ground
+   those pictures sit on rather than a film laid over them. .kbg-midtint
+   below is the other half of the pair: same box, but over the top. */
+.kbg-midbase {
   display: none;
   position: absolute;
+  top: 0;
+  bottom: 0;
   pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgb(var(--cap-grad-start-r, 0) var(--cap-grad-start-g, 0) var(--cap-grad-start-b, 24) /
-          var(--cap-grad-start-a, 1)),
-      rgb(var(--cap-grad-end-r, 0) var(--cap-grad-end-g, 0) var(--cap-grad-end-b, 0) /
-          var(--cap-grad-end-a, 0))
-        var(--cap-grad-pos, 0%)
-    ),
-    rgb(var(--cap-r, 36) var(--cap-g, 36) var(--cap-b, 36) / var(--cap-a, 1));
+  background: rgb(
+    var(--midbase-r, 0) var(--midbase-g, 0) var(--midbase-b, 0) / var(--midbase-a, 0)
+  );
 }
 
-.notes-top-banner--kiseki .kbg-cap {
+.notes-top-banner--kiseki .kbg-midbase {
+  display: block;
+}
+
+/* a flat colour wash over the middle region only — the strip behind the
+   content panel — so that band can be pushed warmer, cooler or darker
+   independently of the two sides. Sits above both pictures that reach
+   into the middle but below the whole-banner tint and gradient. */
+.kbg-midtint {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: rgb(
+    var(--midtint-r, 0) var(--midtint-g, 0) var(--midtint-b, 0) / var(--midtint-a, 0)
+  );
+}
+
+.notes-top-banner--kiseki .kbg-midtint {
   display: block;
 }
 
@@ -448,48 +688,107 @@
    All three pictures are 1920 tall, which is what makes a shared vertical
    offset line the horizon up across the whole width. */
 
-.kbg-half--left {
-  background-image: url("../img/backgrounds/kiseki_bg_empty.png");
-  background-size: calc(var(--kbg-size-left, 35) * 1vw) auto;
-  background-position: left var(--kbg-x-left, -22px) top
-    calc(var(--kbg-y, 136px) + var(--kbg-y-left, 0px));
-  opacity: var(--kbg-a-left, 0.7);
+/* Nothing fades out in the two side areas: each picture is solid right
+   up to the panel's edge and stops there. What reaches into the middle is
+   two separate layers, one from each edge — the left picture again on the
+   left, the middle picture on the right — and they are drawn with the
+   middle region's own size, offset and opacity rather than the values
+   their outer halves use, so the bleed is tuned for the space it's in
+   rather than inheriting a crop meant for a narrow strip.
+
+   Both dissolve the same way: --kbg-fade-offset slides where the dissolve
+   begins in from the edge, --kbg-fade is how far it takes to vanish, and
+   --kbg-fade-mid bends the falloff by moving the half-way point, which is
+   what makes it drop off early and linger, or hold and then go quickly. */
+.kbg-half--leftmid {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 var(--kbg-fade-offset, 45px),
+    rgb(0 0 0 / 0.5)
+      calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px) * var(--kbg-fade-mid, 0.3)),
+    transparent calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px))
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 var(--kbg-fade-offset, 45px),
+    rgb(0 0 0 / 0.5)
+      calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px) * var(--kbg-fade-mid, 0.3)),
+    transparent calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px))
+  );
 }
 
-.kbg-cap--left {
-  /* --cap-offset slides the block down from where it would sit, so it can
-     overlap the picture instead of only stacking above it */
-  top: calc(
-    var(--kbg-y, 136px) + var(--kbg-y-left, 0px) - var(--cap-height-left, 179px) +
-      var(--cap-offset-left, 0px)
+/* read right-to-left, so 0 is this box's own right edge */
+.kbg-half--mid {
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0,
+    #000 var(--kbg-fade-offset, 45px),
+    rgb(0 0 0 / 0.5)
+      calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px) * var(--kbg-fade-mid, 0.3)),
+    transparent calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px))
   );
-  height: var(--cap-height-left, 179px);
+  mask-image: linear-gradient(
+    to left,
+    #000 0,
+    #000 var(--kbg-fade-offset, 45px),
+    rgb(0 0 0 / 0.5)
+      calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px) * var(--kbg-fade-mid, 0.3)),
+    transparent calc(var(--kbg-fade-offset, 45px) + var(--kbg-fade, 500px))
+  );
+}
+
+/* the left picture carrying straight on into the middle: same size, same
+   offsets, so it lines up seamlessly with the half outside the panel and
+   reads as one picture crossing the boundary. Only the opacity comes from
+   the middle region instead, so what shows through the panel is as faint
+   as the middle picture is. --kbg-box-shift undoes the head start this
+   box has over the left one (it begins at the panel's left edge, not the
+   screen's), which is what keeps the two aligned. */
+.kbg-half--leftmid {
+  background-image: url("../img/backgrounds/kiseki_bg_empty3.png");
+  background-size: calc(var(--kbg-size-left, 66) * 1vw) auto;
+  background-position: left
+    calc(var(--kbg-x-left, -2px) + var(--kbg-box-shift, 0px)) top
+    calc(
+      var(--kbg-y, 136px) + var(--kbg-y-left, 0px) -
+        var(--kbg-size-left, 66) * 1vw * 0.175733
+    );
+  opacity: var(--kbg-a-mid, 0.15);
+}
+
+.kbg-half--left {
+  background-image: url("../img/backgrounds/kiseki_bg_empty3.png");
+  background-size: calc(var(--kbg-size-left, 66) * 1vw) auto;
+  background-position: left var(--kbg-x-left, -2px) top
+    calc(
+      var(--kbg-y, 136px) + var(--kbg-y-left, 0px) -
+        var(--kbg-size-left, 66) * 1vw * 0.175733
+    );
+  opacity: var(--kbg-a-sides, 1);
 }
 
 .kbg-half--mid {
-  background-image: url("../img/backgrounds/kiseki_bg_mid.png");
+  background-image: url("../img/backgrounds/kiseki_bg_mid3.png");
   background-size: calc(var(--kbg-size-mid, 30) * 1vw) auto;
   background-position: left var(--kbg-x-mid, 420px) top
-    calc(var(--kbg-y, 136px) + var(--kbg-y-mid, -7px));
+    calc(
+      var(--kbg-y, 136px) + var(--kbg-y-mid, -7px) -
+        var(--kbg-size-mid, 30) * 1vw * 0.394815
+    );
   opacity: var(--kbg-a-mid, 0.15);
 }
 
 .kbg-half--right {
-  background-image: url("../img/backgrounds/kiseki_bg.png");
+  background-image: url("../img/backgrounds/kiseki_bg3.png");
   background-size: calc(var(--kbg-size-right, 60) * 1vw) auto;
   background-position: left var(--kbg-x-right, -600px) top
-    calc(var(--kbg-y, 136px) + var(--kbg-y-right, -10px));
-  opacity: var(--kbg-a-right, 0.7);
-}
-
-.kbg-cap--right {
-  /* --cap-offset slides the block down from where it would sit, so it can
-     overlap the picture instead of only stacking above it */
-  top: calc(
-    var(--kbg-y, 136px) + var(--kbg-y-right, -10px) - var(--cap-height-right, 190px) +
-      var(--cap-offset-right, 0px)
-  );
-  height: var(--cap-height-right, 190px);
+    calc(
+      var(--kbg-y, 136px) + var(--kbg-y-right, -10px) -
+        var(--kbg-size-right, 60) * 1vw * 0.197309
+    );
+  opacity: var(--kbg-a-sides, 1);
 }
 
 .notes-top-banner--kiseki::after {
@@ -501,10 +800,10 @@
     linear-gradient(
       180deg,
       rgb(var(--kbg-grad-start-r, 0) var(--kbg-grad-start-g, 0) var(--kbg-grad-start-b, 0) /
-          var(--kbg-grad-start-a, 0.2)),
-      rgb(var(--kbg-grad-end-r, 255) var(--kbg-grad-end-g, 255) var(--kbg-grad-end-b, 255) /
-          var(--kbg-grad-end-a, 0.05))
-        var(--kbg-grad-pos, 90%)
+          var(--kbg-grad-start-a, 0)),
+      rgb(var(--kbg-grad-end-r, 0) var(--kbg-grad-end-g, 0) var(--kbg-grad-end-b, 0) /
+          var(--kbg-grad-end-a, 0))
+        var(--kbg-grad-pos, 0%)
     ),
     rgb(var(--kbg-tint-r, 0) var(--kbg-tint-g, 0) var(--kbg-tint-b, 0) / var(--kbg-tint-a, 0));
 }

@@ -36,6 +36,14 @@ html {
 }
 
 body {
+  /* temporary: the page's own ground colour, the thing every background
+     layer is painted onto and what shows below where the sky image
+     stops. Driven by the 页面底色 group in library.astro's panel;
+     defaults are --bg's own #000000. Bake in a literal and drop the
+     var()/fallback split once picked. */
+  background-color: rgb(
+    var(--page-bg-r, 0) var(--page-bg-g, 0) var(--page-bg-b, 0)
+  );
   display: flex;
   flex-direction: column;
   min-height: 100svh;

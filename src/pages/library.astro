@@ -60,6 +60,7 @@ const libraryStats = {
     <div class="fx-test__group">
       <span class="fx-test__label">导出</span>
       <button type="button" data-settings-export>导出当前设置</button>
+      <button type="button" data-settings-reset>恢复默认</button>
       <textarea id="settings-export-output" class="fx-test__output" readonly rows="8" hidden></textarea>
     </div>
 
@@ -69,6 +70,21 @@ const libraryStats = {
         横幅高度
         <input type="number" autocomplete="off" data-kbg-height min="100" max="2400" step="10" value="990" />
         <input type="range" autocomplete="off" data-kbg-height-slider min="100" max="2400" step="10" value="990" />
+      </label>
+      <label>
+        淡出长度
+        <input type="number" autocomplete="off" data-kbg-fade min="0" max="1600" step="1" value="500" />
+        <input type="range" autocomplete="off" data-kbg-fade-slider min="0" max="1600" step="1" value="500" />
+      </label>
+      <label>
+        淡出起点
+        <input type="number" autocomplete="off" data-kbg-fade-offset min="-800" max="800" step="1" value="45" />
+        <input type="range" autocomplete="off" data-kbg-fade-offset-slider min="-800" max="800" step="1" value="45" />
+      </label>
+      <label>
+        淡出曲线
+        <input type="number" autocomplete="off" data-kbg-fade-mid min="0" max="100" step="1" value="30" />
+        <input type="range" autocomplete="off" data-kbg-fade-mid-slider min="0" max="100" step="1" value="30" />
       </label>
       <label>
         纵向位置
@@ -81,33 +97,18 @@ const libraryStats = {
       <span class="fx-test__label">左侧画面</span>
       <label>
         大小
-        <input type="number" autocomplete="off" data-kbg-size-left min="5" max="400" step="1" value="35" />
-        <input type="range" autocomplete="off" data-kbg-size-left-slider min="5" max="400" step="1" value="35" />
+        <input type="number" autocomplete="off" data-kbg-size-left min="5" max="400" step="1" value="66" />
+        <input type="range" autocomplete="off" data-kbg-size-left-slider min="5" max="400" step="1" value="66" />
       </label>
       <label>
         横向
-        <input type="number" autocomplete="off" data-kbg-x-left min="-3000" max="3000" step="1" value="-22" />
-        <input type="range" autocomplete="off" data-kbg-x-left-slider min="-3000" max="3000" step="1" value="-22" />
+        <input type="number" autocomplete="off" data-kbg-x-left min="-3000" max="3000" step="1" value="-2" />
+        <input type="range" autocomplete="off" data-kbg-x-left-slider min="-3000" max="3000" step="1" value="-2" />
       </label>
       <label>
         纵向微调
         <input type="number" autocomplete="off" data-kbg-y-left min="-1000" max="1000" step="1" value="0" />
         <input type="range" autocomplete="off" data-kbg-y-left-slider min="-1000" max="1000" step="1" value="0" />
-      </label>
-      <label>
-        透明度
-        <input type="number" autocomplete="off" data-kbg-a-left min="0" max="100" step="1" value="70" />
-        <input type="range" autocomplete="off" data-kbg-a-left-slider min="0" max="100" step="1" value="70" />
-      </label>
-      <label>
-        色块高度
-        <input type="number" autocomplete="off" data-cap-height-left min="0" max="1600" step="1" value="179" />
-        <input type="range" autocomplete="off" data-cap-height-left-slider min="0" max="1600" step="1" value="179" />
-      </label>
-      <label>
-        色块下移
-        <input type="number" autocomplete="off" data-cap-offset-left min="-1000" max="1000" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-offset-left-slider min="-1000" max="1000" step="1" value="0" />
       </label>
     </div>
 
@@ -136,6 +137,76 @@ const libraryStats = {
     </div>
 
     <div class="fx-test__group">
+      <span class="fx-test__label">页面底色</span>
+      <button type="button" data-eyedrop="page-bg">吸色</button>
+      <label>
+        底色 R
+        <input type="number" autocomplete="off" data-page-bg-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-page-bg-r-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 G
+        <input type="number" autocomplete="off" data-page-bg-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-page-bg-g-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 B
+        <input type="number" autocomplete="off" data-page-bg-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-page-bg-b-slider min="0" max="255" step="1" value="0" />
+      </label>
+    </div>
+
+    <div class="fx-test__group">
+      <span class="fx-test__label">中间底色（下层）</span>
+      <button type="button" data-eyedrop="midbase">吸色</button>
+      <label>
+        底色 R
+        <input type="number" autocomplete="off" data-midbase-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midbase-r-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 G
+        <input type="number" autocomplete="off" data-midbase-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midbase-g-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 B
+        <input type="number" autocomplete="off" data-midbase-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midbase-b-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色透明度
+        <input type="number" autocomplete="off" data-midbase-a min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midbase-a-slider min="0" max="100" step="1" value="0" />
+      </label>
+    </div>
+
+    <div class="fx-test__group">
+      <span class="fx-test__label">中间底色（上层）</span>
+      <button type="button" data-eyedrop="midtint">吸色</button>
+      <label>
+        底色 R
+        <input type="number" autocomplete="off" data-midtint-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midtint-r-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 G
+        <input type="number" autocomplete="off" data-midtint-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midtint-g-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 B
+        <input type="number" autocomplete="off" data-midtint-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midtint-b-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色透明度
+        <input type="number" autocomplete="off" data-midtint-a min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-midtint-a-slider min="0" max="100" step="1" value="0" />
+      </label>
+    </div>
+
+    <div class="fx-test__group">
       <span class="fx-test__label">右侧画面</span>
       <label>
         大小
@@ -152,101 +223,10 @@ const libraryStats = {
         <input type="number" autocomplete="off" data-kbg-y-right min="-1000" max="1000" step="1" value="-10" />
         <input type="range" autocomplete="off" data-kbg-y-right-slider min="-1000" max="1000" step="1" value="-10" />
       </label>
-      <label>
-        透明度
-        <input type="number" autocomplete="off" data-kbg-a-right min="0" max="100" step="1" value="70" />
-        <input type="range" autocomplete="off" data-kbg-a-right-slider min="0" max="100" step="1" value="70" />
-      </label>
-      <label>
-        色块高度
-        <input type="number" autocomplete="off" data-cap-height-right min="0" max="1600" step="1" value="190" />
-        <input type="range" autocomplete="off" data-cap-height-right-slider min="0" max="1600" step="1" value="190" />
-      </label>
-      <label>
-        色块下移
-        <input type="number" autocomplete="off" data-cap-offset-right min="-1000" max="1000" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-offset-right-slider min="-1000" max="1000" step="1" value="0" />
-      </label>
     </div>
 
     <div class="fx-test__group">
-      <span class="fx-test__label">顶部色块</span>
-      <button type="button" data-eyedrop="cap">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-cap-r min="0" max="255" step="1" value="36" />
-        <input type="range" autocomplete="off" data-cap-r-slider min="0" max="255" step="1" value="36" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-cap-g min="0" max="255" step="1" value="36" />
-        <input type="range" autocomplete="off" data-cap-g-slider min="0" max="255" step="1" value="36" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-cap-b min="0" max="255" step="1" value="36" />
-        <input type="range" autocomplete="off" data-cap-b-slider min="0" max="255" step="1" value="36" />
-      </label>
-      <label>
-        底色透明度
-        <input type="number" autocomplete="off" data-cap-a min="0" max="100" step="1" value="100" />
-        <input type="range" autocomplete="off" data-cap-a-slider min="0" max="100" step="1" value="100" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">色块渐变</span>
-      <button type="button" data-eyedrop="cap-grad-start">吸色（起始）</button>
-      <label>
-        起始 R
-        <input type="number" autocomplete="off" data-cap-grad-start-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-start-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        起始 G
-        <input type="number" autocomplete="off" data-cap-grad-start-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-start-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        起始 B
-        <input type="number" autocomplete="off" data-cap-grad-start-b min="0" max="255" step="1" value="24" />
-        <input type="range" autocomplete="off" data-cap-grad-start-b-slider min="0" max="255" step="1" value="24" />
-      </label>
-      <label>
-        起始透明度
-        <input type="number" autocomplete="off" data-cap-grad-start-a min="0" max="100" step="1" value="100" />
-        <input type="range" autocomplete="off" data-cap-grad-start-a-slider min="0" max="100" step="1" value="100" />
-      </label>
-      <button type="button" data-eyedrop="cap-grad-end">吸色（结束）</button>
-      <label>
-        结束 R
-        <input type="number" autocomplete="off" data-cap-grad-end-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-end-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束 G
-        <input type="number" autocomplete="off" data-cap-grad-end-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-end-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束 B
-        <input type="number" autocomplete="off" data-cap-grad-end-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-end-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束透明度
-        <input type="number" autocomplete="off" data-cap-grad-end-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-end-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-      <label>
-        渐变位置
-        <input type="number" autocomplete="off" data-cap-grad-pos min="0" max="300" step="1" value="0" />
-        <input type="range" autocomplete="off" data-cap-grad-pos-slider min="0" max="300" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">背景滤镜</span>
+      <span class="fx-test__label">中间滤镜</span>
       <label>
         黑白
         <input type="number" autocomplete="off" data-kbg-grayscale min="0" max="100" step="1" value="0" />
@@ -306,7 +286,7 @@ const libraryStats = {
 
     <div class="fx-test__group">
       <span class="fx-test__label">背景渐变</span>
-      <button type="button" data-eyedrop="kbg-grad-start">吸色</button>
+      <button type="button" data-eyedrop="kbg-grad-start">吸色（起始）</button>
       <label>
         起始 R
         <input type="number" autocomplete="off" data-kbg-grad-start-r min="0" max="255" step="1" value="0" />
@@ -324,38 +304,156 @@ const libraryStats = {
       </label>
       <label>
         起始透明度
-        <input type="number" autocomplete="off" data-kbg-grad-start-a min="0" max="100" step="1" value="20" />
-        <input type="range" autocomplete="off" data-kbg-grad-start-a-slider min="0" max="100" step="1" value="20" />
+        <input type="number" autocomplete="off" data-kbg-grad-start-a min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-start-a-slider min="0" max="100" step="1" value="0" />
       </label>
-      <button type="button" data-eyedrop="kbg-grad-end">吸色</button>
+      <button type="button" data-eyedrop="kbg-grad-end">吸色（结束）</button>
       <label>
         结束 R
-        <input type="number" autocomplete="off" data-kbg-grad-end-r min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-r-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-kbg-grad-end-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-end-r-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         结束 G
-        <input type="number" autocomplete="off" data-kbg-grad-end-g min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-g-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-kbg-grad-end-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-end-g-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         结束 B
-        <input type="number" autocomplete="off" data-kbg-grad-end-b min="0" max="255" step="1" value="255" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-b-slider min="0" max="255" step="1" value="255" />
+        <input type="number" autocomplete="off" data-kbg-grad-end-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-end-b-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         结束透明度
-        <input type="number" autocomplete="off" data-kbg-grad-end-a min="0" max="100" step="1" value="5" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-a-slider min="0" max="100" step="1" value="5" />
+        <input type="number" autocomplete="off" data-kbg-grad-end-a min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-end-a-slider min="0" max="100" step="1" value="0" />
       </label>
       <label>
         渐变位置
-        <input type="number" autocomplete="off" data-kbg-grad-pos min="0" max="300" step="1" value="90" />
-        <input type="range" autocomplete="off" data-kbg-grad-pos-slider min="0" max="300" step="1" value="90" />
+        <input type="number" autocomplete="off" data-kbg-grad-pos min="0" max="300" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-grad-pos-slider min="0" max="300" step="1" value="0" />
+      </label>
+    </div>
+
+  </div>
+
+
+  <!-- temporary: 面板底色 mirrors the group in notes.astro's right panel
+       (same shared vars — this is the content panel's own glass fill,
+       shared by every page), and 毛玻璃 sits next to it since what it
+       drains the colour out of is the background right behind that
+       panel, which is what this page is actually about. Remove along
+       with the other panels once values are picked. -->
+  <div class="hue-test fx-test sleep-anim-test" id="sleep-anim-test-panel">
+    <div class="fx-test__group">
+      <span class="fx-test__label">面板底色</span>
+      <label>
+        红
+        <input type="number" autocomplete="off" data-panel-r min="0" max="255" step="1" value="100" />
+        <input type="range" autocomplete="off" data-panel-r-slider min="0" max="255" step="1" value="100" />
+      </label>
+      <label>
+        绿
+        <input type="number" autocomplete="off" data-panel-g min="0" max="255" step="1" value="100" />
+        <input type="range" autocomplete="off" data-panel-g-slider min="0" max="255" step="1" value="100" />
+      </label>
+      <label>
+        蓝
+        <input type="number" autocomplete="off" data-panel-b min="0" max="255" step="1" value="100" />
+        <input type="range" autocomplete="off" data-panel-b-slider min="0" max="255" step="1" value="100" />
+      </label>
+      <label>
+        透明度
+        <input type="number" autocomplete="off" data-panel-a min="0" max="100" step="1" value="15" />
+        <input type="range" autocomplete="off" data-panel-a-slider min="0" max="100" step="1" value="15" />
+      </label>
+    </div>
+
+    <div class="fx-test__group">
+      <span class="fx-test__label">左右画面（同步）</span>
+      <label>
+        图片透明度
+        <input type="number" autocomplete="off" data-kbg-a-sides min="0" max="100" step="1" value="100" />
+        <input type="range" autocomplete="off" data-kbg-a-sides-slider min="0" max="100" step="1" value="100" />
+      </label>
+      <button type="button" data-eyedrop="sidetint">吸色</button>
+      <label>
+        底色 R
+        <input type="number" autocomplete="off" data-sidetint-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-sidetint-r-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 G
+        <input type="number" autocomplete="off" data-sidetint-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-sidetint-g-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色 B
+        <input type="number" autocomplete="off" data-sidetint-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-sidetint-b-slider min="0" max="255" step="1" value="0" />
+      </label>
+      <label>
+        底色透明度
+        <input type="number" autocomplete="off" data-sidetint-a min="0" max="100" step="1" value="50" />
+        <input type="range" autocomplete="off" data-sidetint-a-slider min="0" max="100" step="1" value="50" />
+      </label>
+      <label>
+        黑白
+        <input type="number" autocomplete="off" data-kbg-side-grayscale min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-side-grayscale-slider min="0" max="100" step="1" value="0" />
+      </label>
+      <label>
+        亮度
+        <input type="number" autocomplete="off" data-kbg-side-brightness min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-kbg-side-brightness-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        对比度
+        <input type="number" autocomplete="off" data-kbg-side-contrast min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-kbg-side-contrast-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        饱和度
+        <input type="number" autocomplete="off" data-kbg-side-saturate min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-kbg-side-saturate-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        色相
+        <input type="number" autocomplete="off" data-kbg-side-hue min="0" max="360" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-side-hue-slider min="0" max="360" step="1" value="0" />
+      </label>
+      <label>
+        复古
+        <input type="number" autocomplete="off" data-kbg-side-sepia min="0" max="100" step="1" value="0" />
+        <input type="range" autocomplete="off" data-kbg-side-sepia-slider min="0" max="100" step="1" value="0" />
+      </label>
+    </div>
+
+    <div class="fx-test__group">
+      <span class="fx-test__label">毛玻璃</span>
+      <button type="button" data-fx-toggle="frostlib">毛玻璃：关</button>
+      <label>
+        模糊
+        <input type="number" autocomplete="off" data-frost-lib-blur min="0" max="60" step="1" value="0" />
+        <input type="range" autocomplete="off" data-frost-lib-blur-slider min="0" max="60" step="1" value="0" />
+      </label>
+      <label>
+        亮度
+        <input type="number" autocomplete="off" data-frost-lib-brightness min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-frost-lib-brightness-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        对比度
+        <input type="number" autocomplete="off" data-frost-lib-contrast min="0" max="300" step="1" value="100" />
+        <input type="range" autocomplete="off" data-frost-lib-contrast-slider min="0" max="300" step="1" value="100" />
+      </label>
+      <label>
+        饱和度
+        <input type="number" autocomplete="off" data-frost-lib-saturate min="0" max="300" step="1" value="5" />
+        <input type="range" autocomplete="off" data-frost-lib-saturate-slider min="0" max="300" step="1" value="5" />
       </label>
     </div>
   </div>
-
 
   <!-- master show/hide for the panel below, same button Writing uses.
        Starts open. Remove along with the panel itself. -->

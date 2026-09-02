@@ -56,6 +56,7 @@ const rendered = await Promise.all(
     <div class="fx-test__group">
       <span class="fx-test__label">导出</span>
       <button type="button" data-settings-export>导出当前设置</button>
+      <button type="button" data-settings-reset>恢复默认</button>
       <textarea id="settings-export-output" class="fx-test__output" readonly rows="8" hidden></textarea>
     </div>
     <div class="fx-test__group">
@@ -146,29 +147,6 @@ const rendered = await Promise.all(
         起始
         <input type="number" autocomplete="off" data-vignette-start min="0" max="100" step="1" value="35" />
         <input type="range" autocomplete="off" data-vignette-start-slider min="0" max="100" step="1" value="35" />
-      </label>
-    </div>
-    <div class="fx-test__group">
-      <span class="fx-test__label">毛玻璃参数</span>
-      <label>
-        模糊
-        <input type="number" autocomplete="off" data-frost-blur min="0" max="60" step="1" value="0" />
-        <input type="range" autocomplete="off" data-frost-blur-slider min="0" max="60" step="1" value="0" />
-      </label>
-      <label>
-        亮度
-        <input type="number" autocomplete="off" data-frost-brightness min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-frost-brightness-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        对比度
-        <input type="number" autocomplete="off" data-frost-contrast min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-frost-contrast-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        饱和度
-        <input type="number" autocomplete="off" data-frost-saturate min="0" max="300" step="1" value="5" />
-        <input type="range" autocomplete="off" data-frost-saturate-slider min="0" max="300" step="1" value="5" />
       </label>
     </div>
     <div class="fx-test__group">
@@ -433,49 +411,6 @@ const rendered = await Promise.all(
         <input type="range" autocomplete="off" data-panel-border-w-slider min="0" max="10" step="1" value="0" />
       </label>
     </div>
-    <div class="fx-test__group">
-      <span class="fx-test__label">面板外阴影</span>
-      <label>
-        红
-        <input type="number" autocomplete="off" data-panel-shadow-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-panel-shadow-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        绿
-        <input type="number" autocomplete="off" data-panel-shadow-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-panel-shadow-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        蓝
-        <input type="number" autocomplete="off" data-panel-shadow-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-panel-shadow-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        透明度
-        <input type="number" autocomplete="off" data-panel-shadow-a min="0" max="100" step="1" value="100" />
-        <input type="range" autocomplete="off" data-panel-shadow-a-slider min="0" max="100" step="1" value="100" />
-      </label>
-      <label>
-        横向偏移
-        <input type="number" autocomplete="off" data-panel-shadow-x min="-100" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-panel-shadow-x-slider min="-100" max="100" step="1" value="0" />
-      </label>
-      <label>
-        纵向偏移
-        <input type="number" autocomplete="off" data-panel-shadow-y min="-100" max="100" step="1" value="-100" />
-        <input type="range" autocomplete="off" data-panel-shadow-y-slider min="-100" max="100" step="1" value="-100" />
-      </label>
-      <label>
-        模糊
-        <input type="number" autocomplete="off" data-panel-shadow-blur min="0" max="120" step="1" value="60" />
-        <input type="range" autocomplete="off" data-panel-shadow-blur-slider min="0" max="120" step="1" value="60" />
-      </label>
-      <label>
-        扩散
-        <input type="number" autocomplete="off" data-panel-shadow-spread min="0" max="60" step="1" value="0" />
-        <input type="range" autocomplete="off" data-panel-shadow-spread-slider min="0" max="60" step="1" value="0" />
-      </label>
-    </div>
   </div>
 
   <!-- temporary: scale/position/speed sliders for the sidebar pixel
@@ -502,61 +437,37 @@ const rendered = await Promise.all(
       </label>
     </div>
     <div class="fx-test__group">
-      <span class="fx-test__label">导航栏动画</span>
+      <span class="fx-test__label">面板外阴影</span>
+      <button type="button" data-panel-shadow-style-toggle>面板外阴影样式：外扩（点击看经典）</button>
       <label>
-        放大倍数
-        <input type="number" autocomplete="off" data-sleep-scale min="1" max="12" step="1" value="2" />
-        <input type="range" autocomplete="off" data-sleep-scale-slider min="1" max="12" step="1" value="2" />
+        红
+        <input type="number" autocomplete="off" data-panel-shadow-r min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-panel-shadow-r-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
-        横向偏移
-        <input type="number" autocomplete="off" data-sleep-x min="-300" max="300" step="1" value="150" />
-        <input type="range" autocomplete="off" data-sleep-x-slider min="-300" max="300" step="1" value="150" />
+        绿
+        <input type="number" autocomplete="off" data-panel-shadow-g min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-panel-shadow-g-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
-        纵向偏移
-        <input type="number" autocomplete="off" data-sleep-y min="-300" max="300" step="1" value="-39" />
-        <input type="range" autocomplete="off" data-sleep-y-slider min="-300" max="300" step="1" value="-39" />
-      </label>
-      <label>
-        播放间隔
-        <input type="number" autocomplete="off" data-sleep-speed min="50" max="3000" step="50" value="2000" />
-        <input type="range" autocomplete="off" data-sleep-speed-slider min="50" max="3000" step="50" value="2000" />
-      </label>
-      <label>
-        黑白
-        <input type="number" autocomplete="off" data-sleep-grayscale min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sleep-grayscale-slider min="0" max="100" step="1" value="0" />
-      </label>
-      <label>
-        亮度
-        <input type="number" autocomplete="off" data-sleep-brightness min="0" max="300" step="1" value="80" />
-        <input type="range" autocomplete="off" data-sleep-brightness-slider min="0" max="300" step="1" value="80" />
-      </label>
-      <label>
-        对比度
-        <input type="number" autocomplete="off" data-sleep-contrast min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-sleep-contrast-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        饱和度
-        <input type="number" autocomplete="off" data-sleep-saturate min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-sleep-saturate-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        色相
-        <input type="number" autocomplete="off" data-sleep-hue min="0" max="360" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sleep-hue-slider min="0" max="360" step="1" value="0" />
-      </label>
-      <label>
-        复古
-        <input type="number" autocomplete="off" data-sleep-sepia min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sleep-sepia-slider min="0" max="100" step="1" value="0" />
+        蓝
+        <input type="number" autocomplete="off" data-panel-shadow-b min="0" max="255" step="1" value="0" />
+        <input type="range" autocomplete="off" data-panel-shadow-b-slider min="0" max="255" step="1" value="0" />
       </label>
       <label>
         透明度
-        <input type="number" autocomplete="off" data-sleep-a min="0" max="100" step="1" value="80" />
-        <input type="range" autocomplete="off" data-sleep-a-slider min="0" max="100" step="1" value="80" />
+        <input type="number" autocomplete="off" data-panel-shadow-a min="0" max="100" step="1" value="40" />
+        <input type="range" autocomplete="off" data-panel-shadow-a-slider min="0" max="100" step="1" value="40" />
+      </label>
+      <label>
+        宽度
+        <input type="number" autocomplete="off" data-panel-shadow-reach min="0" max="500" step="1" value="200" />
+        <input type="range" autocomplete="off" data-panel-shadow-reach-slider min="0" max="500" step="1" value="200" />
+      </label>
+      <label>
+        曲线弯度
+        <input type="number" autocomplete="off" data-panel-shadow-curve min="-20" max="500" step="1" value="500" />
+        <input type="range" autocomplete="off" data-panel-shadow-curve-slider min="-20" max="500" step="1" value="500" />
       </label>
     </div>
   </div>

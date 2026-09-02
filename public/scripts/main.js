@@ -251,14 +251,29 @@
        .sidebar-col and .main-col both take .shell--quadrant as their
        offset parent; .page-header takes .main-col, so its offset has to
        be added onto .main-col's own. */
+    /* .sidebar-col is sticky, and a sticky element reports its *pinned*
+       offset once the page has scrolled — not the layout position it
+       would sit at. Refreshing while scrolled to the bottom restores the
+       scroll before this runs, so the column measured as far down the
+       panel as it was pinned, and the left-hand line went with it.
+       Dropping sticky for the length of the measurement gives the layout
+       position no matter where the page happens to sit; it's put back
+       before anything paints, so nothing moves on screen. */
+    var stickyBefore = sidebar.style.position;
+    sidebar.style.position = "static";
     var sidebarTop = sidebar.offsetTop;
-    var sidebarBottom = sidebarTop + sidebar.offsetHeight;
+    var sidebarHeight = sidebar.offsetHeight;
+    var sidebarLeft = sidebar.offsetLeft;
+    var sidebarWidth = sidebar.offsetWidth;
+    sidebar.style.position = stickyBefore;
+
+    var sidebarBottom = sidebarTop + sidebarHeight;
     var mainTop = mainCol.offsetTop;
     var mainBottom = mainTop + mainCol.offsetHeight;
 
     var top = Math.min(sidebarTop, mainTop) + V_TOP_ADJUST;
     var bottom = Math.max(sidebarBottom, mainBottom) + V_BOTTOM_ADJUST;
-    var left = (sidebar.offsetLeft + sidebar.offsetWidth + mainCol.offsetLeft) / 2;
+    var left = (sidebarLeft + sidebarWidth + mainCol.offsetLeft) / 2;
 
     // V_BOTTOM_ADJUST is a fixed pull-in, which a short page (Projects,
     // with one entry) would otherwise eat almost all of, leaving a stub
@@ -285,14 +300,12 @@
     hLine.style.width = Math.max(0, mainCol.offsetLeft + mainCol.offsetWidth - left) + "px";
 
     // left half: a child of the pinned nav column, so it stays with it
-    // instead of sliding away. offsetTop/offsetLeft rather than
-    // getBoundingClientRect, since those report the column's layout
-    // position and so don't change with however far the page happens to
-    // be scrolled when this runs.
+    // instead of sliding away — measured against the column's layout top
+    // (see the sticky note above), not wherever it's currently pinned.
     if (hLeft) {
       hLeft.style.top = hY - sidebarTop + "px";
       hLeft.style.left = "0px";
-      hLeft.style.width = Math.max(0, left - sidebar.offsetLeft) + "px";
+      hLeft.style.width = Math.max(0, left - sidebarLeft) + "px";
     }
   }
 
@@ -620,6 +633,34 @@
     });
   }
 
+  /* temporary: lets 面板外阴影's two treatments (tonight's outer band,
+     which is the picked/live look, vs. the original single shadow) be
+     compared live. Resets to the band on every load — clicking only ever
+     peeks at the classic look, it never becomes the resting state on its
+     own. Remove along with the rest of the panel-shadow test controls
+     once one is picked for good. */
+  function initPanelShadowStyleToggle() {
+    var button = document.querySelector("[data-panel-shadow-style-toggle]");
+    if (!button) return;
+
+    function label(style) {
+      return style === "classic" ? "面板外阴影样式：经典（点击看外扩）" : "面板外阴影样式：外扩（点击看经典）";
+    }
+
+    delete root.dataset.panelShadowStyle;
+    button.textContent = label("band");
+
+    button.addEventListener("click", function () {
+      var next = root.dataset.panelShadowStyle === "classic" ? "band" : "classic";
+      if (next === "band") {
+        delete root.dataset.panelShadowStyle;
+      } else {
+        root.dataset.panelShadowStyle = next;
+      }
+      button.textContent = label(next);
+    });
+  }
+
   function initFxTestToggle() {
     var button = document.getElementById("fx-test-toggle");
     if (!button) return;
@@ -642,6 +683,37 @@
 
     button.addEventListener("click", function () {
       apply(panels[0].hidden);
+    });
+  }
+
+  /* temporary: throws away everything this browser has remembered and
+     comes back on the values written into the markup and the CSS — the
+     ones a fresh visitor sees. Reloading is the reliable way to get
+     there: it puts every control back to its own default attribute and
+     lets the appliers run from scratch, rather than trying to unpick the
+     current state field by field. Remove along with the panels. */
+  function initTuningReset() {
+    var button = document.querySelector("[data-settings-reset]");
+    if (!button) return;
+
+    button.addEventListener("click", function () {
+      try {
+        window.localStorage.removeItem(TUNING_KEY);
+      } catch (err) {
+        /* nothing stored to clear */
+      }
+
+      // <html> survives a soft navigation but not a reload; clearing it
+      // here anyway keeps the page correct even if the reload is blocked
+      for (var i = root.style.length - 1; i >= 0; i--) {
+        var name = root.style[i];
+        if (name.indexOf("--") === 0) root.style.removeProperty(name);
+      }
+      Object.keys(root.dataset).forEach(function (key) {
+        if (key.indexOf("fx") === 0) delete root.dataset[key];
+      });
+
+      window.location.reload();
     });
   }
 
@@ -709,14 +781,6 @@
       { key: "panel-border-b", cssVar: "--panel-border-b" },
       { key: "panel-border-a", cssVar: "--panel-border-a", isAlpha: true },
       { key: "panel-border-w", cssVar: "--panel-border-w", unit: "px" },
-      { key: "panel-shadow-r", cssVar: "--panel-shadow-r" },
-      { key: "panel-shadow-g", cssVar: "--panel-shadow-g" },
-      { key: "panel-shadow-b", cssVar: "--panel-shadow-b" },
-      { key: "panel-shadow-a", cssVar: "--panel-shadow-a", isAlpha: true },
-      { key: "panel-shadow-x", cssVar: "--panel-shadow-x", unit: "px" },
-      { key: "panel-shadow-y", cssVar: "--panel-shadow-y", unit: "px" },
-      { key: "panel-shadow-blur", cssVar: "--panel-shadow-blur", unit: "px" },
-      { key: "panel-shadow-spread", cssVar: "--panel-shadow-spread", unit: "px" },
       // .notes-row's frame and rounding
       { key: "blog-border-r", cssVar: "--blog-border-r" },
       { key: "blog-border-g", cssVar: "--blog-border-g" },
@@ -761,23 +825,16 @@
       { key: "frost-brightness", cssVar: "--frost-brightness", unit: "%" },
       { key: "frost-contrast", cssVar: "--frost-contrast", unit: "%" },
       { key: "frost-saturate", cssVar: "--frost-saturate", unit: "%" },
+      { key: "frost-lib-blur", cssVar: "--frost-lib-blur", unit: "px" },
+      { key: "frost-lib-brightness", cssVar: "--frost-lib-brightness", unit: "%" },
+      { key: "frost-lib-contrast", cssVar: "--frost-lib-contrast", unit: "%" },
+      { key: "frost-lib-saturate", cssVar: "--frost-lib-saturate", unit: "%" },
       // the page's wordmark image. Height also feeds .sidebar-col--titled's
       // push-down and sticky offset, so the nav follows it automatically.
       { key: "page-title-h", cssVar: "--page-title-img-height", unit: "px" },
       { key: "page-title-x", cssVar: "--page-title-img-x", unit: "px" },
       { key: "page-title-y", cssVar: "--page-title-img-y", unit: "px" },
       // the sidebar's two-frame pixel sprite — same binder, different target
-      { key: "sleep-scale", cssVar: "--sleep-scale" },
-      { key: "sleep-x", cssVar: "--sleep-x", unit: "px" },
-      { key: "sleep-y", cssVar: "--sleep-y", unit: "px" },
-      { key: "sleep-speed", cssVar: "--sleep-speed", unit: "ms" },
-      { key: "sleep-grayscale", cssVar: "--sleep-grayscale", unit: "%" },
-      { key: "sleep-brightness", cssVar: "--sleep-brightness", unit: "%" },
-      { key: "sleep-contrast", cssVar: "--sleep-contrast", unit: "%" },
-      { key: "sleep-saturate", cssVar: "--sleep-saturate", unit: "%" },
-      { key: "sleep-hue", cssVar: "--sleep-hue", unit: "deg" },
-      { key: "sleep-sepia", cssVar: "--sleep-sepia", unit: "%" },
-      { key: "sleep-a", cssVar: "--sleep-a", isAlpha: true },
       // Library's sidebar portrait — hold/cooldown are read back out of
       // these by initNavPortrait() rather than used by CSS directly
       { key: "portrait-size", cssVar: "--portrait-size", unit: "px" },
@@ -805,6 +862,9 @@
       // Reviews' own background illustrations
       { key: "kbg-height", cssVar: "--kbg-height", unit: "px" },
       { key: "kbg-y", cssVar: "--kbg-y", unit: "px" },
+      { key: "kbg-fade", cssVar: "--kbg-fade", unit: "px" },
+      { key: "kbg-fade-offset", cssVar: "--kbg-fade-offset", unit: "px" },
+      { key: "kbg-fade-mid", cssVar: "--kbg-fade-mid", isAlpha: true },
       { key: "kbg-grayscale", cssVar: "--kbg-grayscale", unit: "%" },
       { key: "kbg-brightness", cssVar: "--kbg-brightness", unit: "%" },
       { key: "kbg-contrast", cssVar: "--kbg-contrast", unit: "%" },
@@ -814,34 +874,46 @@
       { key: "kbg-size-left", cssVar: "--kbg-size-left" },
       { key: "kbg-x-left", cssVar: "--kbg-x-left", unit: "px" },
       { key: "kbg-y-left", cssVar: "--kbg-y-left", unit: "px" },
-      { key: "kbg-a-left", cssVar: "--kbg-a-left", isAlpha: true },
-      { key: "cap-height-left", cssVar: "--cap-height-left", unit: "px" },
-      { key: "cap-offset-left", cssVar: "--cap-offset-left", unit: "px" },
       { key: "kbg-size-mid", cssVar: "--kbg-size-mid" },
       { key: "kbg-x-mid", cssVar: "--kbg-x-mid", unit: "px" },
       { key: "kbg-y-mid", cssVar: "--kbg-y-mid", unit: "px" },
       { key: "kbg-a-mid", cssVar: "--kbg-a-mid", isAlpha: true },
+      // the two side pictures, tuned as a pair
+      { key: "kbg-a-sides", cssVar: "--kbg-a-sides", isAlpha: true },
+      { key: "sidetint-r", cssVar: "--sidetint-r" },
+      { key: "sidetint-g", cssVar: "--sidetint-g" },
+      { key: "sidetint-b", cssVar: "--sidetint-b" },
+      { key: "sidetint-a", cssVar: "--sidetint-a", isAlpha: true },
+      { key: "kbg-side-grayscale", cssVar: "--kbg-side-grayscale", unit: "%" },
+      { key: "kbg-side-brightness", cssVar: "--kbg-side-brightness", unit: "%" },
+      { key: "kbg-side-contrast", cssVar: "--kbg-side-contrast", unit: "%" },
+      { key: "kbg-side-saturate", cssVar: "--kbg-side-saturate", unit: "%" },
+      { key: "kbg-side-hue", cssVar: "--kbg-side-hue", unit: "deg" },
+      { key: "kbg-side-sepia", cssVar: "--kbg-side-sepia", unit: "%" },
       { key: "kbg-size-right", cssVar: "--kbg-size-right" },
       { key: "kbg-x-right", cssVar: "--kbg-x-right", unit: "px" },
       { key: "kbg-y-right", cssVar: "--kbg-y-right", unit: "px" },
-      { key: "kbg-a-right", cssVar: "--kbg-a-right", isAlpha: true },
-      { key: "cap-height-right", cssVar: "--cap-height-right", unit: "px" },
-      { key: "cap-offset-right", cssVar: "--cap-offset-right", unit: "px" },
-      // the flat block filling the strip above each picture — one colour
-      // and one gradient shared by all three
-      { key: "cap-r", cssVar: "--cap-r" },
-      { key: "cap-g", cssVar: "--cap-g" },
-      { key: "cap-b", cssVar: "--cap-b" },
-      { key: "cap-a", cssVar: "--cap-a", isAlpha: true },
-      { key: "cap-grad-start-r", cssVar: "--cap-grad-start-r" },
-      { key: "cap-grad-start-g", cssVar: "--cap-grad-start-g" },
-      { key: "cap-grad-start-b", cssVar: "--cap-grad-start-b" },
-      { key: "cap-grad-start-a", cssVar: "--cap-grad-start-a", isAlpha: true },
-      { key: "cap-grad-end-r", cssVar: "--cap-grad-end-r" },
-      { key: "cap-grad-end-g", cssVar: "--cap-grad-end-g" },
-      { key: "cap-grad-end-b", cssVar: "--cap-grad-end-b" },
-      { key: "cap-grad-end-a", cssVar: "--cap-grad-end-a", isAlpha: true },
-      { key: "cap-grad-pos", cssVar: "--cap-grad-pos", unit: "%" },
+      // the middle region's own ground colour, under the pictures
+      { key: "midbase-r", cssVar: "--midbase-r" },
+      { key: "midbase-g", cssVar: "--midbase-g" },
+      { key: "midbase-b", cssVar: "--midbase-b" },
+      { key: "midbase-a", cssVar: "--midbase-a", isAlpha: true },
+      // the page's own ground colour, under everything
+      { key: "page-bg-r", cssVar: "--page-bg-r" },
+      { key: "page-bg-g", cssVar: "--page-bg-g" },
+      { key: "page-bg-b", cssVar: "--page-bg-b" },
+      // and the middle region's colour wash, over the pictures
+      { key: "midtint-r", cssVar: "--midtint-r" },
+      { key: "midtint-g", cssVar: "--midtint-g" },
+      { key: "midtint-b", cssVar: "--midtint-b" },
+      { key: "midtint-a", cssVar: "--midtint-a", isAlpha: true },
+      // 面板外阴影's own band
+      { key: "panel-shadow-r", cssVar: "--panel-shadow-r" },
+      { key: "panel-shadow-g", cssVar: "--panel-shadow-g" },
+      { key: "panel-shadow-b", cssVar: "--panel-shadow-b" },
+      { key: "panel-shadow-a", cssVar: "--panel-shadow-a", isAlpha: true },
+      { key: "panel-shadow-reach", cssVar: "--panel-shadow-reach", unit: "px" },
+      { key: "panel-shadow-curve", cssVar: "--panel-shadow-curve", isAlpha: true },
       { key: "kbg-tint-r", cssVar: "--kbg-tint-r" },
       { key: "kbg-tint-g", cssVar: "--kbg-tint-g" },
       { key: "kbg-tint-b", cssVar: "--kbg-tint-b" },
@@ -864,7 +936,11 @@
         var slider = document.querySelector("[data-" + field.key + "-slider]");
         if (!slider) return;
         var value = field.isAlpha ? Number(slider.value) / 100 : slider.value + (field.unit || "");
-        root.style.setProperty(field.cssVar, value);
+        // a field may drive more than one property — the two side
+        // pictures' opacity is one slider writing both
+        [].concat(field.cssVar).forEach(function (name) {
+          root.style.setProperty(name, value);
+        });
       });
     }
 
@@ -1020,7 +1096,7 @@
      you soft-navigated over from Writing (the flags live on <html>,
      which survives navigation). Bake these in and delete along with the
      panels. */
-  var FX_DEFAULT_ON = ["frost", "gradient", "vignette", "divider"];
+  var FX_DEFAULT_ON = ["frost", "frostlib", "gradient", "vignette", "divider"];
 
   function fxAttr(key) {
     // "text-glow" -> "fxTextGlow" (the dataset property for data-fx-text-glow)
@@ -1042,6 +1118,7 @@
 
     var labels = {
       frost: "毛玻璃",
+      frostlib: "毛玻璃",
       vignette: "暗角",
       noise: "噪点",
       scanlines: "扫描线",
@@ -1066,75 +1143,6 @@
         button.textContent = label + "：" + (isOn ? "关" : "开");
       });
     });
-  }
-
-  /* temporary: switches #notes-list's data-micro-style attribute between
-     the default Micro entry width and the "Narrow" treatment — the
-     matching CSS lives in components.css. Remove this function (and the
-     button row in notes.astro) once one is picked. */
-  function initNotesMicroStyleTest() {
-    var list = document.getElementById("notes-list");
-    var buttons = document.querySelectorAll("[data-micro-style-preset]");
-    if (!list || !buttons.length) return;
-
-    buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        buttons.forEach(function (b) {
-          b.classList.remove("is-active");
-        });
-        button.classList.add("is-active");
-
-        var preset = button.dataset.microStylePreset;
-        if (preset) {
-          list.setAttribute("data-micro-style", preset);
-        } else {
-          list.removeAttribute("data-micro-style");
-        }
-      });
-    });
-  }
-
-  /* temporary: R/G/B/opacity sliders for a Micro entry's background
-     color, setting the four custom properties .notes-micro-item reads
-     in components.css. Remove this function (and the slider row in
-     notes.astro) once values are picked. */
-  function initNotesMicroBgTest() {
-    var rSlider = document.querySelector("[data-micro-bg-r-slider]");
-    if (!rSlider) return;
-
-    var channels = [
-      { key: "r", cssVar: "--micro-bg-r" },
-      { key: "g", cssVar: "--micro-bg-g" },
-      { key: "b", cssVar: "--micro-bg-b" },
-    ];
-
-    function apply() {
-      channels.forEach(function (channel) {
-        var slider = document.querySelector("[data-micro-bg-" + channel.key + "-slider]");
-        if (slider) root.style.setProperty(channel.cssVar, slider.value);
-      });
-      var aSlider = document.querySelector("[data-micro-bg-a-slider]");
-      if (aSlider) root.style.setProperty("--micro-bg-a", Number(aSlider.value) / 100);
-    }
-
-    channels.concat([{ key: "a" }]).forEach(function (channel) {
-      var slider = document.querySelector("[data-micro-bg-" + channel.key + "-slider]");
-      var number = document.querySelector("[data-micro-bg-" + channel.key + "]");
-      if (!slider) return;
-
-      slider.addEventListener("input", function () {
-        if (number) number.value = slider.value;
-        apply();
-      });
-      if (number) {
-        number.addEventListener("input", function () {
-          slider.value = number.value;
-          apply();
-        });
-      }
-    });
-
-    apply();
   }
 
   /* Accordion rows: clicking a [data-notes-toggle] trigger toggles its
@@ -1271,17 +1279,35 @@
     // the picture, and same-stacking siblings paint in DOM order
     // the middle deliberately gets no colour block — the sky is meant to
     // show right up to the top there
-    [
-      ["kbg-half", ["left", "mid", "right"]],
-      ["kbg-cap", ["left", "right"]],
-    ].forEach(function (pair) {
-      pair[1].forEach(function (region) {
-        var el = document.createElement("div");
-        el.className = pair[0] + " " + pair[0] + "--" + region;
-        el.setAttribute("aria-hidden", "true");
-        banner.appendChild(el);
-      });
+    // mid before left, so the left picture's fade-out crosses over the top
+    // of the middle one rather than under it
+    var midBase = document.createElement("div");
+    midBase.className = "kbg-midbase";
+    midBase.setAttribute("aria-hidden", "true");
+
+    ["mid", "leftmid", "left", "right"].forEach(function (region) {
+      var el = document.createElement("div");
+      el.className = "kbg-half kbg-half--" + region;
+      el.setAttribute("aria-hidden", "true");
+      banner.appendChild(el);
     });
+
+    // after the pictures, so the middle's colour wash paints over both of
+    // the layers that reach into it
+    var midTint = document.createElement("div");
+    midTint.className = "kbg-midtint";
+    midTint.setAttribute("aria-hidden", "true");
+    banner.appendChild(midTint);
+
+    ["left", "right"].forEach(function (side) {
+      var tint = document.createElement("div");
+      tint.className = "kbg-sidetint kbg-sidetint--" + side;
+      tint.setAttribute("aria-hidden", "true");
+      banner.appendChild(tint);
+    });
+
+    // and its base colour goes in front of them all, so it paints under
+    banner.insertBefore(midBase, banner.firstChild);
 
     root.appendChild(banner);
     root.appendChild(hikari);
@@ -1313,16 +1339,32 @@
     // colour blocks take exactly the same three boxes as the pictures
     var boxes = {
       left: [0, Math.max(0, rect.left)],
+      // the two layers that reach into the middle both live in the middle
+      // region's own box, one masked from each edge
+      leftmid: [rect.left, Math.max(0, rect.width)],
       mid: [rect.left, Math.max(0, rect.width)],
       right: [rect.right, Math.max(0, vw - rect.right)],
     };
 
+    [".kbg-midbase", ".kbg-midtint"].forEach(function (sel) {
+      var el = document.querySelector(sel);
+      if (!el) return;
+      el.style.left = rect.left + "px";
+      el.style.width = Math.max(0, rect.width) + "px";
+    });
+
     Object.keys(boxes).forEach(function (region) {
-      [".kbg-half--", ".kbg-cap--"].forEach(function (sel) {
+      [".kbg-half--", ".kbg-sidetint--"].forEach(function (sel) {
         var el = document.querySelector(sel + region);
         if (!el) return;
         el.style.left = boxes[region][0] + "px";
         el.style.width = boxes[region][1] + "px";
+        // this box starts at the panel's left edge rather than the
+        // screen's, so the picture inside it has to be pulled back by
+        // that much to stay lined up with its own half outside
+        if (region === "leftmid") {
+          el.style.setProperty("--kbg-box-shift", -rect.left + "px");
+        }
       });
     });
   }
@@ -1450,9 +1492,11 @@
     initNoiseTest();
     initPanelTest();
     initSettingsExport();
+    initTuningReset();
     // last of the panel wiring, so it hides panels the appliers above
     // have already read their starting values out of
     initFxTestToggle();
+    initPanelShadowStyleToggle();
     initEyeDropper();
     initNavPortrait();
     initFilterTabs();
@@ -1462,8 +1506,6 @@
     initQuadrantDividers();
     initQuadrantDividerWatch();
     initNotesAccordion();
-    initNotesMicroStyleTest();
-    initNotesMicroBgTest();
     initNotesCollapseButtons();
     initProjectModals();
     syncPersistentBackground();
