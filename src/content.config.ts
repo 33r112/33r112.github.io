@@ -36,4 +36,29 @@ const thoughts = defineCollection({
   }),
 });
 
-export const collections = { posts, projects, thoughts };
+// One folder per review, named "YYYY-MM-DD 游戏名" — the dates are
+// unique so that alone sorts and identifies them, and the title being
+// right there makes the directory readable. These never get their own
+// URL (they expand in place on the Reviews page), so a non-ASCII id
+// costs nothing. status is the three-step progression only; how a run
+// actually ended (真结局, 全图鉴, 二周目) stays in the body text.
+const reviews = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/reviews/games" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      // the game's own release year, not when it was played
+      year: z.number(),
+      date: z.coerce.date(),
+      hours: z.number(),
+      // neither of these is in the original write-ups — they're filled in
+      // by hand per entry
+      platform: z.string(),
+      // the heart beside the title — not a score, just whether it stuck
+      liked: z.boolean().default(false),
+      status: z.enum(["正在游玩", "通关", "白金"]),
+      cover: image(),
+    }),
+});
+
+export const collections = { posts, projects, reviews, thoughts };

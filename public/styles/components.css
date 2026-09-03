@@ -1405,7 +1405,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  padding: var(--space-4);
+  padding: var(--space-3);
   /* same frame as .notes-row — Library, Projects and Writing rows are
      one look, driven by the same 文章边框 sliders. Inset shadow rather
      than a border so changing its width never reflows anything, with a
@@ -1440,10 +1440,31 @@
   color: var(--accent);
 }
 
+/* a real review's screenshot, in the same slot the placeholder occupies.
+   Cropped to a square from the middle rather than letting each shot keep
+   its own shape — these are screenshots at whatever aspect the console
+   happened to save, and a list of them at mixed heights reads as ragged.
+   The source is generated at twice the displayed size so the crop stays
+   sharp. */
+.library-cover {
+  flex-shrink: 0;
+  width: var(--library-cover-size, 130px);
+  height: var(--library-cover-size, 130px);
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid var(--border);
+}
+
 .library-row .cover-placeholder {
   flex-shrink: 0;
-  width: 100px;
+  width: var(--library-cover-size, 130px);
   margin-block-end: 0;
+}
+
+.library-cover-wrap {
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
 }
 
 .library-row__info {
@@ -1453,8 +1474,12 @@
 
 .library-row__head {
   display: flex;
+  /* bottom-aligned: the year and the heart sit on the title's own
+     baseline rather than being centred against it */
   align-items: baseline;
-  gap: var(--space-3);
+  /* no row gap — each item sets its own, so the year and heart can hug
+     the title while the trophy keeps its distance */
+  gap: 0;
 }
 
 .library-title {
@@ -1462,17 +1487,97 @@
   font-weight: 500;
 }
 
+/* the game's own release year — Verdana like the tags below it, and a
+   real italic this time (Verdana ships one, unlike the ♥ glyph) */
 .library-year {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  margin-inline-start: 0.9em;
+  font-family: Verdana, Geneva, sans-serif;
+  font-style: italic;
+  font-size: var(--text-base);
   color: var(--accent);
+  white-space: nowrap;
+}
+
+/* whether it stuck — right after the release year. Its box is zero-height
+   with the glyph drawn centred on it and allowed to spill, so growing
+   the heart can't push the row taller and shuffle the tags beside it;
+   only its width follows the size, which is what keeps it from
+   overlapping anything horizontally. The two position sliders apply as a
+   gap from the year before it and a nudge off the row's centre line. */
+.library-heart {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* the row it sits on is baseline-aligned; a zero-height box has no
+     useful baseline of its own, so centre it and let the nudge slider
+     place it */
+  align-self: center;
+  width: var(--library-heart-size, 16px);
+  height: 0;
+  overflow: visible;
+  margin-inline-start: var(--library-heart-x, 12px);
+  /* the 0.06em nudge centres the glyph's own ink rather than its em box —
+     ♥ sits high in the box, so centring the box alone reads as slightly
+     raised. Scales with the heart, and the slider still overrides it. */
+  /* slanted to match the italic year beside it. Done with a skew rather
+     than font-style: italic — no font ships an italic cut of ♥, so that
+     declaration comes out ignored or unevenly synthesised. -11deg is
+     about Verdana Italic's own slope. */
+  transform: translateY(calc(var(--library-heart-y, 0px) + 0.06em))
+    skewX(-11deg);
+  color: var(--accent);
+  font-size: var(--library-heart-size, 16px);
+  line-height: 1;
+}
+
+/* Reviews' own tags: the frame in the accent colour, the text plain
+   white. Left alone on the Projects page, which shares this class. */
+.library-tags .project-tag {
+  color: var(--text);
+  border-color: var(--accent);
+  font-family: Verdana, Geneva, sans-serif;
+}
+
+/* the hours keep their lowercase h — the shared tag style uppercases
+   everything, which is right for a platform name and wrong for a unit.
+   Scoped through .library-tags so it outranks .project-tag, which is
+   defined later in this file at the same weight. */
+.library-tags .library-tag--hours {
+  text-transform: none;
+}
+
+/* only on a review whose status is 白金 — pinned to the cover's
+   bottom-right corner */
+.library-platinum {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: auto;
+  height: 34px;
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.9));
 }
 
 .library-tags {
   display: flex;
   flex-wrap: wrap;
+  /* the played-on date at the end of this row lines up with the middle
+     of the pills beside it */
+  align-items: center;
   gap: var(--space-2);
-  margin-block-start: var(--space-3);
+  margin-block-start: var(--space-1);
+}
+
+/* when it was played — the card's bottom-right corner, same treatment
+   as Writing's own dates (.notes-date) */
+.library-played {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* the full review, revealed in place when its row is clicked — same
@@ -1853,6 +1958,7 @@
    picked. */
 .notes-row__thumb img,
 .notes-micro-thumb img,
+.library-cover,
 .library-row .cover-placeholder,
 .project-row .project-screenshot {
   filter: grayscale(var(--avatar-grayscale, 0%)) brightness(var(--avatar-brightness, 80%))

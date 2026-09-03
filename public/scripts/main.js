@@ -482,8 +482,8 @@
 
   /* temporary: one button in the bottom-left corner that shows/hides the
      test panels at once. Deliberately not persisted like the slider
-     values are — the panels start open on every load, since they're
-     still being worked in. Remove along with the panels themselves. */
+     values are — the panels start collapsed on every load, so the page
+     can be judged on its own before opening them. Remove along with the panels themselves. */
   /* Library's sidebar portrait: 007 (looking away) at rest, click to
      turn her front-on (015) for --portrait-hold, then she turns back and
      stays unclickable for a further --portrait-cooldown. Clicks during
@@ -679,7 +679,7 @@
       button.textContent = open ? "收起测试按钮" : "展开测试按钮";
     }
 
-    apply(true);
+    apply(false);
 
     button.addEventListener("click", function () {
       apply(panels[0].hidden);
@@ -860,6 +860,10 @@
       { key: "emote-idle-max", cssVar: "--emote-idle-max", unit: "ms" },
       // Reviews' own background illustration
       // Reviews' own background illustrations
+      { key: "library-cover-size", cssVar: "--library-cover-size", unit: "px" },
+      { key: "library-heart-size", cssVar: "--library-heart-size", unit: "px" },
+      { key: "library-heart-x", cssVar: "--library-heart-x", unit: "px" },
+      { key: "library-heart-y", cssVar: "--library-heart-y", unit: "px" },
       { key: "kbg-height", cssVar: "--kbg-height", unit: "px" },
       { key: "kbg-y", cssVar: "--kbg-y", unit: "px" },
       { key: "kbg-fade", cssVar: "--kbg-fade", unit: "px" },

@@ -1,0 +1,5 @@
+日期：2023-01-14 22:37:01
+
+新年第一条朋友圈，ai绘画首秀，连学带找tag，搞了一下午终于出了一张十分满意的图，而且这个姿势还是ai自己跑出来的，已经超出我的预期了。又多跑了几遍之后已经基本看不出是ai画的了，唯一差一点的可能就是右边头发的线条了，明天看看能不能再跑一跑优化一下。最后把tag贴在下面
+1girl, {{{solo}}}, {{{masterpiece}}}, detailed blue eyes, {blonde hair with own hand},  long hair, blown hair, lens flare, sunlight, , finely detailed, HIGH RES, {white sleeveless dress}, {{{{yokozuwar}}}}, sleepy, brushing hair, [fallen leaves], half body shot
+negative：{lowres}, {{{{{{{{{{{blurry}}}}}}}}}}}, {{{{{{{{{bad hands}}}}}}}}}, {{{bad arms}}}, {{{{{missing fingers}}}}, {{{{{{{{{{{{{extra digit}}}}}}}}}}}}}, fewer digits, small hands, error, multiple limbs, bad feet, cropped, worst quality, low quality, normal quality, jpeg artifacts, bad anatomy, long nails, {{{{interlocked fingers}}}}, milf, nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry
