@@ -462,7 +462,7 @@
       // the effect toggles write root.dataset in their own click handler,
       // so read it back on the next tick rather than mid-click
       panel.addEventListener("click", function (event) {
-        if (event.target.closest("[data-fx-toggle], [data-lib-style]")) setTimeout(save, 0);
+        if (event.target.closest("[data-fx-toggle], [data-lib-style], [data-media-cover-scale]")) setTimeout(save, 0);
       });
     });
   }
@@ -707,6 +707,39 @@
         paint();
       });
     });
+  }
+
+  /* temporary: three preset heights for Anime/Manga's covers, which run
+     natural-proportion instead of the square games use — fixing the
+     height (not the width) keeps every row the same height regardless
+     of a cover's own aspect ratio. 100% is the same 200px tall Astro
+     already generates the source at. Remove with the rest of the panel
+     once a size is picked. */
+  function initMediaCoverScaleButtons() {
+    var buttons = document.querySelectorAll("[data-media-cover-scale]");
+    if (!buttons.length) return;
+
+    var BASE = 200;
+
+    function paint() {
+      var current = root.style.getPropertyValue("--media-cover-height");
+      buttons.forEach(function (button) {
+        var px = (BASE * (Number(button.dataset.mediaCoverScale) / 100)).toFixed(1) + "px";
+        button.classList.toggle(
+          "is-active",
+          current ? current === px : button.dataset.mediaCoverScale === "100"
+        );
+      });
+    }
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        var px = (BASE * (Number(button.dataset.mediaCoverScale) / 100)).toFixed(1) + "px";
+        root.style.setProperty("--media-cover-height", px);
+        paint();
+      });
+    });
+    paint();
   }
 
   function initFxTestToggle() {
@@ -1551,6 +1584,7 @@
     // have already read their starting values out of
     initFxTestToggle();
     initLibraryStyleToggles();
+    initMediaCoverScaleButtons();
     initPanelShadowStyleToggle();
     initEyeDropper();
     initNavPortrait();

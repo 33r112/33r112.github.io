@@ -61,4 +61,23 @@ const reviews = defineCollection({
     }),
 });
 
-export const collections = { posts, projects, reviews, thoughts };
+// Same one-folder-per-entry shape as reviews/games, but the fields swap
+// out for what actually applies to a comic/anime run: "year" holds the
+// serialization span (a string like "2003~2018", not a single number),
+// "medium" replaces platform (comic / anime / manga / webtoon...), and
+// "issue" replaces hours as the chapter/episode count.
+const animeManga = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/reviews/anime-manga" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      year: z.string().optional(),
+      date: z.coerce.date(),
+      medium: z.string().default(""),
+      issue: z.number(),
+      liked: z.boolean().default(false),
+      cover: image(),
+    }),
+});
+
+export const collections = { posts, projects, reviews, thoughts, animeManga };

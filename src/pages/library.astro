@@ -6,8 +6,11 @@ import { getCollection, render } from "astro:content";
 import { formatDate } from "../utils/formatDate";
 
 // Games are real write-ups now, one file each under content/reviews/games.
-// The other two categories are still the original placeholders, so the
-// card below renders whichever shape it's handed.
+// Anime/Manga is starting to fill in the same way, under
+// content/reviews/anime-manga — it and Movies/TV (still the original
+// placeholders) share a single "Other" filter tab, so the card below
+// renders whichever shape it's handed regardless of which of the two
+// an item actually is.
 const reviewEntries = await getCollection("reviews");
 const rendered = await Promise.all(
   reviewEntries
@@ -24,22 +27,44 @@ const rendered = await Promise.all(
     })
 );
 
+const animeMangaEntries = await getCollection("animeManga");
+const renderedAnimeManga = await Promise.all(
+  animeMangaEntries
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+    .map(async (entry, i) => {
+      const { Content } = await render(entry);
+      return {
+        kind: "media",
+        id: `library-media-${i}`,
+        category: "other",
+        Content,
+        ...entry.data,
+      };
+    })
+);
+
 const placeholderReview =
   "Full review placeholder — replace with the real write-up when it's ready. This is where a longer breakdown goes: what worked, what didn't, and why it's still worth remembering months later, instead of just the one-line summary above.";
 
+// the count tag's unit depends on the medium — a manga's issue count is
+// "chapters", a Western comic's is "issues"; anything else (or once
+// TV/anime need a season+episode pair instead of one of these) isn't
+// covered here yet.
+const ISSUE_UNITS: Record<string, string> = { manga: "ch", comic: "iss" };
+const issueUnit = (medium: string) => ISSUE_UNITS[medium] ?? "";
+
 const placeholders = [
-  { title: "Get Out", year: 2017, category: "movie-tv", tags: ["Movie", "Horror"], rating: "8.0", dateAdded: "2026-04-10" },
-  { title: "Severance", year: 2022, category: "movie-tv", tags: ["TV", "Sci-Fi"], rating: "9.0", dateAdded: "2026-04-27" },
-  { title: "Parasite", year: 2019, category: "movie-tv", tags: ["Movie", "Thriller"], rating: "9.0", dateAdded: "2026-05-14" },
-  { title: "The Bear", year: 2022, category: "movie-tv", tags: ["TV", "Drama"], rating: "8.5", dateAdded: "2026-06-02" },
-  { title: "Invincible", year: 2003, category: "anime-manga", tags: ["Manga"], rating: "8.0", dateAdded: "2026-06-19" },
-  { title: "Frieren: Beyond Journey's End", year: 2023, category: "anime-manga", tags: ["Anime"], rating: "9.0", dateAdded: "2026-07-08" },
-  { title: "Chainsaw Man", year: 2018, category: "anime-manga", tags: ["Manga", "Vol. 12"], rating: "8.5", dateAdded: "2026-07-25" },
-  { title: "Vinland Saga", year: 2019, category: "anime-manga", tags: ["Anime"], rating: "9.0", dateAdded: "2026-08-11" },
-  { title: "Berserk", year: 1989, category: "anime-manga", tags: ["Manga"], rating: "9.5", dateAdded: "2026-08-24" },
+  { title: "Get Out", year: 2017, category: "other", tags: ["Movie", "Horror"], rating: "8.0", dateAdded: "2026-04-10" },
+  { title: "Severance", year: 2022, category: "other", tags: ["TV", "Sci-Fi"], rating: "9.0", dateAdded: "2026-04-27" },
+  { title: "Parasite", year: 2019, category: "other", tags: ["Movie", "Thriller"], rating: "9.0", dateAdded: "2026-05-14" },
+  { title: "The Bear", year: 2022, category: "other", tags: ["TV", "Drama"], rating: "8.5", dateAdded: "2026-06-02" },
+  { title: "Frieren: Beyond Journey's End", year: 2023, category: "other", tags: ["Anime"], rating: "9.0", dateAdded: "2026-07-08" },
+  { title: "Chainsaw Man", year: 2018, category: "other", tags: ["Manga", "Vol. 12"], rating: "8.5", dateAdded: "2026-07-25" },
+  { title: "Vinland Saga", year: 2019, category: "other", tags: ["Anime"], rating: "9.0", dateAdded: "2026-08-11" },
+  { title: "Berserk", year: 1989, category: "other", tags: ["Manga"], rating: "9.5", dateAdded: "2026-08-24" },
 ].map((item, i) => ({ ...item, kind: "placeholder", id: `library-review-${i}` }));
 
-const items = [...rendered, ...placeholders];
+const items = [...rendered, ...renderedAnimeManga, ...placeholders];
 
 const latest = items.reduce((newest, item) => {
   const d = item.date ?? new Date(`${item.dateAdded}T00:00:00Z`);
@@ -53,8 +78,7 @@ const categoryCounts = items.reduce((counts, item) => {
 
 const categoryFilters = [
   { text: `Games(${categoryCounts.game ?? 0})`, filter: "game" },
-  { text: `Movies/TV(${categoryCounts["movie-tv"] ?? 0})`, filter: "movie-tv" },
-  { text: `Anime/Manga(${categoryCounts["anime-manga"] ?? 0})`, filter: "anime-manga" },
+  { text: `Other(${categoryCounts.other ?? 0})`, filter: "other" },
 ];
 const libraryStats = { latest: formatDate(latest) };
 
@@ -370,6 +394,10 @@ const libraryStats = { latest: formatDate(latest) };
         <input type="number" autocomplete="off" data-library-cover-size min="40" max="240" step="1" value="130" />
         <input type="range" autocomplete="off" data-library-cover-size-slider min="40" max="240" step="1" value="130" />
       </label>
+      <span class="fx-test__label">动漫封面大小</span>
+      <button type="button" data-media-cover-scale="100">100%</button>
+      <button type="button" data-media-cover-scale="75">75%</button>
+      <button type="button" data-media-cover-scale="50">50%</button>
       <label>
         爱心大小
         <input type="number" autocomplete="off" data-library-heart-size min="8" max="80" step="1" value="16" />
@@ -457,7 +485,7 @@ const libraryStats = { latest: formatDate(latest) };
 
   <div class="page-header">
     <h1 class="page-title"><img src="/img/headers/reviews.png" alt="Reviews" /></h1>
-    <StatsGroup items={categoryFilters} filterTarget="#library-list" filterAttr="category" defaultFilter="game" />
+    <StatsGroup items={categoryFilters} filterTarget="#library-list" filterAttr="category" defaultFilter="game" showAll={false} />
   </div>
 
   <div class="library-list" id="library-list">
@@ -470,7 +498,7 @@ const libraryStats = { latest: formatDate(latest) };
           aria-expanded="false"
           data-notes-toggle={item.id}
         >
-          {item.kind === "review" ? (
+          {item.kind === "review" || item.kind === "media" ? (
             <div class="library-cover-wrap">
               <Image class="library-cover" src={item.cover} alt="" height={200} densities={[1, 2]} />
               {item.status === "白金" && (
@@ -492,6 +520,11 @@ const libraryStats = { latest: formatDate(latest) };
                   <span class="project-tag library-tag--hours">{item.hours}h</span>
                   {item.platform && <span class="project-tag">{item.platform}</span>}
                 </>
+              ) : item.kind === "media" ? (
+                <>
+                  <span class="project-tag library-tag--unit">{item.issue}{issueUnit(item.medium)}</span>
+                  {item.medium && <span class="project-tag">{item.medium}</span>}
+                </>
               ) : (
                 <>
                   {item.tags.map((tag) => <span class="project-tag">{tag}</span>)}
@@ -500,13 +533,13 @@ const libraryStats = { latest: formatDate(latest) };
               )}
             </div>
           </div>
-          {item.kind === "review" && (
+          {(item.kind === "review" || item.kind === "media") && (
             <span class="library-played">{formatDate(item.date)}</span>
           )}
         </a>
         <div class="library-expand" id={item.id} hidden>
           <div class="article-body">
-            {item.kind === "review" ? <item.Content /> : <p>{placeholderReview}</p>}
+            {item.kind === "review" || item.kind === "media" ? <item.Content /> : <p>{placeholderReview}</p>}
           </div>
           <button type="button" class="notes-collapse" data-notes-collapse aria-label="收起">&gt;&gt;</button>
         </div>

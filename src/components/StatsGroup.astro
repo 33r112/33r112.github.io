@@ -6,9 +6,12 @@ export interface Props {
   filterAttr?: string;
   // which filter starts out selected; "all" if not given
   defaultFilter?: string;
+  // Library's two-way Games/Other split doesn't need a catch-all third
+  // button — every item already lands in one of the two
+  showAll?: boolean;
 }
 
-const { label, items, filterTarget, filterAttr, defaultFilter = "all" } = Astro.props;
+const { label, items, filterTarget, filterAttr, defaultFilter = "all", showAll = true } = Astro.props;
 // only worth turning into filter buttons where there's more than one
 // category to switch between, and somewhere to point the filter at
 const filterable = Boolean(filterTarget) && items.some((item) => item.filter);
@@ -33,7 +36,7 @@ const filterable = Boolean(filterTarget) && items.some((item) => item.filter);
       )
     )}
     {/* "All" sits last, after the specific categories */}
-    {filterable && (
+    {filterable && showAll && (
       <li>
         <button type="button" class:list={[defaultFilter === "all" && "is-active"]} data-filter="all">
           All

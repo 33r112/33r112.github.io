@@ -1455,6 +1455,22 @@
   border: 1px solid var(--border);
 }
 
+/* Anime/Manga covers (filed under the shared "other" category) keep
+   their own proportions instead of being cropped to the square games
+   use — a comic cover is a tall book, not a square box, so cropping it
+   loses the top or bottom of the art. Height-only (not width-only): a
+   comic and a manga volume have different width:height ratios, so
+   fixing the height instead keeps every row in the list the same
+   height as the others — matching games' row rhythm — while each
+   cover's own width still comes out however wide its own proportions
+   call for, undistorted. Tunable while sizes are being compared. */
+[data-category="other"] .library-cover {
+  width: auto;
+  height: var(--media-cover-height, 200px);
+  object-fit: contain;
+}
+
+
 .library-row .cover-placeholder {
   flex-shrink: 0;
   width: var(--library-cover-size, 130px);
@@ -1542,7 +1558,8 @@
    everything, which is right for a platform name and wrong for a unit.
    Scoped through .library-tags so it outranks .project-tag, which is
    defined later in this file at the same weight. */
-.library-tags .library-tag--hours {
+.library-tags .library-tag--hours,
+.library-tags .library-tag--unit {
   text-transform: none;
 }
 
