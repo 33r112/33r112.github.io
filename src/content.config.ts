@@ -47,13 +47,13 @@ const reviews = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      // the game's own release year, not when it was played
-      year: z.number(),
+      // the game's own release year, not when it was played — left out
+      // until it's filled in by hand, since it isn't in the write-ups
+      year: z.number().optional(),
       date: z.coerce.date(),
       hours: z.number(),
-      // neither of these is in the original write-ups — they're filled in
-      // by hand per entry
-      platform: z.string(),
+      // not in the original write-ups either — empty until filled in
+      platform: z.string().default(""),
       // the heart beside the title — not a score, just whether it stuck
       liked: z.boolean().default(false),
       status: z.enum(["正在游玩", "通关", "白金"]),

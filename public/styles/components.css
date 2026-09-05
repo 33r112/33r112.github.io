@@ -1492,7 +1492,6 @@
 .library-year {
   margin-inline-start: 0.9em;
   font-family: Verdana, Geneva, sans-serif;
-  font-style: italic;
   font-size: var(--text-base);
   color: var(--accent);
   white-space: nowrap;
@@ -1525,7 +1524,7 @@
      declaration comes out ignored or unevenly synthesised. -11deg is
      about Verdana Italic's own slope. */
   transform: translateY(calc(var(--library-heart-y, 0px) + 0.06em))
-    skewX(-11deg);
+    skewX(var(--library-heart-skew, 0deg));
   color: var(--accent);
   font-size: var(--library-heart-size, 16px);
   line-height: 1;
@@ -1558,6 +1557,39 @@
   filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.9));
 }
 
+/* bold/italic for the three text groups on a review card, driven by the
+   switches in the panel. The heart leans with a skew rather than
+   font-style, since no font ships an italic cut of ♥ — -11deg is about
+   Verdana Italic's own slope, so the two match. */
+[data-lib-title-bold="on"] .library-title {
+  font-weight: 700;
+}
+
+[data-lib-title-italic="on"] .library-title {
+  font-style: italic;
+}
+
+[data-lib-tag-bold="on"] .library-tags .project-tag {
+  font-weight: 700;
+}
+
+[data-lib-tag-italic="on"] .library-tags .project-tag {
+  font-style: italic;
+}
+
+[data-lib-year-bold="on"] .library-year,
+[data-lib-year-bold="on"] .library-heart {
+  font-weight: 700;
+}
+
+[data-lib-year-italic="on"] .library-year {
+  font-style: italic;
+}
+
+[data-lib-year-italic="on"] .library-heart {
+  --library-heart-skew: -11deg;
+}
+
 .library-tags {
   display: flex;
   flex-wrap: wrap;
@@ -1581,8 +1613,11 @@
 }
 
 /* the full review, revealed in place when its row is clicked — same
-   treatment as .notes-expand */
+   treatment as .notes-expand, including position:relative so its own
+   .notes-collapse button (absolutely positioned) anchors to it and not
+   to some ancestor further up */
 .library-expand {
+  position: relative;
   border: 1px solid var(--border);
   border-top: none;
   background: var(--bg-raised);
@@ -2191,6 +2226,52 @@
 
 .article-body p {
   margin-block: var(--space-4);
+}
+
+/* a write-up's own screenshots ride along the right edge of the text and
+   the paragraphs wrap down their left side, the way these were originally
+   written; the clearfix keeps a tall picture from spilling past the end
+   of the entry it belongs to */
+.article-body img {
+  float: right;
+  width: 46%;
+  height: auto;
+  margin: var(--space-1) 0 0 var(--space-5);
+  border: 1px solid var(--border);
+}
+
+/* writing "居中" as the picture's title (not its alt text, which is now a
+   real description) takes it out of the text instead: it sits centred on
+   a line of its own, and anything written right after it on the same line
+   becomes that picture's caption */
+.article-body p > img[title="居中"] {
+  float: none;
+  display: block;
+  margin: 0 auto;
+}
+
+.article-body p:has(> img[title="居中"]) {
+  margin-block: var(--space-5);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* these two pictures settled on smaller than the normal wrap width */
+.article-body img:is([title="缩放-ct"], [title="缩放-aw"]) {
+  width: 34.5%;
+}
+
+/* a whole batch of write-ups settled on 75% of the normal wrap width for
+   their inline pictures */
+.article-body img[title="缩放75"] {
+  width: 34.5%;
+}
+
+.article-body::after {
+  content: "";
+  display: block;
+  clear: both;
 }
 
 .article-body h2 {

@@ -1,12 +1,12 @@
 ---
 title: "吸血鬼爬行者"
-year: 2025
+year: 2026
 date: 2026-07-28
 hours: 18
-platform: "Steam"
+platform: "steam"
 status: "白金"
+liked: false
 cover: "./cover.jpg"
-liked: true
 ---
 
 极致爽感。和原作的幸存者一样，虽然变成了卡牌肉鸽，但是在游戏寿命中仍然可以体验到满格的爽感。疯狂打了5天直接白金。不过这都是4月底的事情了，我看我steam时间记录，从4月25号买这个游戏，然后每天都拿到无数个成就，连续五天到30号直接白金，然后就没有打开过了。

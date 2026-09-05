@@ -358,6 +358,13 @@ const libraryStats = { latest: formatDate(latest) };
   <div class="hue-test fx-test sleep-anim-test" id="sleep-anim-test-panel">
     <div class="fx-test__group">
       <span class="fx-test__label">评测卡片</span>
+      <span class="fx-test__label">字重与倾斜</span>
+      <button type="button" data-lib-style="title-bold">标题 粗体：关</button>
+      <button type="button" data-lib-style="title-italic">标题 斜体：关</button>
+      <button type="button" data-lib-style="tag-bold">标签 粗体：关</button>
+      <button type="button" data-lib-style="tag-italic">标签 斜体：开</button>
+      <button type="button" data-lib-style="year-bold">年份+爱心 粗体：关</button>
+      <button type="button" data-lib-style="year-italic">年份+爱心 斜体：开</button>
       <label>
         封面大小
         <input type="number" autocomplete="off" data-library-cover-size min="40" max="240" step="1" value="130" />
@@ -379,7 +386,6 @@ const libraryStats = { latest: formatDate(latest) };
         <input type="range" autocomplete="off" data-library-heart-y-slider min="-120" max="120" step="1" value="0" />
       </label>
     </div>
-
 
     <div class="fx-test__group">
       <span class="fx-test__label">左右画面（同步）</span>
@@ -477,14 +483,14 @@ const libraryStats = { latest: formatDate(latest) };
           <div class="library-row__info">
             <div class="library-row__head">
               <span class="library-title">{item.title}</span>
-              <span class="library-year">{item.year}</span>
+              {item.year && <span class="library-year">{item.year}</span>}
               {item.liked && <span class="library-heart" title="喜欢">♥</span>}
             </div>
             <div class="library-tags">
               {item.kind === "review" ? (
                 <>
                   <span class="project-tag library-tag--hours">{item.hours}h</span>
-                  <span class="project-tag">{item.platform}</span>
+                  {item.platform && <span class="project-tag">{item.platform}</span>}
                 </>
               ) : (
                 <>
@@ -502,6 +508,7 @@ const libraryStats = { latest: formatDate(latest) };
           <div class="article-body">
             {item.kind === "review" ? <item.Content /> : <p>{placeholderReview}</p>}
           </div>
+          <button type="button" class="notes-collapse" data-notes-collapse aria-label="收起">&gt;&gt;</button>
         </div>
       </div>
       ))}

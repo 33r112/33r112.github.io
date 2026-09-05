@@ -462,7 +462,7 @@
       // the effect toggles write root.dataset in their own click handler,
       // so read it back on the next tick rather than mid-click
       panel.addEventListener("click", function (event) {
-        if (event.target.closest("[data-fx-toggle]")) setTimeout(save, 0);
+        if (event.target.closest("[data-fx-toggle], [data-lib-style]")) setTimeout(save, 0);
       });
     });
   }
@@ -658,6 +658,54 @@
         root.dataset.panelShadowStyle = next;
       }
       button.textContent = label(next);
+    });
+  }
+
+  /* temporary: bold/italic switches for the three text groups on a
+     review card — the title, the tag pills, and the release year with its
+     heart. Each writes a flag onto <html> that the stylesheet reads, so
+     the state survives a soft navigation the same way the effect toggles
+     do. The year starts italic, which is where it was left. Remove with
+     the rest of the panel once they're settled. */
+  function initLibraryStyleToggles() {
+    var buttons = document.querySelectorAll("[data-lib-style]");
+    if (!buttons.length) return;
+
+    var LABELS = {
+      "title-bold": "标题 粗体",
+      "title-italic": "标题 斜体",
+      "tag-bold": "标签 粗体",
+      "tag-italic": "标签 斜体",
+      "year-bold": "年份+爱心 粗体",
+      "year-italic": "年份+爱心 斜体",
+    };
+    var DEFAULT_ON = ["tag-italic", "year-italic"];
+
+    buttons.forEach(function (button) {
+      var key = button.dataset.libStyle;
+      // "title-bold" -> "libTitleBold"
+      var attr = ("lib-" + key).replace(/-([a-z])/g, function (_, c) {
+        return c.toUpperCase();
+      });
+
+      if (root.dataset[attr] === undefined && DEFAULT_ON.indexOf(key) !== -1) {
+        root.dataset[attr] = "on";
+      }
+
+      function paint() {
+        button.textContent =
+          (LABELS[key] || key) + "：" + (root.dataset[attr] === "on" ? "开" : "关");
+      }
+      paint();
+
+      button.addEventListener("click", function () {
+        if (root.dataset[attr] === "on") {
+          delete root.dataset[attr];
+        } else {
+          root.dataset[attr] = "on";
+        }
+        paint();
+      });
     });
   }
 
@@ -1179,22 +1227,24 @@
     });
   }
 
-  /* The [data-notes-collapse] button inside an expanded .notes-expand
-     always collapses (never toggles open) — unlike initNotesAccordion's
-     triggers, it only ever exists while its panel is already visible.
-     Also resyncs the row's aria-expanded, since that's what the
-     collapsed-state CSS (e.g. hiding the bobbing arrow) keys off of. */
+  /* The [data-notes-collapse] button inside an expanded panel (Notes'
+     .notes-expand, or Library's reuse of the same mechanism as
+     .library-expand) always collapses (never toggles open) — unlike
+     initNotesAccordion's triggers, it only ever exists while its panel
+     is already visible. Also resyncs the row's aria-expanded, since
+     that's what the collapsed-state CSS (e.g. hiding the bobbing arrow)
+     keys off of. */
   function initNotesCollapseButtons() {
     var buttons = document.querySelectorAll("[data-notes-collapse]");
     if (!buttons.length) return;
 
     buttons.forEach(function (button) {
       button.addEventListener("click", function () {
-        var expand = button.closest(".notes-expand");
+        var expand = button.closest(".notes-expand, .library-expand");
         if (!expand) return;
         expand.hidden = true;
 
-        var item = expand.closest(".notes-item");
+        var item = expand.closest(".notes-item, .library-item");
         var trigger = item && item.querySelector("[data-notes-toggle]");
         if (trigger) trigger.setAttribute("aria-expanded", "false");
       });
@@ -1500,6 +1550,7 @@
     // last of the panel wiring, so it hides panels the appliers above
     // have already read their starting values out of
     initFxTestToggle();
+    initLibraryStyleToggles();
     initPanelShadowStyleToggle();
     initEyeDropper();
     initNavPortrait();

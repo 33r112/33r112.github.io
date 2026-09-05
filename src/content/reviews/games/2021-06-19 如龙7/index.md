@@ -1,12 +1,12 @@
 ---
-title: "如龙7"
+title: "如龙7：光与暗的去向"
 year: 2020
 date: 2021-06-19
-hours: 60
+hours: 54
 platform: "PS4"
 status: "白金"
-cover: "./cover.jpg"
 liked: false
+cover: "./cover.jpg"
 ---
 
 虽然主角也换了，战斗也换成回合制了，不过从各种意义上来说，如龙还是那个如龙，还是那个味。
