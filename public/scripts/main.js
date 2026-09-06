@@ -462,7 +462,7 @@
       // the effect toggles write root.dataset in their own click handler,
       // so read it back on the next tick rather than mid-click
       panel.addEventListener("click", function (event) {
-        if (event.target.closest("[data-fx-toggle], [data-lib-style], [data-media-cover-scale]")) setTimeout(save, 0);
+        if (event.target.closest("[data-fx-toggle], [data-lib-style], [data-grid-title-size]")) setTimeout(save, 0);
       });
     });
   }
@@ -709,37 +709,131 @@
     });
   }
 
-  /* temporary: three preset heights for Anime/Manga's covers, which run
-     natural-proportion instead of the square games use — fixing the
-     height (not the width) keeps every row the same height regardless
-     of a cover's own aspect ratio. 100% is the same 200px tall Astro
-     already generates the source at. Remove with the rest of the panel
-     once a size is picked. */
-  function initMediaCoverScaleButtons() {
-    var buttons = document.querySelectorAll("[data-media-cover-scale]");
+  /* Other's grid: cards only show a cover + title; clicking one clones
+     that card's <template> into whichever "slot" spans the full row it
+     belongs to (one slot per GRID_COLUMNS cards, see library.astro),
+     and points the slot's arrow back up at the card that opened it.
+     Games' row list stays on the generic accordion in initNotesAccordion
+     — this is a second, independent mechanism only for the grid. */
+  /* temporary: preset sizes for Other's card title and expanded detail
+     panel title — two independent exclusive button groups sharing the
+     same wiring, each defaulting to whichever size the CSS itself
+     falls back to when nothing's been picked yet. Remove with the rest
+     of the panel once sizes are picked. */
+  function initSizePresetButtons(attr, cssVar, defaultValue) {
+    var buttons = document.querySelectorAll("[data-" + attr + "]");
     if (!buttons.length) return;
 
-    var BASE = 200;
-
     function paint() {
-      var current = root.style.getPropertyValue("--media-cover-height");
+      var current = root.style.getPropertyValue(cssVar) || defaultValue;
       buttons.forEach(function (button) {
-        var px = (BASE * (Number(button.dataset.mediaCoverScale) / 100)).toFixed(1) + "px";
-        button.classList.toggle(
-          "is-active",
-          current ? current === px : button.dataset.mediaCoverScale === "100"
-        );
+        button.classList.toggle("is-active", current === button.dataset[toCamel(attr)]);
       });
     }
 
     buttons.forEach(function (button) {
       button.addEventListener("click", function () {
-        var px = (BASE * (Number(button.dataset.mediaCoverScale) / 100)).toFixed(1) + "px";
-        root.style.setProperty("--media-cover-height", px);
+        root.style.setProperty(cssVar, button.dataset[toCamel(attr)]);
         paint();
       });
     });
     paint();
+  }
+
+  function toCamel(attr) {
+    return attr.replace(/-([a-z])/g, function (_, c) {
+      return c.toUpperCase();
+    });
+  }
+
+  function initGridTitleSizeButtons() {
+    initSizePresetButtons("grid-title-size", "--grid-title-size", "1.75rem");
+  }
+
+  function initLibraryGrid() {
+    var grid = document.getElementById("library-grid");
+    if (!grid) return;
+
+    var cards = Array.prototype.slice.call(grid.querySelectorAll("[data-grid-card]"));
+    var slots = Array.prototype.slice.call(grid.querySelectorAll(".library-grid-slot"));
+    var GRID_COLUMNS = 4;
+
+    function slotFor(cardIndex) {
+      return slots[Math.floor(cardIndex / GRID_COLUMNS)];
+    }
+
+    function rowCards(cardIndex) {
+      var row = Math.floor(cardIndex / GRID_COLUMNS);
+      return cards.filter(function (_, i) {
+        return Math.floor(i / GRID_COLUMNS) === row;
+      });
+    }
+
+    function closeSlot(slot, cardsInRow) {
+      slot.hidden = true;
+      slot.dataset.openId = "";
+      slot.querySelector(".library-grid-slot-content").innerHTML = "";
+      cardsInRow.forEach(function (c) {
+        c.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    cards.forEach(function (card, i) {
+      card.addEventListener("click", function () {
+        var slot = slotFor(i);
+        var siblings = rowCards(i);
+        var id = card.dataset.gridCard;
+
+        if (slot.dataset.openId === id && !slot.hidden) {
+          closeSlot(slot, siblings);
+          return;
+        }
+
+        var template = grid.querySelector('template[data-grid-detail="' + id + '"]');
+        var content = slot.querySelector(".library-grid-slot-content");
+        content.innerHTML = "";
+        if (template) content.appendChild(template.content.cloneNode(true));
+
+        slot.dataset.openId = id;
+        slot.hidden = false;
+        siblings.forEach(function (c) {
+          c.setAttribute("aria-expanded", String(c === card));
+        });
+
+        var cardRect = card.getBoundingClientRect();
+        var slotRect = slot.getBoundingClientRect();
+        var arrow = slot.querySelector(".library-grid-arrow");
+        arrow.style.setProperty(
+          "--arrow-left",
+          cardRect.left - slotRect.left + cardRect.width / 2 + "px"
+        );
+      });
+    });
+
+    slots.forEach(function (slot) {
+      var collapse = slot.querySelector("[data-grid-collapse]");
+      if (!collapse) return;
+      collapse.addEventListener("click", function () {
+        var row = slots.indexOf(slot);
+        closeSlot(
+          slot,
+          cards.filter(function (_, i) {
+            return Math.floor(i / GRID_COLUMNS) === row;
+          })
+        );
+      });
+    });
+
+    // Games/Other tabs show one list or the other, entirely separate
+    // containers rather than one filtered list — see library.astro
+    var list = document.getElementById("library-list");
+    document.querySelectorAll("[data-filter]").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var showOther = tab.dataset.filter === "other";
+        grid.hidden = !showOther;
+        if (list) list.hidden = showOther;
+      });
+    });
   }
 
   function initFxTestToggle() {
@@ -1584,7 +1678,8 @@
     // have already read their starting values out of
     initFxTestToggle();
     initLibraryStyleToggles();
-    initMediaCoverScaleButtons();
+    initGridTitleSizeButtons();
+    initLibraryGrid();
     initPanelShadowStyleToggle();
     initEyeDropper();
     initNavPortrait();

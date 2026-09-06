@@ -1009,7 +1009,12 @@
   flex-shrink: 0;
 }
 
-.page-header + * {
+/* pulls whatever sits right under the page title up to the same spot on
+   every page — #library-grid needs it explicitly too, since it isn't
+   the element immediately after .page-header (#library-list, hidden
+   when Other is active, sits between them) */
+.page-header + *,
+.page-header ~ #library-grid {
   margin-block-start: calc(var(--space-5) - var(--space-8));
 }
 
@@ -1455,21 +1460,6 @@
   border: 1px solid var(--border);
 }
 
-/* Anime/Manga covers (filed under the shared "other" category) keep
-   their own proportions instead of being cropped to the square games
-   use — a comic cover is a tall book, not a square box, so cropping it
-   loses the top or bottom of the art. Height-only (not width-only): a
-   comic and a manga volume have different width:height ratios, so
-   fixing the height instead keeps every row in the list the same
-   height as the others — matching games' row rhythm — while each
-   cover's own width still comes out however wide its own proportions
-   call for, undistorted. Tunable while sizes are being compared. */
-[data-category="other"] .library-cover {
-  width: auto;
-  height: var(--media-cover-height, 200px);
-  object-fit: contain;
-}
-
 
 .library-row .cover-placeholder {
   flex-shrink: 0;
@@ -1563,6 +1553,123 @@
   text-transform: none;
 }
 
+/* ---- Other: 4-per-row grid, clicking a card opens a full-width panel
+   under its row instead of the row-list accordion Games uses ---- */
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.library-grid-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 var(--blog-border-w, 2px)
+    rgb(
+      var(--blog-border-r, 0) var(--blog-border-g, 0) var(--blog-border-b, 0) /
+        var(--blog-border-a, 0.8)
+    );
+  border: 1px solid transparent;
+  border-radius: var(--blog-radius, 10px);
+  background: linear-gradient(
+    180deg,
+    rgba(110, 123, 145, 0.1),
+    var(--bg-raised) var(--notes-tint-spread, 35%)
+  );
+  background-clip: padding-box;
+}
+
+.library-grid-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  object-position: center top;
+  border: 1px solid var(--border);
+}
+
+.library-grid-title {
+  font-size: 1.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.library-grid-card:hover .library-grid-title,
+.library-grid-card:focus-visible .library-grid-title {
+  color: var(--accent);
+}
+
+/* the shared per-row reveal — spans every column so it sits under the
+   whole row rather than in any one card's cell */
+.library-grid-slot {
+  position: relative;
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  padding: var(--space-4);
+}
+
+/* points back up at whichever card opened this row's panel — a small
+   filled triangle, positioned along the top edge via --arrow-left,
+   set from JS to that card's own horizontal center */
+.library-grid-arrow {
+  position: absolute;
+  top: -8px;
+  left: var(--arrow-left, 50%);
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  /* matches .library-grid-slot's own background instead of its border,
+     so it reads as a notch in the panel itself rather than a separate
+     outlined shape sitting on top of it */
+  border-bottom: 8px solid var(--bg-raised);
+}
+
+.library-grid-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.library-grid-meta__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.library-grid-meta__date {
+  white-space: nowrap;
+}
+
+.library-grid-meta__title {
+  font-family: var(--font-body);
+  font-size: var(--grid-title-size, 1.75rem);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.library-grid-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-block: var(--space-4);
+}
+
 /* only on a review whose status is 白金 — pinned to the cover's
    bottom-right corner */
 .library-platinum {
@@ -1574,36 +1681,20 @@
   filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.9));
 }
 
-/* bold/italic for the three text groups on a review card, driven by the
-   switches in the panel. The heart leans with a skew rather than
+/* bold/italic for the three text groups on a review card — baked in at
+   the values the panel's switches were left on (tags and the year+heart
+   italic, nothing bold). The heart leans with a skew rather than
    font-style, since no font ships an italic cut of ♥ — -11deg is about
    Verdana Italic's own slope, so the two match. */
-[data-lib-title-bold="on"] .library-title {
-  font-weight: 700;
-}
-
-[data-lib-title-italic="on"] .library-title {
+.library-tags .project-tag {
   font-style: italic;
 }
 
-[data-lib-tag-bold="on"] .library-tags .project-tag {
-  font-weight: 700;
-}
-
-[data-lib-tag-italic="on"] .library-tags .project-tag {
+.library-year {
   font-style: italic;
 }
 
-[data-lib-year-bold="on"] .library-year,
-[data-lib-year-bold="on"] .library-heart {
-  font-weight: 700;
-}
-
-[data-lib-year-italic="on"] .library-year {
-  font-style: italic;
-}
-
-[data-lib-year-italic="on"] .library-heart {
+.library-heart {
   --library-heart-skew: -11deg;
 }
 

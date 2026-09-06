@@ -4,6 +4,7 @@ import StatsGroup from "../components/StatsGroup.astro";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import { formatDate } from "../utils/formatDate";
+import placeholderCover from "../assets/library-placeholder-cover.png";
 
 // Games are real write-ups now, one file each under content/reviews/games.
 // Anime/Manga is starting to fill in the same way, under
@@ -50,15 +51,12 @@ const placeholderReview =
 // "chapters", a Western comic's is "issues"; anything else (or once
 // TV/anime need a season+episode pair instead of one of these) isn't
 // covered here yet.
-const ISSUE_UNITS: Record<string, string> = { manga: "ch", comic: "iss" };
-const issueUnit = (medium: string) => ISSUE_UNITS[medium] ?? "";
+const issueUnit = "话";
 
 const placeholders = [
-  { title: "Get Out", year: 2017, category: "other", tags: ["Movie", "Horror"], rating: "8.0", dateAdded: "2026-04-10" },
   { title: "Severance", year: 2022, category: "other", tags: ["TV", "Sci-Fi"], rating: "9.0", dateAdded: "2026-04-27" },
   { title: "Parasite", year: 2019, category: "other", tags: ["Movie", "Thriller"], rating: "9.0", dateAdded: "2026-05-14" },
   { title: "The Bear", year: 2022, category: "other", tags: ["TV", "Drama"], rating: "8.5", dateAdded: "2026-06-02" },
-  { title: "Frieren: Beyond Journey's End", year: 2023, category: "other", tags: ["Anime"], rating: "9.0", dateAdded: "2026-07-08" },
   { title: "Chainsaw Man", year: 2018, category: "other", tags: ["Manga", "Vol. 12"], rating: "8.5", dateAdded: "2026-07-25" },
   { title: "Vinland Saga", year: 2019, category: "other", tags: ["Anime"], rating: "9.0", dateAdded: "2026-08-11" },
   { title: "Berserk", year: 1989, category: "other", tags: ["Manga"], rating: "9.5", dateAdded: "2026-08-24" },
@@ -82,6 +80,13 @@ const categoryFilters = [
 ];
 const libraryStats = { latest: formatDate(latest) };
 
+// Other has its own grid + accordion layout (see .library-grid below),
+// so it's a completely separate list from Games' rows rather than one
+// shared list filtered by category.
+const gameItems = items.filter((item) => item.category === "game");
+const otherItems = items.filter((item) => item.category === "other");
+const GRID_COLUMNS = 4;
+
 ---
 
 <InnerLayout
@@ -92,389 +97,19 @@ const libraryStats = { latest: formatDate(latest) };
 >
 
 
-  <!-- temporary: this page's own background illustration — size,
-       position, filters, a flat tint and a gradient over the top.
-       Remove along with the matching CSS/JS once values are picked. -->
-  <div class="hue-test fx-test" id="fx-test-panel">
-    <div class="fx-test__group">
-      <span class="fx-test__label">导出</span>
-      <button type="button" data-settings-export>导出当前设置</button>
-      <button type="button" data-settings-reset>恢复默认</button>
-      <textarea id="settings-export-output" class="fx-test__output" readonly rows="8" hidden></textarea>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">背景整体</span>
-      <label>
-        横幅高度
-        <input type="number" autocomplete="off" data-kbg-height min="100" max="2400" step="10" value="990" />
-        <input type="range" autocomplete="off" data-kbg-height-slider min="100" max="2400" step="10" value="990" />
-      </label>
-      <label>
-        淡出长度
-        <input type="number" autocomplete="off" data-kbg-fade min="0" max="1600" step="1" value="500" />
-        <input type="range" autocomplete="off" data-kbg-fade-slider min="0" max="1600" step="1" value="500" />
-      </label>
-      <label>
-        淡出起点
-        <input type="number" autocomplete="off" data-kbg-fade-offset min="-800" max="800" step="1" value="45" />
-        <input type="range" autocomplete="off" data-kbg-fade-offset-slider min="-800" max="800" step="1" value="45" />
-      </label>
-      <label>
-        淡出曲线
-        <input type="number" autocomplete="off" data-kbg-fade-mid min="0" max="100" step="1" value="30" />
-        <input type="range" autocomplete="off" data-kbg-fade-mid-slider min="0" max="100" step="1" value="30" />
-      </label>
-      <label>
-        纵向位置
-        <input type="number" autocomplete="off" data-kbg-y min="-2000" max="2000" step="1" value="136" />
-        <input type="range" autocomplete="off" data-kbg-y-slider min="-2000" max="2000" step="1" value="136" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">左侧画面</span>
-      <label>
-        大小
-        <input type="number" autocomplete="off" data-kbg-size-left min="5" max="400" step="1" value="66" />
-        <input type="range" autocomplete="off" data-kbg-size-left-slider min="5" max="400" step="1" value="66" />
-      </label>
-      <label>
-        横向
-        <input type="number" autocomplete="off" data-kbg-x-left min="-3000" max="3000" step="1" value="-2" />
-        <input type="range" autocomplete="off" data-kbg-x-left-slider min="-3000" max="3000" step="1" value="-2" />
-      </label>
-      <label>
-        纵向微调
-        <input type="number" autocomplete="off" data-kbg-y-left min="-1000" max="1000" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-y-left-slider min="-1000" max="1000" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">中间画面</span>
-      <label>
-        大小
-        <input type="number" autocomplete="off" data-kbg-size-mid min="5" max="400" step="1" value="30" />
-        <input type="range" autocomplete="off" data-kbg-size-mid-slider min="5" max="400" step="1" value="30" />
-      </label>
-      <label>
-        横向
-        <input type="number" autocomplete="off" data-kbg-x-mid min="-3000" max="3000" step="1" value="420" />
-        <input type="range" autocomplete="off" data-kbg-x-mid-slider min="-3000" max="3000" step="1" value="420" />
-      </label>
-      <label>
-        纵向微调
-        <input type="number" autocomplete="off" data-kbg-y-mid min="-1000" max="1000" step="1" value="-7" />
-        <input type="range" autocomplete="off" data-kbg-y-mid-slider min="-1000" max="1000" step="1" value="-7" />
-      </label>
-      <label>
-        透明度
-        <input type="number" autocomplete="off" data-kbg-a-mid min="0" max="100" step="1" value="15" />
-        <input type="range" autocomplete="off" data-kbg-a-mid-slider min="0" max="100" step="1" value="15" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">页面底色</span>
-      <button type="button" data-eyedrop="page-bg">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-page-bg-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-page-bg-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-page-bg-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-page-bg-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-page-bg-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-page-bg-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">中间底色（下层）</span>
-      <button type="button" data-eyedrop="midbase">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-midbase-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midbase-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-midbase-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midbase-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-midbase-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midbase-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色透明度
-        <input type="number" autocomplete="off" data-midbase-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midbase-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">中间底色（上层）</span>
-      <button type="button" data-eyedrop="midtint">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-midtint-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midtint-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-midtint-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midtint-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-midtint-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midtint-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色透明度
-        <input type="number" autocomplete="off" data-midtint-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-midtint-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">右侧画面</span>
-      <label>
-        大小
-        <input type="number" autocomplete="off" data-kbg-size-right min="5" max="400" step="1" value="60" />
-        <input type="range" autocomplete="off" data-kbg-size-right-slider min="5" max="400" step="1" value="60" />
-      </label>
-      <label>
-        横向
-        <input type="number" autocomplete="off" data-kbg-x-right min="-3000" max="3000" step="1" value="-600" />
-        <input type="range" autocomplete="off" data-kbg-x-right-slider min="-3000" max="3000" step="1" value="-600" />
-      </label>
-      <label>
-        纵向微调
-        <input type="number" autocomplete="off" data-kbg-y-right min="-1000" max="1000" step="1" value="-10" />
-        <input type="range" autocomplete="off" data-kbg-y-right-slider min="-1000" max="1000" step="1" value="-10" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">中间滤镜</span>
-      <label>
-        黑白
-        <input type="number" autocomplete="off" data-kbg-grayscale min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grayscale-slider min="0" max="100" step="1" value="0" />
-      </label>
-      <label>
-        亮度
-        <input type="number" autocomplete="off" data-kbg-brightness min="0" max="300" step="1" value="90" />
-        <input type="range" autocomplete="off" data-kbg-brightness-slider min="0" max="300" step="1" value="90" />
-      </label>
-      <label>
-        对比度
-        <input type="number" autocomplete="off" data-kbg-contrast min="0" max="300" step="1" value="90" />
-        <input type="range" autocomplete="off" data-kbg-contrast-slider min="0" max="300" step="1" value="90" />
-      </label>
-      <label>
-        饱和度
-        <input type="number" autocomplete="off" data-kbg-saturate min="0" max="300" step="1" value="90" />
-        <input type="range" autocomplete="off" data-kbg-saturate-slider min="0" max="300" step="1" value="90" />
-      </label>
-      <label>
-        色相
-        <input type="number" autocomplete="off" data-kbg-hue min="0" max="360" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-hue-slider min="0" max="360" step="1" value="0" />
-      </label>
-      <label>
-        复古
-        <input type="number" autocomplete="off" data-kbg-sepia min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-sepia-slider min="0" max="100" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">背景底色</span>
-      <button type="button" data-eyedrop="kbg-tint">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-kbg-tint-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-tint-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-kbg-tint-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-tint-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-kbg-tint-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-tint-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色透明度
-        <input type="number" autocomplete="off" data-kbg-tint-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-tint-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-    </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">背景渐变</span>
-      <button type="button" data-eyedrop="kbg-grad-start">吸色（起始）</button>
-      <label>
-        起始 R
-        <input type="number" autocomplete="off" data-kbg-grad-start-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-start-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        起始 G
-        <input type="number" autocomplete="off" data-kbg-grad-start-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-start-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        起始 B
-        <input type="number" autocomplete="off" data-kbg-grad-start-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-start-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        起始透明度
-        <input type="number" autocomplete="off" data-kbg-grad-start-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-start-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-      <button type="button" data-eyedrop="kbg-grad-end">吸色（结束）</button>
-      <label>
-        结束 R
-        <input type="number" autocomplete="off" data-kbg-grad-end-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束 G
-        <input type="number" autocomplete="off" data-kbg-grad-end-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束 B
-        <input type="number" autocomplete="off" data-kbg-grad-end-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        结束透明度
-        <input type="number" autocomplete="off" data-kbg-grad-end-a min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-end-a-slider min="0" max="100" step="1" value="0" />
-      </label>
-      <label>
-        渐变位置
-        <input type="number" autocomplete="off" data-kbg-grad-pos min="0" max="300" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-grad-pos-slider min="0" max="300" step="1" value="0" />
-      </label>
-    </div>
-
-  </div>
 
 
-  <!-- temporary: the review cards' own sizing and the heart's placement.
-       Remove along with the other panels once values are picked. -->
+  <!-- temporary: preset sizes for Other's expanded detail panel title.
+       Remove along with the toggle button once a size is picked. -->
   <div class="hue-test fx-test sleep-anim-test" id="sleep-anim-test-panel">
     <div class="fx-test__group">
-      <span class="fx-test__label">评测卡片</span>
-      <span class="fx-test__label">字重与倾斜</span>
-      <button type="button" data-lib-style="title-bold">标题 粗体：关</button>
-      <button type="button" data-lib-style="title-italic">标题 斜体：关</button>
-      <button type="button" data-lib-style="tag-bold">标签 粗体：关</button>
-      <button type="button" data-lib-style="tag-italic">标签 斜体：开</button>
-      <button type="button" data-lib-style="year-bold">年份+爱心 粗体：关</button>
-      <button type="button" data-lib-style="year-italic">年份+爱心 斜体：开</button>
-      <label>
-        封面大小
-        <input type="number" autocomplete="off" data-library-cover-size min="40" max="240" step="1" value="130" />
-        <input type="range" autocomplete="off" data-library-cover-size-slider min="40" max="240" step="1" value="130" />
-      </label>
-      <span class="fx-test__label">动漫封面大小</span>
-      <button type="button" data-media-cover-scale="100">100%</button>
-      <button type="button" data-media-cover-scale="75">75%</button>
-      <button type="button" data-media-cover-scale="50">50%</button>
-      <label>
-        爱心大小
-        <input type="number" autocomplete="off" data-library-heart-size min="8" max="80" step="1" value="16" />
-        <input type="range" autocomplete="off" data-library-heart-size-slider min="8" max="80" step="1" value="16" />
-      </label>
-      <label>
-        爱心横向
-        <input type="number" autocomplete="off" data-library-heart-x min="-100" max="1000" step="1" value="12" />
-        <input type="range" autocomplete="off" data-library-heart-x-slider min="-100" max="1000" step="1" value="12" />
-      </label>
-      <label>
-        爱心纵向
-        <input type="number" autocomplete="off" data-library-heart-y min="-120" max="120" step="1" value="0" />
-        <input type="range" autocomplete="off" data-library-heart-y-slider min="-120" max="120" step="1" value="0" />
-      </label>
+      <span class="fx-test__label">展开面板标题字号</span>
+      <button type="button" data-grid-title-size="1.25rem">1.25rem</button>
+      <button type="button" data-grid-title-size="1.5rem">1.5rem</button>
+      <button type="button" data-grid-title-size="1.75rem">1.75rem</button>
+      <button type="button" data-grid-title-size="2rem">2rem</button>
+      <button type="button" data-grid-title-size="2.25rem">2.25rem</button>
     </div>
-
-    <div class="fx-test__group">
-      <span class="fx-test__label">左右画面（同步）</span>
-      <label>
-        图片透明度
-        <input type="number" autocomplete="off" data-kbg-a-sides min="0" max="100" step="1" value="40" />
-        <input type="range" autocomplete="off" data-kbg-a-sides-slider min="0" max="100" step="1" value="40" />
-      </label>
-      <button type="button" data-eyedrop="sidetint">吸色</button>
-      <label>
-        底色 R
-        <input type="number" autocomplete="off" data-sidetint-r min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sidetint-r-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 G
-        <input type="number" autocomplete="off" data-sidetint-g min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sidetint-g-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色 B
-        <input type="number" autocomplete="off" data-sidetint-b min="0" max="255" step="1" value="0" />
-        <input type="range" autocomplete="off" data-sidetint-b-slider min="0" max="255" step="1" value="0" />
-      </label>
-      <label>
-        底色透明度
-        <input type="number" autocomplete="off" data-sidetint-a min="0" max="100" step="1" value="10" />
-        <input type="range" autocomplete="off" data-sidetint-a-slider min="0" max="100" step="1" value="10" />
-      </label>
-      <label>
-        黑白
-        <input type="number" autocomplete="off" data-kbg-side-grayscale min="0" max="100" step="1" value="10" />
-        <input type="range" autocomplete="off" data-kbg-side-grayscale-slider min="0" max="100" step="1" value="10" />
-      </label>
-      <label>
-        亮度
-        <input type="number" autocomplete="off" data-kbg-side-brightness min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-kbg-side-brightness-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        对比度
-        <input type="number" autocomplete="off" data-kbg-side-contrast min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-kbg-side-contrast-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        饱和度
-        <input type="number" autocomplete="off" data-kbg-side-saturate min="0" max="300" step="1" value="100" />
-        <input type="range" autocomplete="off" data-kbg-side-saturate-slider min="0" max="300" step="1" value="100" />
-      </label>
-      <label>
-        色相
-        <input type="number" autocomplete="off" data-kbg-side-hue min="0" max="360" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-side-hue-slider min="0" max="360" step="1" value="0" />
-      </label>
-      <label>
-        复古
-        <input type="number" autocomplete="off" data-kbg-side-sepia min="0" max="100" step="1" value="0" />
-        <input type="range" autocomplete="off" data-kbg-side-sepia-slider min="0" max="100" step="1" value="0" />
-      </label>
-    </div>
-
   </div>
 
   <!-- master show/hide for the panel below, same button Writing uses.
@@ -489,7 +124,7 @@ const libraryStats = { latest: formatDate(latest) };
   </div>
 
   <div class="library-list" id="library-list">
-    {items.map((item) => (
+    {gameItems.map((item) => (
       <div class="library-item" data-category={item.category}>
         <a
           class="library-row bracket-hover"
@@ -498,16 +133,12 @@ const libraryStats = { latest: formatDate(latest) };
           aria-expanded="false"
           data-notes-toggle={item.id}
         >
-          {item.kind === "review" || item.kind === "media" ? (
-            <div class="library-cover-wrap">
-              <Image class="library-cover" src={item.cover} alt="" height={200} densities={[1, 2]} />
-              {item.status === "白金" && (
-                <img class="library-platinum" src="/img/baijin.png" alt="白金" title="白金" />
-              )}
-            </div>
-          ) : (
-            <div class="cover-placeholder" data-label="COVER"></div>
-          )}
+          <div class="library-cover-wrap">
+            <Image class="library-cover" src={item.cover} alt="" height={200} densities={[1, 2]} />
+            {item.status === "白金" && (
+              <img class="library-platinum" src="/img/baijin.png" alt="白金" title="白金" />
+            )}
+          </div>
           <div class="library-row__info">
             <div class="library-row__head">
               <span class="library-title">{item.title}</span>
@@ -515,35 +146,78 @@ const libraryStats = { latest: formatDate(latest) };
               {item.liked && <span class="library-heart" title="喜欢">♥</span>}
             </div>
             <div class="library-tags">
-              {item.kind === "review" ? (
-                <>
-                  <span class="project-tag library-tag--hours">{item.hours}h</span>
-                  {item.platform && <span class="project-tag">{item.platform}</span>}
-                </>
-              ) : item.kind === "media" ? (
-                <>
-                  <span class="project-tag library-tag--unit">{item.issue}{issueUnit(item.medium)}</span>
-                  {item.medium && <span class="project-tag">{item.medium}</span>}
-                </>
-              ) : (
-                <>
-                  {item.tags.map((tag) => <span class="project-tag">{tag}</span>)}
-                  <span class="project-tag">{item.rating}</span>
-                </>
-              )}
+              <span class="project-tag library-tag--hours">{item.hours}h</span>
+              {item.platform && <span class="project-tag">{item.platform}</span>}
             </div>
           </div>
-          {(item.kind === "review" || item.kind === "media") && (
-            <span class="library-played">{formatDate(item.date)}</span>
-          )}
+          <span class="library-played">{formatDate(item.date)}</span>
         </a>
         <div class="library-expand" id={item.id} hidden>
           <div class="article-body">
-            {item.kind === "review" || item.kind === "media" ? <item.Content /> : <p>{placeholderReview}</p>}
+            <item.Content />
           </div>
           <button type="button" class="notes-collapse" data-notes-collapse aria-label="收起">&gt;&gt;</button>
         </div>
       </div>
+      ))}
+    </div>
+
+    <!-- Other: a 4-column grid instead of a row list — each card shows
+         only its cover + title, and clicking one opens a full-width
+         detail panel right under whichever row of 4 it belongs to,
+         with a small arrow pointing back up at the card that opened
+         it. One shared "slot" per row of GRID_COLUMNS cards carries
+         whichever card's detail was most recently opened, cloned in
+         from that card's own template; see initLibraryGrid(). -->
+    <div class="library-grid" id="library-grid" hidden>
+      {otherItems.map((item, i) => (
+        <>
+          <button
+            type="button"
+            class="library-grid-card"
+            data-grid-card={item.id}
+            aria-expanded="false"
+          >
+            <Image
+              class="library-grid-cover"
+              src={item.kind === "media" ? item.cover : placeholderCover}
+              alt=""
+              height={200}
+              densities={[1, 2]}
+            />
+            <span class="library-grid-title">{item.kind === "media" ? (item.titleZh || item.title) : item.title}</span>
+          </button>
+          <template data-grid-detail={item.id}>
+            <div class="library-grid-meta">
+              <div class="library-grid-meta__head">
+                <span class="library-grid-meta__title">{item.title}</span>
+                {item.kind === "media" && (
+                  <span class="library-grid-meta__date">{formatDate(item.date)}</span>
+                )}
+              </div>
+              {item.kind === "media" ? (
+                <span>
+                  {[item.author, `全${item.issue}${issueUnit}`, item.year].filter(Boolean).join(" / ")}
+                </span>
+              ) : (
+                <span>
+                  {[...item.tags, item.rating].filter(Boolean).join(" / ")}
+                </span>
+              )}
+            </div>
+            <hr class="library-grid-divider" />
+            <div class="article-body">
+              {item.kind === "media" ? <item.Content /> : <p>{placeholderReview}</p>}
+            </div>
+          </template>
+          {(i % GRID_COLUMNS === GRID_COLUMNS - 1 || i === otherItems.length - 1) && (
+            <div class="library-grid-slot" hidden>
+              <span class="library-grid-arrow" aria-hidden="true"></span>
+              <div class="library-grid-slot-content"></div>
+              <button type="button" class="notes-collapse" data-grid-collapse aria-label="收起">&gt;&gt;</button>
+            </div>
+          )}
+        </>
       ))}
     </div>
 </InnerLayout>

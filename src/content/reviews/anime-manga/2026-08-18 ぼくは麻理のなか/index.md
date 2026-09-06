@@ -1,9 +1,11 @@
 ---
 title: "ぼくは麻理のなか"
+titleZh: "我在麻理体内"
 year: "2012-2016"
 date: 2026-08-18
 medium: "manga"
 issue: 80
+author: "押見修造"
 liked: false
 cover: "./cover.jpg"
 ---

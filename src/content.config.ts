@@ -70,11 +70,19 @@ const animeManga = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/reviews/anime-manga" }),
   schema: ({ image }) =>
     z.object({
+      // the work's own title, in its original language — shown in the
+      // expanded detail panel
       title: z.string(),
+      // a Chinese title, shown on the collapsed grid card instead;
+      // falls back to title itself when there isn't a separate one
+      titleZh: z.string().optional(),
       year: z.string().optional(),
       date: z.coerce.date(),
       medium: z.string().default(""),
       issue: z.number(),
+      // not in the raw write-ups — empty until filled in, same as
+      // reviews/games' platform started out
+      author: z.string().default(""),
       liked: z.boolean().default(false),
       cover: image(),
     }),

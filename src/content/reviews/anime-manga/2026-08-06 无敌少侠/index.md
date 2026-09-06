@@ -1,9 +1,11 @@
 ---
 title: "Invincible"
+titleZh: "无敌少侠"
 year: "2003-2018"
 date: 2026-08-06
 medium: "comic"
 issue: 144
+author: "Robert Kirkman"
 liked: false
 cover: "./cover.jpg"
 ---
