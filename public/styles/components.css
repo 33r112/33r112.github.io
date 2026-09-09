@@ -141,28 +141,11 @@
 /* ---- decorative background ASCII art (Notes page only) ---- */
 
 /* frames the whole sidebar+content area in a translucent gray panel so
-   it reads clearly over the background image behind it.
-   temporary: color/opacity/radius/border/shadow sliders (see
-   .panel-test) drive these — defaults are the original flat
-   rgba(55,55,55,0.3) with no radius, border or shadow. Bake in literal
-   values and remove the var()/fallback split once picked. */
+   it reads clearly over the background image behind it. */
 .notes-shell {
   position: relative;
-  background: rgb(var(--panel-r, 100) var(--panel-g, 100) var(--panel-b, 100) / var(--panel-a, 0.15));
-  border-radius: var(--panel-radius, 0px);
-  /* the pre-band look, kept as a button-triggered comparison rather than
-     the resting state — the band is the picked, live treatment now, so
-     this only shows up while [data-panel-shadow-style="classic"] is set,
-     and that never survives a reload. */
-}
-
-[data-panel-shadow-style="classic"] .notes-shell {
-  /* frozen — a fixed reference to compare the (tunable) band against, so
-     it has to stay exactly what it always was regardless of anything the
-     band's own sliders are currently set to. This is only ever a
-     comparison view, not the shipped look (band is), so it's left as
-     the single original shadow rather than reworked further. */
-  box-shadow: 0 -100px 60px 0 rgb(0 0 0 / 1);
+  background: rgb(100 100 100 / 0.15);
+  border-radius: 0px;
 }
 
 /* separate element-less layer for the panel's own frame: an inset
@@ -358,27 +341,14 @@
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 var(--panel-border-w, 0px)
-    rgb(var(--panel-border-r, 0) var(--panel-border-g, 0) var(--panel-border-b, 0) /
-        var(--panel-border-a, 0));
+  box-shadow: inset 0 0 0 0px rgb(0 0 0 / 0);
 }
 
-/* temporary: Notes-page background-effect experiments — five real,
-   independently-toggleable overlay layers (rendered by InnerLayout.astro
-   only for current="notes") instead of one shared pseudo-element, so any
-   combination of them can be switched on together, not just one at a
-   time. Each is hidden unless its own data-fx-* attribute on <html> says
-   "on" — see .fx-test. Remove this whole block (and the matching
-   markup/JS) once picked, or none. */
-/* these come after .sidebar-col in DOM order and are positioned, so
-   without an explicit stacking order they'd paint on top of the nav,
-   the quadrant divider lines and the article list — everything they're
-   meant to sit behind. Each gets its own z-index below the content's
-   (10, set right after) so the layers stack in a deliberate order
-   rather than by DOM position: noise sits above the flat color washes
-   so its grain still reads even when gradient/vignette are at full
-   opacity, and frost stays at the bottom since it blurs what's behind
-   the panel entirely. */
+/* Notes/Library/Projects' shared background-effect layers, rendered by
+   InnerLayout.astro. Each gets its own z-index below the content's (10,
+   set right after) so the layers stack in a deliberate order: frost
+   stays at the bottom since it blurs what's behind the panel entirely,
+   vignette and gradient wash over it. */
 .fx-layer {
   display: none;
   position: absolute;
@@ -400,14 +370,6 @@
 
 .fx-layer--gradient {
   z-index: 3;
-}
-
-.fx-layer--scanlines {
-  z-index: 4;
-}
-
-.fx-layer--noise {
-  z-index: 5;
 }
 
 /* .sidebar-col is already sticky and the dividers already absolute, so
@@ -437,25 +399,20 @@
    drain the color out of whatever shows through. Bake in literal values
    and remove the var()/fallback split once picked. */
 /* Two separate frosts. Writing and Projects keep the settled values as
-   literals with only an on/off switch, while Reviews runs its own set of
-   sliders and its own switch — what the frost drains the colour out of
-   there is that page's own background art, which is a different problem
-   from the plain sky the other two sit on. Scoped by the page name on
-   <main> so neither can reach the other. */
-[data-fx-frost="on"] main:not([data-page="library"]) .fx-layer--frost {
+   literals, while Reviews runs its own set — what the frost drains the
+   colour out of there is that page's own background art, which is a
+   different problem from the plain sky the other two sit on. Scoped by
+   the page name on <main> so neither can reach the other. */
+main:not([data-page="library"]) .fx-layer--frost {
   display: block;
   backdrop-filter: blur(0px) brightness(100%) contrast(100%) saturate(5%);
   -webkit-backdrop-filter: blur(0px) brightness(100%) contrast(100%) saturate(5%);
 }
 
-[data-fx-frostlib="on"] main[data-page="library"] .fx-layer--frost {
+main[data-page="library"] .fx-layer--frost {
   display: block;
-  backdrop-filter: blur(var(--frost-lib-blur, 2px))
-    brightness(var(--frost-lib-brightness, 120%)) contrast(var(--frost-lib-contrast, 100%))
-    saturate(var(--frost-lib-saturate, 110%));
-  -webkit-backdrop-filter: blur(var(--frost-lib-blur, 2px))
-    brightness(var(--frost-lib-brightness, 120%)) contrast(var(--frost-lib-contrast, 100%))
-    saturate(var(--frost-lib-saturate, 110%));
+  backdrop-filter: blur(2px) brightness(120%) contrast(100%) saturate(110%);
+  -webkit-backdrop-filter: blur(2px) brightness(120%) contrast(100%) saturate(110%);
 }
 
 /* background-attachment: fixed sizes/positions the gradient against the
@@ -463,95 +420,29 @@
    (which makes the panel taller) doesn't stretch the ramp out with it —
    the wash stays exactly as it looks on screen right now. Still clipped
    to the panel; only the gradient's own geometry is viewport-based. */
-/* temporary: color/opacity/spread sliders (see .fx-test's 暗角参数 group)
-   drive these — 起始 is how far out the clear center reaches before the
-   darkening begins. Bake in literal values and remove the var()/fallback
-   split once picked. */
-[data-fx-vignette="on"] .fx-layer--vignette {
+.fx-layer--vignette {
   display: block;
   background: radial-gradient(
     ellipse at center,
-    transparent var(--vignette-start, 35%),
-    rgb(var(--vignette-r, 0) var(--vignette-g, 0) var(--vignette-b, 0) / var(--vignette-a, 0.55))
-      100%
+    transparent 35%,
+    rgb(0 0 0 / 0.55) 100%
   );
   background-attachment: fixed;
 }
 
-/* opacity/tile-size/blend sliders (see .fx-test's 噪点参数 group) drive
-   these; the background-image itself is regenerated in JS by
-   initNoiseTest(), since grain density lives inside the SVG's
-   feTurbulence baseFrequency and can't be reached from CSS */
-[data-fx-noise="on"] .fx-layer--noise {
+/* a very faint top-down black-to-gray wash */
+.fx-layer--gradient {
   display: block;
-  opacity: var(--noise-opacity, 0.1);
-  background-size: var(--noise-size, 250px) var(--noise-size, 250px);
-  mix-blend-mode: var(--noise-blend, normal);
-}
-
-[data-fx-scanlines="on"] .fx-layer--scanlines {
-  display: block;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.18) 0px,
-    rgba(0, 0, 0, 0.18) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-}
-
-/* angle/start-color/end-color/opacity sliders (see .fx-test's Gradient
-   group) drive these — defaults are a very faint top-down black-to-gray
-   wash, matching the values picked while tuning */
-[data-fx-gradient="on"] .fx-layer--gradient {
-  display: block;
-  /* fixed top-to-bottom; --gradient-pos slides the point where the ramp
-     finishes instead, which moves the visible transition up or down */
+  /* fixed top-to-bottom; the gradient's stop position slides where the
+     ramp finishes instead, which moves the visible transition up or down */
   background: linear-gradient(
     180deg,
-    rgb(var(--gradient-start-r, 0) var(--gradient-start-g, 0) var(--gradient-start-b, 0) /
-        var(--gradient-start-a, 0)),
-    rgb(var(--gradient-end-r, 255) var(--gradient-end-g, 255) var(--gradient-end-b, 255) /
-        var(--gradient-end-a, 0.05))
-      var(--gradient-pos, 275%)
+    rgb(0 0 0 / 0),
+    rgb(255 255 255 / 0.05) 275%
   );
   /* see the vignette layer above — keeps the ramp viewport-sized so a
      taller panel doesn't stretch it */
   background-attachment: fixed;
-}
-
-/* text glow only shows up on hover (same trigger as the existing accent
-   color change on .notes-title) — a much larger/doubled shadow than a
-   first pass so it reads clearly even against that already-bright color */
-[data-fx-text-glow="on"] .notes-row:hover .notes-title {
-  text-shadow: 0 0 6px var(--accent), 0 0 16px var(--accent);
-}
-
-[data-fx-torn-edge="on"] .notes-shell {
-  clip-path: polygon(
-    0% 0%,
-    10% 2.5%,
-    20% 0%,
-    30% 2.5%,
-    40% 0%,
-    50% 2.5%,
-    60% 0%,
-    70% 2.5%,
-    80% 0%,
-    90% 2.5%,
-    100% 0%,
-    100% 100%,
-    90% 97.5%,
-    80% 100%,
-    70% 97.5%,
-    60% 100%,
-    50% 97.5%,
-    40% 100%,
-    30% 97.5%,
-    20% 100%,
-    10% 97.5%,
-    0% 100%
-  );
 }
 
 /* wide sky strip pinned to the very top, tiling horizontally only — the
@@ -987,12 +878,6 @@
    has to stay glued to the nav, which is pinned. Keeping it a child of
    .sidebar-col is what does that — the sticky column carries it along,
    so the line never drifts away from the nav underneath it. */
-[data-fx-divider="off"] .quadrant-divider--v,
-[data-fx-divider="off"] .quadrant-divider--h,
-[data-fx-divider="off"] .quadrant-divider--h-left {
-  display: none;
-}
-
 .quadrant-divider--v {
   width: 2px;
 }
@@ -1518,10 +1403,10 @@
      useful baseline of its own, so centre it and let the nudge slider
      place it */
   align-self: center;
-  width: var(--library-heart-size, 16px);
+  width: 25px;
   height: 0;
   overflow: visible;
-  margin-inline-start: var(--library-heart-x, 12px);
+  margin-inline-start: 5px;
   /* the 0.06em nudge centres the glyph's own ink rather than its em box —
      ♥ sits high in the box, so centring the box alone reads as slightly
      raised. Scales with the heart, and the slider still overrides it. */
@@ -1529,10 +1414,9 @@
      than font-style: italic — no font ships an italic cut of ♥, so that
      declaration comes out ignored or unevenly synthesised. -11deg is
      about Verdana Italic's own slope. */
-  transform: translateY(calc(var(--library-heart-y, 0px) + 0.06em))
-    skewX(var(--library-heart-skew, 0deg));
+  transform: translateY(calc(0px + 0.06em)) skewX(var(--library-heart-skew, 0deg));
   color: var(--accent);
-  font-size: var(--library-heart-size, 16px);
+  font-size: 25px;
   line-height: 1;
 }
 
@@ -1659,7 +1543,7 @@
 
 .library-grid-meta__title {
   font-family: var(--font-body);
-  font-size: var(--grid-title-size, 1.75rem);
+  font-size: 1.75rem;
   font-weight: 500;
   color: var(--text);
 }

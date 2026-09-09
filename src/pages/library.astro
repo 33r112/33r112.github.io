@@ -95,29 +95,6 @@ const GRID_COLUMNS = 4;
   description="Games, movies, TV, anime and manga — everything logged in THREAD 33's library."
   sidebarStats={libraryStats}
 >
-
-
-
-
-  <!-- temporary: preset sizes for Other's expanded detail panel title.
-       Remove along with the toggle button once a size is picked. -->
-  <div class="hue-test fx-test sleep-anim-test" id="sleep-anim-test-panel">
-    <div class="fx-test__group">
-      <span class="fx-test__label">展开面板标题字号</span>
-      <button type="button" data-grid-title-size="1.25rem">1.25rem</button>
-      <button type="button" data-grid-title-size="1.5rem">1.5rem</button>
-      <button type="button" data-grid-title-size="1.75rem">1.75rem</button>
-      <button type="button" data-grid-title-size="2rem">2rem</button>
-      <button type="button" data-grid-title-size="2.25rem">2.25rem</button>
-    </div>
-  </div>
-
-  <!-- master show/hide for the panel below, same button Writing uses.
-       Starts collapsed. Remove along with the panel itself. -->
-  <button type="button" class="fx-test-toggle" id="fx-test-toggle" data-fx-test-toggle>
-    展开测试按钮
-  </button>
-
   <div class="page-header">
     <h1 class="page-title"><img src="/img/headers/reviews.png" alt="Reviews" /></h1>
     <StatsGroup items={categoryFilters} filterTarget="#library-list" filterAttr="category" defaultFilter="game" showAll={false} />
