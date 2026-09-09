@@ -7,66 +7,6 @@ import NavVertical from "../components/NavVertical.astro";
   <div class="home-frame">
     <div class="home-frame__bg" aria-hidden="true"></div>
 
-    <!-- temporary: background color presets, remove once a value is picked -->
-    <div class="hue-test">
-      <button type="button" data-color-preset="none">Original</button>
-      <button type="button" data-color-preset="blue">Blue</button>
-      <button type="button" data-color-preset="yellow">Yellow</button>
-      <button type="button" data-color-preset="red">Red</button>
-      <button type="button" data-color-preset="white">White</button>
-    </div>
-
-    <!-- temporary: background scale presets, remove once a value is picked -->
-    <div class="hue-test scale-test">
-      <button type="button" data-size-preset="auto">Auto</button>
-      <button type="button" data-size-preset="25">25%</button>
-      <button type="button" data-size-preset="50">50%</button>
-      <button type="button" data-size-preset="100">100%</button>
-      <button type="button" data-size-preset="200">200%</button>
-      <button type="button" data-size-preset="300">300%</button>
-      <button type="button" data-size-preset="500">500%</button>
-      <button type="button" data-size-preset="1000">1000%</button>
-    </div>
-
-    <!-- temporary: background image toggle, remove once a choice is made -->
-    <div class="hue-test image-test">
-      <button type="button" data-bg-image="stars">Starfield</button>
-      <button type="button" data-bg-image="bricks">Bricks</button>
-      <button type="button" data-bg-image="vgrid">Vgrid</button>
-    </div>
-
-    <!-- temporary: filter + size sliders, remove once values are picked.
-         Clicking a preset button above updates these to match, and the
-         number boxes are editable — typing a value also updates the
-         matching slider. -->
-    <div class="hue-test filter-sliders">
-      <label>
-        Hue
-        <input type="number" data-filter-number="hue-rotate" min="0" max="360" step="1" value="120" />°
-        <input type="range" data-filter-slider="hue-rotate" data-unit="deg" min="0" max="360" step="1" value="120" />
-      </label>
-      <label>
-        Gray
-        <input type="number" data-filter-number="grayscale" min="0" max="100" step="1" value="0" />%
-        <input type="range" data-filter-slider="grayscale" data-unit="%" min="0" max="100" step="1" value="0" />
-      </label>
-      <label>
-        Sat
-        <input type="number" data-filter-number="saturate" min="0" max="200" step="1" value="100" />%
-        <input type="range" data-filter-slider="saturate" data-unit="%" min="0" max="200" step="1" value="100" />
-      </label>
-      <label>
-        Bright
-        <input type="number" data-filter-number="brightness" min="0" max="200" step="1" value="100" />%
-        <input type="range" data-filter-slider="brightness" data-unit="%" min="0" max="200" step="1" value="100" />
-      </label>
-      <label>
-        Size
-        <input type="number" data-size-number min="0" max="1000" step="1" value="200" />%
-        <input type="range" data-size-slider min="0" max="1000" step="1" value="200" />
-      </label>
-    </div>
-
     <div class="home-wrap">
       <div class="home-window-columns">
         <aside class="home-left" aria-label="Navigation">

@@ -2339,8 +2339,12 @@
 /* a write-up's own screenshots ride along the right edge of the text and
    the paragraphs wrap down their left side, the way these were originally
    written; the clearfix keeps a tall picture from spilling past the end
-   of the entry it belongs to */
-.article-body img {
+   of the entry it belongs to. Scoped to Reviews' two rendered contexts
+   (Games' row expand, Other's grid detail panel) — .article-body is
+   shared with Notes/Projects/Micro, whose inline pictures should keep
+   their own default placement rather than float. */
+.library-expand .article-body img,
+.library-grid-slot-content .article-body img {
   float: right;
   width: 46%;
   height: auto;
@@ -2352,13 +2356,15 @@
    real description) takes it out of the text instead: it sits centred on
    a line of its own, and anything written right after it on the same line
    becomes that picture's caption */
-.article-body p > img[title="居中"] {
+.library-expand .article-body p > img[title="居中"],
+.library-grid-slot-content .article-body p > img[title="居中"] {
   float: none;
   display: block;
   margin: 0 auto;
 }
 
-.article-body p:has(> img[title="居中"]) {
+.library-expand .article-body p:has(> img[title="居中"]),
+.library-grid-slot-content .article-body p:has(> img[title="居中"]) {
   margin-block: var(--space-5);
   text-align: center;
   font-size: var(--text-sm);
@@ -2366,17 +2372,20 @@
 }
 
 /* these two pictures settled on smaller than the normal wrap width */
-.article-body img:is([title="缩放-ct"], [title="缩放-aw"]) {
+.library-expand .article-body img:is([title="缩放-ct"], [title="缩放-aw"]),
+.library-grid-slot-content .article-body img:is([title="缩放-ct"], [title="缩放-aw"]) {
   width: 34.5%;
 }
 
 /* a whole batch of write-ups settled on 75% of the normal wrap width for
    their inline pictures */
-.article-body img[title="缩放75"] {
+.library-expand .article-body img[title="缩放75"],
+.library-grid-slot-content .article-body img[title="缩放75"] {
   width: 34.5%;
 }
 
-.article-body::after {
+.library-expand .article-body::after,
+.library-grid-slot-content .article-body::after {
   content: "";
   display: block;
   clear: both;
