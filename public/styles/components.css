@@ -1657,7 +1657,7 @@ main[data-page="library"] .fx-layer--frost {
 
 .project-row .project-screenshot {
   flex-shrink: 0;
-  width: 160px;
+  width: 80px;
 }
 
 .project-row__info {
@@ -1741,6 +1741,10 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 img.project-screenshot {
+  /* overrides the <img>'s own width/height attributes, which otherwise
+     win out over the aspect-ratio above and stop it from ever kicking
+     in */
+  height: auto;
   object-fit: cover;
   object-position: center top;
 }
