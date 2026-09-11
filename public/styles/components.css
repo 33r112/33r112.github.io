@@ -1657,6 +1657,9 @@ main[data-page="library"] .fx-layer--frost {
 
 .project-row .project-screenshot {
   flex-shrink: 0;
+}
+
+.project-row div.project-screenshot {
   width: 80px;
 }
 
@@ -1729,6 +1732,13 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 .project-screenshot {
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+/* the placeholder box has no picture of its own, so it needs a shape —
+   a real cover keeps whatever shape it already has instead (see below) */
+div.project-screenshot {
   aspect-ratio: var(--screenshot-ratio);
   background-color: var(--bg-raised);
   background-image: repeating-linear-gradient(
@@ -1736,17 +1746,16 @@ main[data-page="library"] .fx-layer--frost {
     var(--border) 0 1px,
     transparent 1px 8px
   );
-  border: 1px solid var(--border);
-  position: relative;
 }
 
+/* a real cover keeps its own proportions rather than being cropped to
+   the placeholder's 16:9 box — width is the only thing that's set, and
+   height follows automatically. Overrides the <img>'s own width/height
+   attributes, which otherwise win out over "auto" and lock the ratio
+   the image happened to be exported at. */
 img.project-screenshot {
-  /* overrides the <img>'s own width/height attributes, which otherwise
-     win out over the aspect-ratio above and stop it from ever kicking
-     in */
+  width: var(--project-cover-w, 80px);
   height: auto;
-  object-fit: cover;
-  object-position: center top;
 }
 
 .project-screenshot::before {
@@ -2390,6 +2399,61 @@ img.project-screenshot {
 
 .article-figure--bw img {
   filter: grayscale(100%);
+}
+
+/* temporary: width preset buttons on Projects, see #project-size-test.
+   Remove this rule (and go back to a plain variant like --half above)
+   once a size is picked. */
+.article-figure--cbz-shot img {
+  width: var(--project-shot-w, 75%);
+}
+
+/* temporary: the size preset panel itself — parked top-right the same
+   way the old tuning panels were. Remove along with #project-size-test
+   once cover/screenshot sizes are picked. */
+.size-test {
+  position: fixed;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.size-test__group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.size-test__label {
+  width: 100%;
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: #000;
+  padding: 2px var(--space-2);
+}
+
+.size-test button {
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.size-test button:hover,
+.size-test button.is-active {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 .article-figure figcaption {
