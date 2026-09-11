@@ -2220,6 +2220,18 @@ main[data-page="library"] .fx-layer--frost {
   margin-block: var(--space-4);
 }
 
+/* an inline link inside a write-up — plain prose text otherwise gives no
+   hint it's clickable, so this restores the classic blue-and-underlined
+   look rather than the site's own chromeless nav-link styling */
+.article-body a {
+  color: #6cb2eb;
+  text-decoration: underline;
+}
+
+.article-body a:hover {
+  color: #93c9f5;
+}
+
 /* a write-up's own screenshots ride along the right edge of the text and
    the paragraphs wrap down their left side, the way these were originally
    written; the clearfix keeps a tall picture from spilling past the end
