@@ -1701,11 +1701,10 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 /* the write-up's rendered Markdown reuses .article-body's typography
-   (headings, lists, etc., in case a future project needs them) but
-   keeps the old .project-desc look — muted color, a readable line
-   length — for its own plain paragraphs */
+   (headings, lists, etc., in case a future project needs them); color
+   is left to inherit from .project-modal so the body text reads the
+   same as the title rather than a dimmer muted tone */
 .project-modal .article-body {
-  color: var(--text-muted);
   max-width: 42em;
 }
 
@@ -1739,6 +1738,11 @@ main[data-page="library"] .fx-layer--frost {
   );
   border: 1px solid var(--border);
   position: relative;
+}
+
+img.project-screenshot {
+  object-fit: cover;
+  object-position: center top;
 }
 
 .project-screenshot::before {

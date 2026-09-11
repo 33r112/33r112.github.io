@@ -18,12 +18,16 @@ const posts = defineCollection({
 
 const projects = defineCollection({
   loader: glob({ pattern: "**/*.mdx", base: "./src/content/projects" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    summary: z.string(),
-    tags: z.array(z.string()),
-  }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      date: z.coerce.date(),
+      summary: z.string(),
+      tags: z.array(z.string()),
+      // shown in the list row in place of the placeholder box — left out
+      // until a project actually has one
+      cover: image().optional(),
+    }),
 });
 
 const thoughts = defineCollection({

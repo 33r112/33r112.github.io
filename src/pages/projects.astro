@@ -1,5 +1,6 @@
 ---
 import InnerLayout from "../layouts/InnerLayout.astro";
+import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import { formatDate } from "../utils/formatDate";
 
@@ -37,7 +38,11 @@ const rendered = await Promise.all(
     {rendered.map(({ entry, Content, id, dateDisplay }) => (
       <div class="project-item">
         <a class="project-row bracket-hover" role="button" tabindex="0" data-project-open={id}>
-          <div class="project-screenshot" data-label="SCREENSHOT"></div>
+          {entry.data.cover ? (
+            <Image class="project-screenshot" src={entry.data.cover} alt="" width={320} densities={[1, 2]} />
+          ) : (
+            <div class="project-screenshot" data-label="SCREENSHOT"></div>
+          )}
           <div class="project-row__info">
             <span class="project-row__title">{entry.data.title}</span>
             <p class="project-row__desc">{entry.data.summary}</p>

@@ -3,7 +3,11 @@ title: "漫画打包器 CBZRebinder"
 date: 2026-08-21
 summary: "最近比较常看漫画，做了一个小工具，把下载来的各种格式资源一键转换成 CBZ。"
 tags: ["Desktop Tool", "Manga/Comic", "CBZ Converter"]
+cover: "./cover.jpg"
 ---
+
+import Figure from "../../../components/Figure.astro";
+import screenshot from "./screenshot.png";
 
 最近比较常看漫画，做了一个小工具，把下载来的各种格式资源一键转换成 CBZ。
 
@@ -14,5 +18,9 @@ CBZRebinder 可以将图片文件夹、ZIP、RAR、7Z、CBR、CB7、EPUB 等常�
 - 批量删除指定页码。
 - 自动检测异常大小的页面，可手动查看并删除隐藏在图片中的广告页。
 - PDF、MOBI 等文件的批量改名。
+
+<Figure src={screenshot} alt="CBZRebinder 主界面截图" />
+
+---
 
 [Download](https://github.com/33r112/CBZRebinder/releases/download/v1.0.0/CBZRebinder-v1.0.0-win64.zip) · [GitHub](https://github.com/33r112/CBZRebinder)
