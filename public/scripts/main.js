@@ -429,8 +429,9 @@
     if (!panel) return;
 
     [
-      { attr: "projectCoverW", cssVar: "--project-cover-w" },
-      { attr: "projectShotW", cssVar: "--project-shot-w" },
+      { attr: "projectCoverW", cssVar: "--project-cover-w", defaultValue: "160px" },
+      { attr: "projectShotW", cssVar: "--project-shot-w", defaultValue: "100%" },
+      { attr: "projectShotBrightness", cssVar: "--project-shot-brightness", defaultValue: "100%" },
     ].forEach(function (group) {
       var buttons = Array.prototype.slice.call(
         panel.querySelectorAll("[data-" + group.cssVar.slice(2) + "]")
@@ -438,7 +439,7 @@
       if (!buttons.length) return;
 
       function paint() {
-        var current = root.style.getPropertyValue(group.cssVar);
+        var current = root.style.getPropertyValue(group.cssVar) || group.defaultValue;
         buttons.forEach(function (button) {
           button.classList.toggle("is-active", current === button.dataset[group.attr]);
         });

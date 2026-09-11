@@ -1754,7 +1754,7 @@ div.project-screenshot {
    attributes, which otherwise win out over "auto" and lock the ratio
    the image happened to be exported at. */
 img.project-screenshot {
-  width: var(--project-cover-w, 80px);
+  width: var(--project-cover-w, 160px);
   height: auto;
 }
 
@@ -2405,7 +2405,8 @@ img.project-screenshot {
    Remove this rule (and go back to a plain variant like --half above)
    once a size is picked. */
 .article-figure--cbz-shot img {
-  width: var(--project-shot-w, 75%);
+  width: var(--project-shot-w, 100%);
+  filter: brightness(var(--project-shot-brightness, 100%));
 }
 
 /* temporary: the size preset panel itself — parked top-right the same
