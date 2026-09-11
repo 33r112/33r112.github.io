@@ -461,7 +461,7 @@ main[data-page="library"] .fx-layer--frost {
      though the DOM node itself is never destroyed */
   will-change: transform;
   height: 660px;
-  background-image: url("../img/backgrounds/blog2.png");
+  background-image: url("../img/backgrounds/blog2.webp");
   /* "round" (not repeat-x) — with an auto-computed tile width, the
      browser has to round to a whole pixel somewhere, and with plain
      repeat that rounding shows up as a 1px seam between tiles; round
@@ -638,7 +638,7 @@ main[data-page="library"] .fx-layer--frost {
    box has over the left one (it begins at the panel's left edge, not the
    screen's), which is what keeps the two aligned. */
 .kbg-half--leftmid {
-  background-image: url("../img/backgrounds/kiseki_bg_empty3.png");
+  background-image: url("../img/backgrounds/kiseki_bg_empty3.webp");
   background-size: calc(var(--kbg-size-left, 66) * 1vw) auto;
   background-position: left
     calc(var(--kbg-x-left, -2px) + var(--kbg-box-shift, 0px)) top
@@ -650,7 +650,7 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 .kbg-half--left {
-  background-image: url("../img/backgrounds/kiseki_bg_empty3.png");
+  background-image: url("../img/backgrounds/kiseki_bg_empty3.webp");
   background-size: calc(var(--kbg-size-left, 66) * 1vw) auto;
   background-position: left var(--kbg-x-left, -2px) top
     calc(
@@ -661,7 +661,7 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 .kbg-half--mid {
-  background-image: url("../img/backgrounds/kiseki_bg_mid3.png");
+  background-image: url("../img/backgrounds/kiseki_bg_mid3.webp");
   background-size: calc(var(--kbg-size-mid, 30) * 1vw) auto;
   background-position: left var(--kbg-x-mid, 420px) top
     calc(
@@ -672,7 +672,7 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 .kbg-half--right {
-  background-image: url("../img/backgrounds/kiseki_bg3.png");
+  background-image: url("../img/backgrounds/kiseki_bg3.webp");
   background-size: calc(var(--kbg-size-right, 60) * 1vw) auto;
   background-position: left var(--kbg-x-right, -600px) top
     calc(
@@ -726,14 +726,14 @@ main[data-page="library"] .fx-layer--frost {
    currently has), so swapping sides always keeps each image as itself */
 #notes-char-hikari {
   aspect-ratio: 459 / 926;
-  background-image: url("../img/backgrounds/hikari.png");
+  background-image: url("../img/backgrounds/hikari.webp");
   left: 2rem;
   transform: translateY(calc(-50% + -39px)) scale(2);
 }
 
 #notes-char-homura {
   aspect-ratio: 460 / 927;
-  background-image: url("../img/backgrounds/homura.png");
+  background-image: url("../img/backgrounds/homura.webp");
   right: -1rem;
   transform: translateY(calc(-50% + -90px)) scale(2.45);
 }
