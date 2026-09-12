@@ -419,42 +419,6 @@
     });
   }
 
-  /* temporary: width preset buttons for CBZRebinder's cover thumbnail
-     and inline screenshot (see #project-size-test in projects.astro).
-     Each group is independent and just writes its own custom property
-     onto <html>. Remove this function (and the panel) once sizes are
-     picked. */
-  function initProjectSizeTest() {
-    var panel = document.getElementById("project-size-test");
-    if (!panel) return;
-
-    [
-      { attr: "projectCoverW", cssVar: "--project-cover-w", defaultValue: "160px" },
-      { attr: "projectShotW", cssVar: "--project-shot-w", defaultValue: "100%" },
-      { attr: "projectShotBrightness", cssVar: "--project-shot-brightness", defaultValue: "100%" },
-    ].forEach(function (group) {
-      var buttons = Array.prototype.slice.call(
-        panel.querySelectorAll("[data-" + group.cssVar.slice(2) + "]")
-      );
-      if (!buttons.length) return;
-
-      function paint() {
-        var current = root.style.getPropertyValue(group.cssVar) || group.defaultValue;
-        buttons.forEach(function (button) {
-          button.classList.toggle("is-active", current === button.dataset[group.attr]);
-        });
-      }
-
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          root.style.setProperty(group.cssVar, button.dataset[group.attr]);
-          paint();
-        });
-      });
-      paint();
-    });
-  }
-
   /* Accordion rows: clicking a [data-notes-toggle] trigger toggles its
      matching #id panel open/closed in place. Originally built for Notes'
      article list, reused as-is for Library's review rows since the
@@ -744,7 +708,6 @@
   document.addEventListener("astro:page-load", function () {
     initClock();
     initLibraryGrid();
-    initProjectSizeTest();
     initNavPortrait();
     initFilterTabs();
     // after the appliers and after the filter, since both change the
