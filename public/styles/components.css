@@ -723,7 +723,13 @@ main[data-page="library"] .fx-layer--frost {
 }
 
 /* identity only — tied to the element itself (not to which side class it
-   currently has), so swapping sides always keeps each image as itself */
+   currently has), so swapping sides always keeps each image as itself.
+   This is also the untouched original vertical positioning (top:50% +
+   this translateY) — initCharBgAnchor() in main.js overrides both top
+   and transform inline on pages with a titled sidebar, but leaves
+   these CSS values as the only ones About ever sees, since About's
+   own sidebar sits high enough that anchoring it the same way would
+   move things there instead. */
 #notes-char-hikari {
   aspect-ratio: 459 / 926;
   background-image: url("../img/backgrounds/hikari.webp");

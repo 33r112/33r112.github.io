@@ -592,6 +592,47 @@
     syncPersistentBackground();
   }
 
+  /* experimental: hikari/homura's vertical position used to be pinned to
+     50% of the viewport's own height, with no awareness of where the
+     sidebar nav actually sits — at some window shapes that put a face
+     right behind the nav column. Anchoring to the sidebar's own
+     measured top instead keeps the same offset regardless of window
+     height, so the two can't drift into it. Only applied on pages with
+     a titled sidebar (Notes/Writing, Projects) — About's sidebar sits
+     higher up with no wordmark pushing it down, so it's left on its
+     original CSS-only positioning untouched, both here and in
+     components.css. Calibrated so a 1400x1000 window (this session's
+     usual test size) renders pixel-identical to the old fixed values
+     on those pages; only other window shapes should look any
+     different. Not wired into git yet — checking live first. */
+  function initCharBgAnchor() {
+    var sidebar = document.querySelector(".sidebar-col");
+    var hikari = document.getElementById("notes-char-hikari");
+    var homura = document.getElementById("notes-char-homura");
+    if (!sidebar || !hikari || !homura) return;
+
+    if (!sidebar.classList.contains("sidebar-col--titled")) {
+      // back to whatever components.css says on its own
+      hikari.style.top = "";
+      homura.style.top = "";
+      hikari.style.transform = "";
+      homura.style.transform = "";
+      return;
+    }
+
+    var navTop = sidebar.getBoundingClientRect().top;
+    var h = 0.7 * window.innerHeight; // matches --char-bg's own `height: 70vh`
+
+    [
+      { el: hikari, offset: 231.5, scale: 2 },
+      { el: homura, offset: 180.5, scale: 2.45 },
+    ].forEach(function (item) {
+      var centerY = navTop + item.offset;
+      item.el.style.top = centerY - h / 2 + "px";
+      item.el.style.transform = "scale(" + item.scale + ")";
+    });
+  }
+
   /* shows the background only on pages built on InnerLayout (marked by
      .notes-shell) and hides it on the home page. Re-run on every
      astro:page-load, since <body>'s content has just been replaced by
@@ -667,6 +708,7 @@
       });
 
     initKisekiSplit();
+    initCharBgAnchor();
   }
 
   function initConsoleGreeting() {
@@ -698,6 +740,7 @@
     dividerResizeTimer = setTimeout(function () {
       initQuadrantDividers();
       initKisekiSplit();
+      initCharBgAnchor();
     }, 100);
   });
 
