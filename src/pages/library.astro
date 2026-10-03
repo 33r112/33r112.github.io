@@ -4,14 +4,9 @@ import StatsGroup from "../components/StatsGroup.astro";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import { formatDate } from "../utils/formatDate";
-import placeholderCover from "../assets/library-placeholder-cover.png";
 
-// Games are real write-ups now, one file each under content/reviews/games.
-// Anime/Manga is starting to fill in the same way, under
-// content/reviews/anime-manga — it and Movies/TV (still the original
-// placeholders) share a single "Other" filter tab, so the card below
-// renders whichever shape it's handed regardless of which of the two
-// an item actually is.
+// Games and Other are both real write-ups now, one file each under
+// content/reviews/games and content/reviews/anime-manga respectively.
 const reviewEntries = await getCollection("reviews");
 const rendered = await Promise.all(
   reviewEntries
@@ -19,7 +14,6 @@ const rendered = await Promise.all(
     .map(async (entry, i) => {
       const { Content } = await render(entry);
       return {
-        kind: "review",
         id: `library-game-${i}`,
         category: "game",
         Content,
@@ -35,7 +29,6 @@ const renderedAnimeManga = await Promise.all(
     .map(async (entry, i) => {
       const { Content } = await render(entry);
       return {
-        kind: "media",
         id: `library-media-${i}`,
         category: "other",
         Content,
@@ -44,30 +37,14 @@ const renderedAnimeManga = await Promise.all(
     })
 );
 
-const placeholderReview =
-  "Full review placeholder — replace with the real write-up when it's ready. This is where a longer breakdown goes: what worked, what didn't, and why it's still worth remembering months later, instead of just the one-line summary above.";
+// the count tag's unit depends on the medium — manga/comics count in 话
+// (chapters), anime in 集 (episodes); once a multi-season show shows up
+// this'll need a season+episode pair instead of a single count.
+const issueUnit = (medium) => (medium === "anime" ? "集" : "话");
 
-// the count tag's unit depends on the medium — a manga's issue count is
-// "chapters", a Western comic's is "issues"; anything else (or once
-// TV/anime need a season+episode pair instead of one of these) isn't
-// covered here yet.
-const issueUnit = "话";
+const items = [...rendered, ...renderedAnimeManga];
 
-const placeholders = [
-  { title: "Severance", year: 2022, category: "other", tags: ["TV", "Sci-Fi"], rating: "9.0", dateAdded: "2026-04-27" },
-  { title: "Parasite", year: 2019, category: "other", tags: ["Movie", "Thriller"], rating: "9.0", dateAdded: "2026-05-14" },
-  { title: "The Bear", year: 2022, category: "other", tags: ["TV", "Drama"], rating: "8.5", dateAdded: "2026-06-02" },
-  { title: "Chainsaw Man", year: 2018, category: "other", tags: ["Manga", "Vol. 12"], rating: "8.5", dateAdded: "2026-07-25" },
-  { title: "Vinland Saga", year: 2019, category: "other", tags: ["Anime"], rating: "9.0", dateAdded: "2026-08-11" },
-  { title: "Berserk", year: 1989, category: "other", tags: ["Manga"], rating: "9.5", dateAdded: "2026-08-24" },
-].map((item, i) => ({ ...item, kind: "placeholder", id: `library-review-${i}` }));
-
-const items = [...rendered, ...renderedAnimeManga, ...placeholders];
-
-const latest = items.reduce((newest, item) => {
-  const d = item.date ?? new Date(`${item.dateAdded}T00:00:00Z`);
-  return d > newest ? d : newest;
-}, new Date(0));
+const latest = items.reduce((newest, item) => (item.date > newest ? item.date : newest), new Date(0));
 
 const categoryCounts = items.reduce((counts, item) => {
   counts[item.category] = (counts[item.category] || 0) + 1;
@@ -157,34 +134,26 @@ const GRID_COLUMNS = 4;
           >
             <Image
               class="library-grid-cover"
-              src={item.kind === "media" ? item.cover : placeholderCover}
+              src={item.cover}
               alt=""
               height={200}
               densities={[1, 2]}
             />
-            <span class="library-grid-title">{item.kind === "media" ? (item.titleZh || item.title) : item.title}</span>
+            <span class="library-grid-title">{item.titleZh || item.title}</span>
           </button>
           <template data-grid-detail={item.id}>
             <div class="library-grid-meta">
               <div class="library-grid-meta__head">
                 <span class="library-grid-meta__title">{item.title}</span>
-                {item.kind === "media" && (
-                  <span class="library-grid-meta__date">{formatDate(item.date)}</span>
-                )}
+                <span class="library-grid-meta__date">{formatDate(item.date)}</span>
               </div>
-              {item.kind === "media" ? (
-                <span>
-                  {[item.author, `全${item.issue}${issueUnit}`, item.year].filter(Boolean).join(" / ")}
-                </span>
-              ) : (
-                <span>
-                  {[...item.tags, item.rating].filter(Boolean).join(" / ")}
-                </span>
-              )}
+              <span>
+                {[item.author, `全${item.issue}${issueUnit(item.medium)}`, item.year].filter(Boolean).join(" / ")}
+              </span>
             </div>
             <hr class="library-grid-divider" />
             <div class="article-body">
-              {item.kind === "media" ? <item.Content /> : <p>{placeholderReview}</p>}
+              <item.Content />
             </div>
           </template>
           {(i % GRID_COLUMNS === GRID_COLUMNS - 1 || i === otherItems.length - 1) && (
