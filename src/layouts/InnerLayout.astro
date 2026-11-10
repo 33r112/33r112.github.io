@@ -4,7 +4,7 @@ import NavVertical from "../components/NavVertical.astro";
 import SidebarStats from "../components/SidebarStats.astro";
 
 export interface Props {
-  current: "library" | "projects" | "notes" | "about";
+  current: "library" | "projects" | "notes" | "about" | "calendar";
   title: string;
   description: string;
   sidebarStats?: {
@@ -18,7 +18,7 @@ const { current, title, description, sidebarStats } = Astro.props;
 // effect layers, same quadrant divider, same everything. About is the
 // odd one out: no wordmark, no filter row and no list, so there's
 // nothing for the divider to line up with and it keeps the plain panel.
-const decorated = current !== "about";
+const decorated = current !== "about" && current !== "calendar";
 ---
 
 <Layout title={title} description={description}>
@@ -33,7 +33,7 @@ const decorated = current !== "about";
        matching stacking-context notes. -->
 
   <main data-page={current} class="container shell notes-shell" class:list={[decorated && "shell--quadrant"]} id="main-content">
-    <aside class="sidebar-col" class:list={[current !== "about" && "sidebar-col--titled"]} aria-label="Navigation">
+    <aside class="sidebar-col" class:list={[decorated && "sidebar-col--titled"]} aria-label="Navigation">
       {current === "library" ? (
         <>
           <div class="nav-portrait" aria-hidden="true"></div>

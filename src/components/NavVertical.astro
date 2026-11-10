@@ -1,6 +1,6 @@
 ---
 export interface Props {
-  current: "home" | "library" | "projects" | "notes" | "about";
+  current: "home" | "library" | "projects" | "notes" | "about" | "calendar";
 }
 
 const { current } = Astro.props;
@@ -10,7 +10,7 @@ const links: { key: Props["current"]; href: string; label: string }[] = [
   { key: "library", href: "/library", label: "Reviews" },
   { key: "projects", href: "/projects", label: "Projects" },
   { key: "notes", href: "/notes", label: "Writing" },
-  { key: "about", href: "/about", label: "About" },
+  { key: "calendar", href: "/calendar", label: "Calendar" },
 ];
 ---
 

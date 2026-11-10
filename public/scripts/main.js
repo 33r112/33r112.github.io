@@ -692,6 +692,7 @@
     // has to be re-decided on each navigation rather than baked into the
     // markup
     var isLibrary = !!document.querySelector('[data-page="library"]');
+    var isCalendar = !!document.querySelector('[data-page="calendar"]');
 
     var banner = document.querySelector(".notes-top-banner");
     if (banner) {
@@ -704,7 +705,7 @@
     document
       .querySelectorAll("#notes-char-hikari, #notes-char-homura")
       .forEach(function (el) {
-        el.hidden = !visible || isLibrary;
+        el.hidden = !visible || isLibrary || isCalendar;
       });
 
     initKisekiSplit();

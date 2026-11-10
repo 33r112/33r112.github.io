@@ -1,0 +1,314 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+const [thoughts, posts, games, media] = await Promise.all([
+  getCollection('thoughts'), getCollection('posts'), getCollection('reviews'), getCollection('animeManga'),
+]);
+const mediaLabel = (medium: string) => {
+  if (['manga', 'comic', 'webtoon'].includes(medium.toLowerCase())) return '漫画评价';
+  if (['anime', 'animation'].includes(medium.toLowerCase())) return '动画评价';
+  return '影视评价';
+};
+const detailEntries = await Promise.all([
+  ...thoughts.map(entry => ({ entry, name: '随手记', title: '', kind: 'thought' })),
+  ...posts.map(entry => ({ entry, name: '文章', title: entry.data.title, kind: 'post' })),
+  ...games.map(entry => ({ entry, name: '游戏评价', title: entry.data.title, kind: 'review' })),
+  ...media.map(entry => ({ entry, name: mediaLabel(entry.data.medium), title: entry.data.titleZh || entry.data.title, kind: 'review' })),
+].filter(({ entry }) => entry.data.date.toISOString().slice(0, 10) >= '2026-08-23')
+  .map(async ({ entry, ...labels }) => ({ ...labels, date: entry.data.date.toISOString().slice(0, 10), ...(await render(entry)) })));
+---
+
+<Layout title="Calendar — THREAD 33" description="THREAD 33 的个人活动日历。">
+  <main class="calendar-frame notes-shell" data-page="calendar" id="main-content">
+  <section class="calendar" aria-label="个人活动日历">
+    <header class="calendar-heading">
+      <nav class="calendar-nav" aria-label="网站导航">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/library">Reviews</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/notes">Writing</a></li>
+          <li><a href="/calendar" aria-current="page">Calendar</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div class="calendar-panel">
+      <div class="calendar-toolbar">
+        <h2 data-calendar-month lang="en" aria-live="polite"></h2>
+        <div class="calendar-controls">
+          <button type="button" data-calendar-prev aria-label="上一月">‹</button>
+          <button type="button" data-calendar-today>Today</button>
+          <button type="button" data-calendar-next aria-label="下一月">›</button>
+        </div>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true">
+        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => <span>{day}</span>)}
+      </div>
+      <div class="calendar-grid" data-calendar-grid role="group" aria-label="本月日期"></div>
+    </div>
+    <aside class="calendar-detail" id="calendar-detail" role="dialog" aria-labelledby="calendar-detail-date" tabindex="-1" hidden>
+      <header class="calendar-detail-heading">
+        <h3 id="calendar-detail-date"></h3>
+      </header>
+      <div class="calendar-detail-body" data-detail-body></div>
+    </aside>
+    {detailEntries.map(({ date, name, title, kind, Content }) => (
+      <template data-day-content={date}>
+        <article class={`calendar-detail-entry is-${kind}`}>
+          <span class="calendar-detail-category">{name}</span>
+          {kind === 'thought' ? <div class="calendar-detail-prose"><Content /></div> : (
+            <details><summary>{title}</summary><div class="calendar-detail-prose"><Content /></div></details>
+          )}
+        </article>
+      </template>
+    ))}
+    <noscript><p>请启用 JavaScript 以查看月历和切换月份。</p></noscript>
+  </section>
+  </main>
+</Layout>
+
+<script>
+  import { monthDays, tokyoToday, holidaysOn, tasksOn } from '../data/calendar.js';
+
+  function initCalendar() {
+    const root = document.querySelector<HTMLElement>('.calendar');
+    if (!root || root.dataset.initialized) return;
+    root.dataset.initialized = 'true';
+    const grid = root.querySelector<HTMLElement>('[data-calendar-grid]')!;
+    const heading = root.querySelector<HTMLElement>('[data-calendar-month]')!;
+    let today = tokyoToday();
+    let [year, month] = today.split('-').map(Number);
+    month -= 1;
+
+    const popup = root.querySelector<HTMLElement>('.calendar-detail')!;
+    const detailBody = popup.querySelector<HTMLElement>('[data-detail-body]')!;
+    const detailDate = popup.querySelector<HTMLElement>('h3')!;
+    let activeCell: HTMLElement | null = null;
+    let pinned = false;
+    let closeTimer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    function cancelClose() { clearTimeout(closeTimer); }
+    function closeDetail(restoreFocus = false) {
+      cancelClose();
+      const previous = activeCell;
+      activeCell?.classList.remove('is-previewing', 'is-pinned');
+      activeCell?.setAttribute('aria-expanded', 'false');
+      activeCell = null;
+      pinned = false;
+      popup.classList.remove('is-pinned');
+      popup.inert = true;
+      popup.hidden = true;
+      if (restoreFocus) previous?.focus();
+    }
+    function positionDetail() {
+      if (!activeCell || popup.hidden) return;
+      const cell = activeCell.getBoundingClientRect();
+      const box = popup.getBoundingClientRect();
+      const left = cell.right + 10 + box.width <= innerWidth - 16
+        ? cell.right + 10 : cell.left - box.width - 10;
+      popup.style.left = `${Math.max(16, Math.min(left, innerWidth - box.width - 16))}px`;
+      popup.style.top = `${Math.max(16, Math.min(cell.top, innerHeight - box.height - 16))}px`;
+    }
+    function showDetail(cell: HTMLElement, lock = false) {
+      cancelClose();
+      if (pinned && !lock) return;
+      if (activeCell !== cell) {
+        closeDetail();
+        activeCell = cell;
+        const key = cell.dataset.date!;
+        detailDate.textContent = new Intl.DateTimeFormat('en-US', {
+          month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+        }).format(new Date(`${key}T00:00:00Z`));
+        detailBody.replaceChildren();
+        const agenda = [...holidaysOn(key).filter(item => item.start === key).map(item => ({ name: item.name, kind: 'holiday' })), ...tasksOn(key)];
+        for (const item of agenda) {
+          const row = document.createElement('div');
+          row.className = `calendar-event calendar-detail-agenda is-${item.kind}`;
+          row.textContent = item.name;
+          detailBody.append(row);
+        }
+        root.querySelectorAll<HTMLTemplateElement>(`template[data-day-content="${key}"]`).forEach(template => {
+          detailBody.append(template.content.cloneNode(true));
+        });
+        if (!detailBody.children.length) {
+          const empty = document.createElement('p');
+          empty.className = 'calendar-detail-empty';
+          empty.textContent = '这一天还没有记录。';
+          detailBody.append(empty);
+        }
+        detailBody.scrollTop = 0;
+      }
+      pinned = lock;
+      popup.classList.toggle('is-pinned', pinned);
+      popup.inert = !pinned;
+      cell.classList.add('is-previewing');
+      cell.classList.toggle('is-pinned', pinned);
+      cell.setAttribute('aria-expanded', 'true');
+      popup.hidden = false;
+      positionDetail();
+    }
+    function scheduleClose() {
+      if (!pinned) closeTimer = setTimeout(() => closeDetail(), 160);
+    }
+    popup.addEventListener('pointerenter', cancelClose);
+    popup.addEventListener('pointerleave', scheduleClose);
+    document.addEventListener('pointerdown', event => {
+      const target = event.target as Node;
+      if (!popup.contains(target) && !grid.contains(target)) closeDetail();
+    }, { signal });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !popup.hidden) { event.preventDefault(); closeDetail(true); }
+    }, { signal });
+    window.addEventListener('resize', positionDetail, { signal });
+    const detailResize = new ResizeObserver(positionDetail);
+    detailResize.observe(popup);
+    document.addEventListener('astro:before-swap', () => { cancelClose(); detailResize.disconnect(); controller.abort(); }, { once: true, signal });
+
+    function render() {
+      closeDetail();
+      today = tokyoToday();
+      const monthLabel = document.createElement('span');
+      monthLabel.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(year, month, 1)));
+      const yearLabel = document.createElement('span');
+      yearLabel.className = 'calendar-year';
+      yearLabel.textContent = String(year);
+      heading.replaceChildren(monthLabel, document.createTextNode(' '), yearLabel);
+      grid.setAttribute('aria-label', `${year}年${month + 1}月日期，周一开始`);
+      const cells = monthDays(year, month).map(({ key, day, outside }) => {
+        const cell = document.createElement('div');
+        cell.className = `calendar-day${outside ? ' is-outside' : ''}${key === today ? ' is-today' : ''}`;
+        cell.setAttribute('role', 'button');
+        cell.tabIndex = 0;
+        cell.setAttribute('aria-haspopup', 'dialog');
+        cell.setAttribute('aria-controls', 'calendar-detail');
+        cell.setAttribute('aria-expanded', 'false');
+        cell.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') showDetail(cell); });
+        cell.addEventListener('pointerleave', scheduleClose);
+        cell.addEventListener('click', () => showDetail(cell, true));
+        cell.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); showDetail(cell, true);
+            popup.focus({ preventScroll: true });
+          }
+        });
+        cell.dataset.date = key;
+        cell.setAttribute('aria-label', key + (key === today ? '，今天' : ''));
+        const number = document.createElement('time');
+        number.dateTime = key;
+        number.className = 'calendar-day-number';
+        number.textContent = String(day);
+        if (key === today) number.setAttribute('aria-current', 'date');
+        cell.append(number);
+        const events = document.createElement('div');
+        events.className = 'calendar-events';
+        const entries: { name: string; kind: string; title?: string }[] = [
+          ...holidaysOn(key).filter(holiday => holiday.start === key).map(holiday => ({ name: holiday.name, kind: 'holiday' })),
+          ...tasksOn(key),
+        ];
+        for (const event of entries) {
+          const entry = document.createElement('div');
+          entry.className = `calendar-event is-${event.kind}`;
+          entry.textContent = event.name;
+          entry.setAttribute('aria-label', event.name);
+          events.append(entry);
+        }
+        cell.append(events);
+        return cell;
+      });
+      grid.replaceChildren(...cells);
+    }
+
+    function changeMonth(delta: number) {
+      const date = new Date(Date.UTC(year, month + delta, 1));
+      year = date.getUTCFullYear();
+      month = date.getUTCMonth();
+      render();
+    }
+    root.querySelector('[data-calendar-prev]')!.addEventListener('click', () => changeMonth(-1));
+    root.querySelector('[data-calendar-next]')!.addEventListener('click', () => changeMonth(1));
+    root.querySelector('[data-calendar-today]')!.addEventListener('click', () => {
+      [year, month] = tokyoToday().split('-').map(Number);
+      month -= 1;
+      render();
+    });
+    render();
+  }
+  initCalendar();
+  document.addEventListener('astro:page-load', initCalendar);
+</script>
+
+<style is:global>
+  .calendar-day { cursor: pointer; transition: background-color 120ms; }
+  .calendar-grid .calendar-day.is-previewing { background-color: #292929; }
+  .calendar-day.is-pinned { box-shadow: inset 0 0 0 1px #777; }
+  .calendar-day:focus-visible { outline: 2px solid #aaa; outline-offset: -3px; }
+  .calendar-detail[hidden] { display: none; }
+  .calendar-detail { pointer-events: none; }
+  .calendar-detail.is-pinned { pointer-events: auto; }
+  .calendar-detail { position: fixed; z-index: 30; width: min(360px, calc(100vw - 32px)); max-height: min(480px, calc(100svh - 32px)); display: flex; flex-direction: column; background: #242424; color: #e0e0e0; border: 1px solid #505050; border-radius: 10px; box-shadow: 0 14px 48px rgb(0 0 0 / 55%); overflow: hidden; }
+  .calendar-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #3a3a3a; }
+  .calendar-detail-heading h3 { margin: 0; font: 600 16px/1.4 var(--font-body); }
+  .calendar-detail-body { min-height: 0; padding: 16px 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #626262 #242424; }
+  .calendar-detail-entry + .calendar-detail-entry { margin-top: 18px; padding-top: 16px; border-top: 1px solid #3a3a3a; }
+  .calendar-detail-category { display: block; margin-bottom: 8px; color: #c5b6d7; font: 12px/1.4 var(--font-body); }
+  .calendar-detail .calendar-detail-agenda { margin-bottom: 12px; padding: 7px 10px; font: 13px/1.5 var(--font-body); white-space: normal; }
+  .calendar-detail-prose { font: 14px/1.85 var(--font-body); overflow-wrap: anywhere; }
+  .calendar-detail-prose p { margin: 0 0 12px; }
+  .calendar-detail-prose > :last-child { margin-bottom: 0; }
+  .calendar-detail-prose img { max-width: 100%; height: auto; }
+  .calendar-detail summary { cursor: pointer; font: 600 14px/1.7 var(--font-body); }
+  .calendar-detail details[open] summary { margin-bottom: 12px; }
+  .calendar-detail-empty { margin: 4px 0; color: #aaa; font: 14px/1.6 var(--font-body); }
+  html:has(.calendar-frame) { overflow: hidden; scrollbar-gutter: auto; }
+  body:has(.calendar-frame) { height: 100svh; min-height: 0; overflow: hidden; }
+  .calendar-frame { height: 100svh; flex: none; display: flex; justify-content: center; align-items: center; padding: 24px 32px; overflow: hidden; background: rgb(8 8 8 / 52%); }
+  .calendar { position: relative; z-index: 1; width: 100%; max-width: 1140px; height: min(900px, 100%); min-height: 0; display: flex; flex-direction: column; }
+  .calendar-heading { display: flex; flex: none; align-items: center; margin-bottom: 18px; }
+  .calendar-nav ul { display: flex; align-items: center; margin: 0; padding: 0; list-style: none; }
+  .calendar-nav li { display: flex; align-items: center; }
+  .calendar-nav li + li::before { content: '/'; margin-inline: 12px; color: #b1a8a2; font: 12px var(--font-mono); }
+  .calendar-nav a { display: inline-block; padding-block: 3px; font: 12px/1.4 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: #b1a8a2; transition: color var(--transition-fast); }
+  .calendar-nav a:hover { color: var(--accent); }
+  .calendar-nav a[aria-current="page"] { color: var(--accent); }
+  .calendar-nav a:focus-visible { color: var(--accent); outline: 1px solid var(--accent); outline-offset: 4px; }
+  .calendar-panel { position: relative; isolation: isolate; flex: 1; min-height: 0; display: flex; flex-direction: column; background: #1c1c1c; border: 1px solid rgb(230 230 230 / 16%); border-radius: 10px; overflow: hidden; box-shadow: 0 16px 48px rgb(0 0 0 / 32%); }
+  .calendar-toolbar { display: flex; flex: none; justify-content: space-between; align-items: center; padding: 18px 22px; background: #242424; }
+  .calendar-toolbar h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; font: 600 24px/1.3 "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.025em; }
+  .calendar-year { font-size: 16px; font-weight: 400; letter-spacing: 0; color: var(--text-muted); }
+  .calendar-controls { display: flex; gap: 6px; }
+  .calendar-controls button { background: transparent; color: var(--text); border: 1px solid rgb(230 230 230 / 12%); border-radius: 5px; height: 32px; min-width: 32px; padding: 0 10px; cursor: pointer; font: 13px var(--font-body); transition: color var(--transition-fast), background var(--transition-fast); }
+  .calendar-controls button:first-child, .calendar-controls button:last-child { font-size: 23px; }
+  .calendar-controls button:hover { background: rgb(40 40 40 / 90%); color: var(--accent); }
+  .calendar-controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .calendar-weekdays { flex: none; border-top: 1px solid rgb(230 230 230 / 5%); border-bottom: 1px solid rgb(230 230 230 / 8%); background: #242424; }
+  .calendar-grid { flex: 1; min-height: 0; grid-template-rows: repeat(6, minmax(0, 1fr)); }
+  .calendar-weekdays span { padding: 10px 0; text-align: center; font: 600 13px/1.4 var(--font-body); letter-spacing: 0.02em; color: #cccccc; }
+  .calendar-weekdays span:nth-last-child(-n+2) { color: #bcbcbc; }
+  .calendar-day { display: flex; flex-direction: column; min-height: 0; padding: 5px 7px; border-right: 1px solid #3a3a3a; border-bottom: 1px solid #3a3a3a; min-width: 0; }
+  .calendar-day:nth-child(7n) { border-right: 0; }
+  .calendar-day:nth-last-child(-n+7) { border-bottom: 0; }
+  .calendar-day:nth-child(7n), .calendar-day:nth-child(7n-1) { background: rgb(0 0 0 / 8%); }
+  .calendar-events { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; min-height: 0; }
+  .calendar-event { flex: none; min-width: 0; padding: 3px 7px; border-radius: 3px; border-left: 2px solid #bd9861; background: #382d20; color: #e7cca4; font: 12px/15px var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .calendar-event.is-zemi { border-left-color: #70a697; background: #20362f; color: #bbdfd0; }
+  .calendar-event.is-presentation { border-left-color: #d47870; background: #442725; color: #f0c2b9; }
+  .calendar-event.is-thought, .calendar-event.is-post, .calendar-event.is-review { border-left-color: #a18cbd; background: #32273e; color: #e0ceed; }
+  .calendar-day.is-outside .calendar-events { opacity: 0.45; }
+  .calendar-day-number { flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin: 0 0 0 auto; font: 17px var(--font-mono); }
+  .calendar-day.is-today .calendar-day-number { border-radius: 50%; background: var(--accent); color: #fff; }
+  .calendar-day.is-outside .calendar-day-number { color: #646464; }
+  @media (max-height: 650px) {
+    .calendar-frame { padding-block: 16px; }
+    .calendar-heading { margin-bottom: 14px; }
+    .calendar-toolbar { padding-block: 10px; }
+    .calendar-weekdays span { padding-block: 7px; }
+    .calendar-day { padding-block: 2px; }
+    .calendar-day-number { height: 26px; width: 26px; font-size: 15px; }
+    .calendar-events { margin-top: 2px; }
+    .calendar-event { padding-block: 0; font-size: 10px; line-height: 12px; }
+  }
+</style>
